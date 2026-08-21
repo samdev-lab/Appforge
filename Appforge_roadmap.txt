@@ -1,0 +1,353 @@
+Goal - Build an application factory inside ServiceNow that allows developers/admins to create, configure, secure, extend, and operate business applications through AppForge.
+
+                         ┌──────────────────────────────┐
+                         │          USERS               │
+                         │                              │
+                         │ Admin │ Developer │ Employee │
+                         │ Client│ Vendor    │ Manager  │
+                         └──────────────┬───────────────┘
+                                        │
+                                        ▼
+                    ┌────────────────────────────────────┐
+                    │          APPFORGE EXPERIENCE        │
+                    │                                    │
+                    │  App Builder │ App Admin │ Portal  │
+                    │  Workspace   │ Developer  │ APIs   │
+                    └────────────────┬───────────────────┘
+                                     │
+                                     ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                    APPFORGE CORE                        │
+        │                                                        │
+        │ ┌────────────┐ ┌────────────┐ ┌─────────────────────┐ │
+        │ │ Application│ │ Module     │ │ Metadata / Schema   │ │
+        │ │ Factory    │ │ Manager    │ │ Engine              │ │
+        │ └────────────┘ └────────────┘ └─────────────────────┘ │
+        │                                                        │
+        │ ┌────────────┐ ┌────────────┐ ┌─────────────────────┐ │
+        │ │ UI Engine  │ │ Workflow   │ │ Business Logic      │ │
+        │ │            │ │ Engine     │ │ Engine              │ │
+        │ └────────────┘ └────────────┘ └─────────────────────┘ │
+        │                                                        │
+        │ ┌────────────┐ ┌────────────┐ ┌─────────────────────┐ │
+        │ │ Security / │ │ API /      │ │ Notification /      │ │
+        │ │ ACL Engine │ │ Integration│ │ Event Engine        │ │
+        │ └────────────┘ └────────────┘ └─────────────────────┘ │
+        └────────────────────────┬───────────────────────────────┘
+                                 │
+                                 ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                 SERVICENOW PLATFORM                     │
+        │                                                        │
+        │ Tables │ Glide │ Flow Designer │ Script Includes       │
+        │ ACL    │ Roles │ Events         │ REST APIs             │
+        │ ATF    │ Jobs  │ Notifications  │ Attachments            │
+        └────────────────────────┬───────────────────────────────┘
+                                 │
+                                 ▼
+                 ┌─────────────────────────────────┐
+                 │       APPFORGE FOUNDATION       │
+                 │                                 │
+                 │ Users / Groups / Companies      │
+                 │ Organizations / Locations       │
+                 │ Applications / Modules          │
+                 │ Configuration / Audit           │
+                 │ Security / Permissions          │
+                 └────────────────┬────────────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │  GITHUB SOURCE   │
+                         │                  │
+                         │ Version Control  │
+                         │ Branches         │
+                         │ Releases         │
+                         │ Backup           │
+                         └──────────────────┘
+
+The roadmap - AppForge into 10 major stages
+Stage 0 — Engineering Foundation
+    0.1 GitHub repository
+    0.2 ServiceNow PDI
+    0.3 Scoped application
+    0.4 Source control connection
+    0.5 Naming conventions
+    0.6 Application scope strategy
+    0.7 Development standards
+    0.8 Security standards
+    0.9 Testing strategy
+    0.10 Documentation framework
+
+Stage 1 — Platform Foundation
+    1.1 Application Registry
+    1.2 Module Registry
+    1.3 Table Registry
+    1.4 Field Registry
+    1.5 Configuration Registry
+    1.6 User Foundation
+    1.7 Group Foundation
+    1.8 Organization
+    1.9 Company
+    1.10 Location
+    1.11 Department
+    1.12 Audit foundation
+
+Stage 2 — Application Factory
+Create Application
+       │
+       ├── Application metadata
+       ├── Tables
+       ├── Fields
+       ├── Modules
+       ├── Navigation
+       ├── Forms
+       ├── Lists
+       └── Permissions
+                │
+                ▼
+          Generated App
+
+Capabilities:
+    Create application
+    Clone application
+    Activate/deactivate application
+    Application versioning
+    Application ownership
+    Application dependencies
+    Application lifecycle
+    Application configuration
+
+Stage 3 — Data & Metadata Engine
+
+Application
+     │
+     └── Module
+          │
+          └── Table
+               │
+               ├── Field
+               ├── Reference
+               ├── Choice
+               ├── Dictionary
+               └── Validation
+
+Stage 4 — UI Factory
+
+UI Factory
+   │
+   ├── Form Builder
+   ├── List Builder
+   ├── Related List
+   ├── Workspace
+   ├── Navigation
+   ├── Dashboard
+   ├── Reports
+   └── Search
+
+Example:
+Create Table
+      ↓
+Create Fields
+      ↓
+Generate Form
+      ↓
+Generate List
+      ↓
+Generate Navigation
+      ↓
+Application Ready
+
+
+Stage 5 — Security & Governance
+                    Security
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+      Users          Roles           ACL
+        │              │              │
+        ▼              ▼              ▼
+     Groups       Permissions     Conditions
+                       │
+                       ▼
+                 Data Security
+
+Capabilities:
+    Roles
+    Groups
+    ACLs
+    Table permissions
+    Field permissions
+    Record permissions
+    Application permissions
+    Delegation
+    Data visibility
+    Domain separation strategy
+    Audit
+    Security logging
+
+
+Stage 6 — Automation Engine
+Record Event
+     │
+     ▼
+Condition
+     │
+     ▼
+Business Rule / Flow
+     │
+     ├── Update record
+     ├── Create record
+     ├── Notification
+     ├── Approval
+     ├── Script
+     ├── API
+     └── Integration
+
+
+Stage 7 — Integration Platform
+                 AppForge
+                    │
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+      REST         SOAP       Events
+        │           │           │
+        └───────────┼───────────┘
+                    ▼
+             Integration Hub
+                    │
+       ┌────────────┼─────────────┐
+       ▼            ▼             ▼
+     ERP          CRM           HR
+
+
+Stage 8 — Developer Platform
+                 Developer
+                     │
+                     ▼
+              AppForge Studio
+                     │
+       ┌─────────────┼──────────────┐
+       ▼             ▼              ▼
+   Data Model      UI Builder     Automation
+       │             │              │
+       └─────────────┼──────────────┘
+                     ▼
+                Application
+
+
+Stage 9 — Enterprise Application Modules
+
+                 AppForge Platform
+                        │
+       ┌────────────────┼─────────────────┐
+       ▼                ▼                 ▼
+      ITSM             CSM               SPM
+       │                │                 │
+   Incident          Case              Demand
+   Problem           Account           Project
+   Change            Contact           Portfolio
+   Request           Contract          Resource
+
+Stage 10 — Enterprise Certification
+Functional
+    Create
+    Read
+    Update
+    Delete
+    Search
+    Filter
+    Sort
+    Import
+    Export
+Security
+    Authentication
+    Authorization
+    ACL
+    Role
+    Group
+    Record security
+    Field security
+    Data isolation
+Performance
+    Large datasets
+    Concurrent users
+    Large forms
+    Large lists
+    API load
+    Automation load
+Reliability
+    Failure recovery
+    Transactions
+    Rollback
+    Logging
+    Audit
+    Error handling
+Developer experience
+    Create application
+    Create table
+    Create field
+    Create form
+    Create workflow
+    Create ACL
+    Create API
+    Deploy application
+
+Can a real developer build a useful business application using AppForge without manually modifying the underlying platform?
+
+Overall roadmap
+
+                    APPFORGE
+                       │
+                       ▼
+              ┌─────────────────┐
+              │ 0 Foundation    │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 1 Core Platform │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 2 App Factory   │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 3 Data/Metadata │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 4 UI Factory    │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 5 Security      │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 6 Automation    │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 7 Integration   │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 8 Developer     │
+              │    Platform     │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │ 9 Business Apps │
+              └────────┬────────┘
+                       ▼
+              ┌─────────────────┐
+              │10 Certification │
+              └─────────────────┘
+
+
+
+
+
+
+
+

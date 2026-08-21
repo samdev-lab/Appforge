@@ -1,0 +1,29 @@
+{
+  "name": "AppForge",
+  "scope": "x_appforge",
+  "vendor_prefix": "x_appforge",
+  "version": "0.1.0",
+  "short_description": "Application Factory and native platform engine for ServiceNow",
+  "category": "Platform / Custom Application",
+  "dependencies": [],
+  "global_modifications": false,
+  "roles": [
+    {
+      "name": "x_appforge.admin",
+      "description": "Full administrative access to AppForge application configuration, metadata engine, and platform settings."
+    },
+    {
+      "name": "x_appforge.developer",
+      "description": "Developer access to create, configure, and manage AppForge application definitions, schemas, and flows."
+    },
+    {
+      "name": "x_appforge.user",
+      "description": "Standard user access to interact with applications hosted on AppForge."
+    }
+  ],
+  "source_control": {
+    "repository_url": "https://github.com/your-org/appforge-servicenow.git",
+    "branch": "main",
+    "protocol": "https"
+  }
+}
