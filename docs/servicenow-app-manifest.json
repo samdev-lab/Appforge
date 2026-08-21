@@ -22,6 +22,7 @@
     }
   ],
   "source_control": {
+    "instance_url": "https://dev280961.service-now.com/",
     "repository_url": "https://github.com/samdev-lab/Appforge.git",
     "branch": "main",
     "protocol": "https"

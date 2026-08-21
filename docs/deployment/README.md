@@ -15,7 +15,7 @@ AppForge deployment utilizes native ServiceNow Application Repository and Git-ba
  └─────────────────┘       └─────────────────┘       └─────────────────┘
 ```
 
-1. **Development**: All scoped development occurs in the developer's ServiceNow PDI connected to Git branch `main` or `feature/*`.
+1. **Development**: All scoped development occurs in the developer's ServiceNow PDI ([`https://dev280961.service-now.com/`](https://dev280961.service-now.com/)) connected to Git branch `main` or `feature/*`.
 2. **Commit & Tag**: Upon verification, code is committed to Git and tagged (`v0.1.0`).
 3. **App Repository Publish**: In Studio, publish application to instance Application Repository (`Publish to Application Repository`).
 4. **Target Instance Installation**: Target instances install updated application via `System Applications > My Company Applications`.

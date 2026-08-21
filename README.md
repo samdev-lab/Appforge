@@ -111,7 +111,7 @@ AppForge/
 
 ## ⚙️ Quick Start — ServiceNow Studio Integration
 
-1. Open your **ServiceNow Personal Developer Instance (PDI)**.
+1. Open your **ServiceNow Personal Developer Instance (PDI)**: [`https://dev280961.service-now.com/`](https://dev280961.service-now.com/)
 2. Navigate to **ServiceNow Studio** (`System Applications > Studio`).
 3. Click **Import From Source Control**.
 4. URL: `https://github.com/samdev-lab/Appforge.git`
