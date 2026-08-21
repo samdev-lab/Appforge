@@ -8,7 +8,7 @@ AppForge uses **GitHub** as its remote version control, code collaboration, and 
 
 ## 2. GitHub Repository Specifications
 
-- **Repository Name**: `appforge-servicenow`
+- **Repository Name**: `samdev-lab/Appforge.git` (`https://github.com/samdev-lab/Appforge.git`)
 - **Default Baseline Branch**: `main`
 - **Access Protocol**: HTTPS / SSH (using Personal Access Token with `repo` scope)
 
