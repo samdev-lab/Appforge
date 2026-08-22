@@ -1,0 +1,28 @@
+{
+  "name": "x_appforge_logic",
+  "label": "AppForge Logic Registry",
+  "description": "Master logic registry tracking all automation artifacts managed by AppForge (Business Rules, Script Includes, Events, Notifications)",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "logic_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "module", "type": "Reference", "reference_table": "x_appforge_module", "indexed": true },
+    { "name": "type", "type": "Choice", "choices": ["BUSINESS_RULE", "SCRIPT_INCLUDE", "EVENT", "NOTIFICATION", "FLOW", "ACTION"], "mandatory": true, "indexed": true },
+    { "name": "table_name", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "description", "type": "String", "max_length": 1000 },
+    { "name": "active", "type": "Boolean", "default_value": true },
+    { "name": "version", "type": "String", "max_length": 20, "default_value": "1.0.0" },
+    { "name": "execution_order", "type": "Integer", "default_value": 100 },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "ACTIVE", "INACTIVE", "DEPRECATED"], "default_value": "ACTIVE" },
+    { "name": "sn_sys_id", "type": "String", "max_length": 32, "description": "Actual ServiceNow platform artifact sys_id" },
+    { "name": "owner", "type": "String", "max_length": 100 },
+    { "name": "created_by", "type": "String", "max_length": 100 },
+    { "name": "updated_by", "type": "String", "max_length": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_logic_id", "fields": ["logic_id"], "unique": true },
+    { "name": "idx_logic_app_type", "fields": ["application", "type"] }
+  ]
+}

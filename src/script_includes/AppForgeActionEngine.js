@@ -1,0 +1,175 @@
+/**
+ * AppForgeActionEngine
+ * Validates and generates declarative action scripts for Business Rules.
+ * Supported actions: SET_FIELD, COPY_FIELD, CLEAR_FIELD, CREATE_RECORD,
+ *   UPDATE_RECORD, ADD_MESSAGE, RAISE_EVENT, SEND_NOTIFICATION.
+ * Blocked actions: DELETE_RECORD, DELETE_MULTIPLE, MASS_UPDATE,
+ *   DIRECT_SQL, ARBITRARY_SCRIPT_EXECUTION.
+ */
+var AppForgeActionEngine = Class.create();
+AppForgeActionEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeActionEngine] ';
+        this.SUPPORTED_ACTIONS = [
+            'SET_FIELD', 'COPY_FIELD', 'CLEAR_FIELD',
+            'CREATE_RECORD', 'UPDATE_RECORD',
+            'ADD_MESSAGE', 'RAISE_EVENT', 'SEND_NOTIFICATION'
+        ];
+        this.BLOCKED_ACTIONS = [
+            'DELETE_RECORD', 'DELETE_MULTIPLE', 'MASS_UPDATE',
+            'DIRECT_SQL', 'ARBITRARY_SCRIPT_EXECUTION'
+        ];
+    },
+
+    /**
+     * Validates an array of action definitions.
+     * @param {Array} actions - Array of action objects.
+     * @return {Object} { valid: boolean, errors: Array }
+     */
+    validate: function(actions) {
+        'use strict';
+        var errors = [];
+        if (!actions || !Array.isArray(actions) || actions.length === 0) {
+            return { valid: false, errors: ['At least one action is required'] };
+        }
+
+        for (var i = 0; i < actions.length; i++) {
+            var action = actions[i];
+            if (!action.type) {
+                errors.push('Action at index ' + i + ' missing required type');
+                continue;
+            }
+            if (this.BLOCKED_ACTIONS.indexOf(action.type) !== -1) {
+                errors.push('Action type BLOCKED: ' + action.type + '. Destructive automation requires privileged Migration Engine.');
+                continue;
+            }
+            if (this.SUPPORTED_ACTIONS.indexOf(action.type) === -1) {
+                errors.push('Unsupported action type: ' + action.type);
+                continue;
+            }
+            var res = this._validateActionFields(action, i);
+            if (!res.valid) errors = errors.concat(res.errors);
+        }
+
+        return { valid: errors.length === 0, errors: errors };
+    },
+
+    /**
+     * Validates individual action field requirements.
+     * @private
+     */
+    _validateActionFields: function(action, idx) {
+        'use strict';
+        var errors = [];
+        var type = action.type;
+
+        if ((type === 'SET_FIELD' || type === 'COPY_FIELD' || type === 'CLEAR_FIELD') && !action.field) {
+            errors.push('Action ' + type + ' at index ' + idx + ' requires field name');
+        }
+        if (type === 'SET_FIELD' && action.value === undefined) {
+            errors.push('SET_FIELD at index ' + idx + ' requires a value');
+        }
+        if (type === 'COPY_FIELD' && !action.source_field) {
+            errors.push('COPY_FIELD at index ' + idx + ' requires source_field');
+        }
+        if ((type === 'CREATE_RECORD' || type === 'UPDATE_RECORD') && !action.table) {
+            errors.push('Action ' + type + ' at index ' + idx + ' requires target table');
+        }
+        if (type === 'RAISE_EVENT' && !action.event_name) {
+            errors.push('RAISE_EVENT at index ' + idx + ' requires event_name');
+        }
+        if (type === 'SEND_NOTIFICATION' && !action.notification_name) {
+            errors.push('SEND_NOTIFICATION at index ' + idx + ' requires notification_name');
+        }
+        if (type === 'ADD_MESSAGE' && !action.message) {
+            errors.push('ADD_MESSAGE at index ' + idx + ' requires message text');
+        }
+        return { valid: errors.length === 0, errors: errors };
+    },
+
+    /**
+     * Generates a safe JavaScript script fragment for an array of declarative actions.
+     * @param {Array} actions - Validated action definitions.
+     * @return {string} Safe ServiceNow Business Rule script body.
+     */
+    toScript: function(actions) {
+        'use strict';
+        var lines = [];
+        for (var i = 0; i < actions.length; i++) {
+            var action = actions[i];
+            switch (action.type) {
+                case 'SET_FIELD':
+                    var val = typeof action.value === 'string'
+                        ? '"' + action.value.replace(/"/g, '\\"') + '"'
+                        : JSON.stringify(action.value);
+                    lines.push('current.' + action.field + ' = ' + val + ';');
+                    break;
+                case 'COPY_FIELD':
+                    lines.push('current.' + action.field + ' = current.' + action.source_field + ';');
+                    break;
+                case 'CLEAR_FIELD':
+                    lines.push('current.' + action.field + ' = "";');
+                    break;
+                case 'ADD_MESSAGE':
+                    var msgType = action.message_type || 'info';
+                    var safeMsg = String(action.message).replace(/"/g, '\\"');
+                    if (msgType === 'error') {
+                        lines.push('gs.addErrorMessage("' + safeMsg + '");');
+                    } else {
+                        lines.push('gs.addInfoMessage("' + safeMsg + '");');
+                    }
+                    break;
+                case 'RAISE_EVENT':
+                    var evtName = String(action.event_name).replace(/"/g, '\\"');
+                    lines.push('gs.eventQueue("' + evtName + '", current, current.sys_id, "");');
+                    break;
+                case 'CREATE_RECORD':
+                    lines.push('(function() {');
+                    lines.push('  var gr = new GlideRecord("' + action.table + '");');
+                    lines.push('  gr.initialize();');
+                    if (action.fields && typeof action.fields === 'object') {
+                        var fields = action.fields;
+                        var keys = Object.keys(fields);
+                        for (var k = 0; k < keys.length; k++) {
+                            var fk = keys[k];
+                            var fv = typeof fields[fk] === 'string'
+                                ? '"' + fields[fk].replace(/"/g, '\\"') + '"'
+                                : JSON.stringify(fields[fk]);
+                            lines.push('  gr.' + fk + ' = ' + fv + ';');
+                        }
+                    }
+                    lines.push('  gr.insert();');
+                    lines.push('})();');
+                    break;
+                case 'UPDATE_RECORD':
+                    lines.push('(function() {');
+                    lines.push('  var gr = new GlideRecord("' + action.table + '");');
+                    lines.push('  if (gr.get(current.' + (action.reference_field || 'sys_id') + ')) {');
+                    if (action.fields && typeof action.fields === 'object') {
+                        var uFields = action.fields;
+                        var uKeys = Object.keys(uFields);
+                        for (var uk = 0; uk < uKeys.length; uk++) {
+                            var ufk = uKeys[uk];
+                            var ufv = typeof uFields[ufk] === 'string'
+                                ? '"' + uFields[ufk].replace(/"/g, '\\"') + '"'
+                                : JSON.stringify(uFields[ufk]);
+                            lines.push('    gr.' + ufk + ' = ' + ufv + ';');
+                        }
+                    }
+                    lines.push('    gr.update();');
+                    lines.push('  }');
+                    lines.push('})();');
+                    break;
+                case 'SEND_NOTIFICATION':
+                    lines.push('gs.eventQueue("send_notification.' + action.notification_name + '", current, current.sys_id, "");');
+                    break;
+                default:
+                    lines.push('/* Unsupported action: ' + action.type + ' */');
+            }
+        }
+        return lines.join('\n');
+    },
+
+    type: 'AppForgeActionEngine'
+};

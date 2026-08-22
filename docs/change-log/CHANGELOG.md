@@ -5,6 +5,21 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-08-23
+
+### Added — Stage 4: Logic & Automation Factory
+- Created Logic Registry schemas: `x_appforge_logic`, `x_appforge_business_rule`, `x_appforge_script_include`, `x_appforge_event`, `x_appforge_notification`, `x_appforge_logic_run`, `x_appforge_logic_operation`.
+- Implemented `AppForgeConditionEngine.js` — 13 supported operators (=, !=, >, <, >=, <=, IS_EMPTY, IS_NOT_EMPTY, CHANGES, CHANGES_TO, CHANGES_FROM, IN, NOT_IN), JS expression + SN filter string generation.
+- Implemented `AppForgeActionEngine.js` — 8 supported actions (SET_FIELD, COPY_FIELD, CLEAR_FIELD, CREATE_RECORD, UPDATE_RECORD, ADD_MESSAGE, RAISE_EVENT, SEND_NOTIFICATION); 4 blocked actions (DELETE_RECORD, DELETE_MULTIPLE, MASS_UPDATE, DIRECT_SQL).
+- Implemented `AppForgeScriptSecurityScanner.js` — static pattern scanner with BLOCK-level (eval, Function(), deleteMultiple, GlideSQLStatement, execCommand) and WARN-level findings, plus structural syntax validation.
+- Implemented `AppForgeLogicValidator.js` — validates Business Rules, Script Includes, Events, Notifications, cross-scope protection, destructive guards, payload injection prevention, recipient type validation.
+- Implemented `AppForgeLogicPlanner.js` — dependency-ordered dry-run plan (Events → Business Rules → Notifications → Script Includes) with inline security scan.
+- Implemented `AppForgeLogicRollback.js` — compensating rollback manager (COMPLETE / PARTIAL / NOT_POSSIBLE).
+- Implemented `AppForgeLogicExecutor.js` — provisions real ServiceNow platform artifacts: `sys_script`, `sys_script_include`, `sysevent_register`, `sysevent_email_action`; writes AppForge Logic Registry and `x_appforge_logic_run` / `x_appforge_logic_operation` audit records.
+- Implemented `AppForgeLogicAPI.js` — REST endpoints `POST /api/x_appforge/logic/plan` and `POST /api/x_appforge/logic/execute` with RBAC enforcement.
+- Created `tests/AppForgeLogicTestSuite.js` — 35 automated test scenarios covering Business Rules, Actions, Script Includes, Events, Notifications, Security, and End-to-End Integration.
+- All 137/137 automated tests passed (35 Prompt 007 + 102 regressions).
+
 ## [0.6.0] - 2026-08-23
 
 ### Added - Stage 3: Experience Factory — Forms, Lists, Views & UI Layout Engine

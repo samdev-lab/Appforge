@@ -1,0 +1,28 @@
+{
+  "name": "x_appforge_script_include",
+  "label": "AppForge Script Include Registry",
+  "description": "Registry tracking controlled Script Includes managed and security-scanned by AppForge",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "script_include_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "logic_registry", "type": "Reference", "reference_table": "x_appforge_logic", "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "api_name", "type": "String", "max_length": 100, "mandatory": true, "unique": true },
+    { "name": "description", "type": "String", "max_length": 1000 },
+    { "name": "client_callable", "type": "Boolean", "default_value": false },
+    { "name": "active", "type": "Boolean", "default_value": true },
+    { "name": "script", "type": "String", "max_length": 32000 },
+    { "name": "version", "type": "String", "max_length": 20, "default_value": "1.0.0" },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "SCAN_PENDING", "SCAN_PASSED", "SCAN_BLOCKED", "ACTIVE", "DEPRECATED"], "default_value": "DRAFT" },
+    { "name": "security_scan_result", "type": "Choice", "choices": ["PASS", "WARN", "BLOCK", "PENDING"], "default_value": "PENDING" },
+    { "name": "security_scan_findings", "type": "String", "max_length": 8000 },
+    { "name": "sn_sys_id", "type": "String", "max_length": 32, "description": "ServiceNow sys_script_include sys_id" },
+    { "name": "accessible_from", "type": "Choice", "choices": ["THIS_APP_ONLY", "ANY_SCOPE", "GLOBAL"], "default_value": "THIS_APP_ONLY" }
+  ],
+  "indexes": [
+    { "name": "idx_si_id", "fields": ["script_include_id"], "unique": true },
+    { "name": "idx_si_api_name", "fields": ["api_name"], "unique": true }
+  ]
+}

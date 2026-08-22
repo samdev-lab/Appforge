@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_logic_operation",
+  "label": "AppForge Logic Operation Audit",
+  "description": "Granular operation audit log recording individual Logic Factory provisioning steps",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run", "type": "Reference", "reference_table": "x_appforge_logic_run", "mandatory": true, "indexed": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["CREATE_BUSINESS_RULE", "UPDATE_BUSINESS_RULE", "CREATE_SCRIPT_INCLUDE", "UPDATE_SCRIPT_INCLUDE", "CREATE_EVENT", "CREATE_NOTIFICATION", "UPDATE_NOTIFICATION", "ROLLBACK"] },
+    { "name": "target_type", "type": "String", "max_length": 50 },
+    { "name": "target_name", "type": "String", "max_length": 200 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "sequence", "type": "Integer" },
+    { "name": "before_state_json", "type": "String", "max_length": 8000 },
+    { "name": "after_state_json", "type": "String", "max_length": 8000 },
+    { "name": "security_result", "type": "Choice", "choices": ["PASS", "WARN", "BLOCK", "N_A"], "default_value": "N_A" },
+    { "name": "error_message", "type": "String", "max_length": 4000 }
+  ],
+  "indexes": [
+    { "name": "idx_logic_op_run", "fields": ["run"] }
+  ]
+}

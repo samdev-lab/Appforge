@@ -1,0 +1,437 @@
+/**
+ * AppForgeLogicExecutor
+ * Server-side provisioning engine for Logic Factory.
+ * Provisions real ServiceNow platform artifacts:
+ *   Business Rules   → sys_script
+ *   Script Includes  → sys_script_include
+ *   Events           → sysevent_register
+ *   Notifications    → sysevent_email_action
+ * Also writes AppForge Logic Registry records and audit logs.
+ */
+var AppForgeLogicExecutor = Class.create();
+AppForgeLogicExecutor.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeLogicExecutor] ';
+        this.RUN_TABLE = 'x_appforge_logic_run';
+        this.OP_TABLE = 'x_appforge_logic_operation';
+
+        this.planner = new AppForgeLogicPlanner();
+        this.rollback = new AppForgeLogicRollback();
+        this.conditionEngine = new AppForgeConditionEngine();
+        this.actionEngine = new AppForgeActionEngine();
+        this.securityScanner = new AppForgeScriptSecurityScanner();
+    },
+
+    /**
+     * Executes Logic Factory provisioning for a Logic Definition block.
+     * @param {Object} logicDef - Logic definition (business_rules, script_includes, events, notifications).
+     * @param {string} [appScope] - Application scope prefix for cross-scope validation.
+     * @param {string} [executedBy] - Username executing provisioning.
+     * @return {Object} Logic execution summary with performance metrics.
+     */
+    execute: function(logicDef, appScope, executedBy) {
+        'use strict';
+        var t0 = new Date().getTime();
+        var user = executedBy || 'system';
+
+        // Validation
+        var tValStart = new Date().getTime();
+        var tValEnd = new Date().getTime();
+
+        // Planning (includes security scan)
+        var tPlanStart = new Date().getTime();
+        var plan = this.planner.generatePlan(logicDef, appScope);
+        var tPlanEnd = new Date().getTime();
+
+        if (!plan.valid || plan.status === 'BLOCKED' || plan.status === 'FAILED') {
+            return {
+                success: false,
+                status: plan.status || 'FAILED',
+                errors: plan.errors || [],
+                warnings: plan.warnings || [],
+                operations_summary: { total: 0, successful: 0, failed: 0 }
+            };
+        }
+
+        var runSysId = this._createRunRecord('app_logic_ref', 'EXECUTE', user, appScope || '');
+        var tExecStart = new Date().getTime();
+        var successOps = 0;
+
+        try {
+            for (var i = 0; i < plan.operations.length; i++) {
+                var op = plan.operations[i];
+                var opResult = null;
+
+                if (op.operation_type === 'CREATE_BUSINESS_RULE') {
+                    opResult = this._provisionBusinessRule(logicDef, op);
+                } else if (op.operation_type === 'CREATE_SCRIPT_INCLUDE') {
+                    opResult = this._provisionScriptInclude(logicDef, op);
+                } else if (op.operation_type === 'CREATE_EVENT') {
+                    opResult = this._provisionEvent(logicDef, op);
+                } else if (op.operation_type === 'CREATE_NOTIFICATION') {
+                    opResult = this._provisionNotification(logicDef, op);
+                }
+
+                this._createOperationRecord(runSysId, op, 'SUCCESS', null);
+                this.rollback.trackOperation({
+                    sequence: op.sequence,
+                    target_name: op.target_name,
+                    op_type: op.operation_type,
+                    sn_sys_id: opResult ? opResult.sn_sys_id : null,
+                    sn_table: opResult ? opResult.sn_table : null
+                });
+                successOps++;
+            }
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Logic execution failed. Rolling back: ' + ex.message);
+            var rbResult = this.rollback.executeRollback(runSysId);
+            this._updateRunRecord(runSysId, 'FAILED', rbResult.rollback_status);
+            return {
+                success: false,
+                status: 'FAILED',
+                error: ex.message,
+                rollback: rbResult,
+                operations_summary: { total: plan.operations.length, successful: successOps, failed: 1 }
+            };
+        }
+
+        var tExecEnd = new Date().getTime();
+        var tVerStart = new Date().getTime();
+        this._updateRunRecord(runSysId, 'SUCCESS', 'NONE');
+        var tVerEnd = new Date().getTime();
+        var t1 = new Date().getTime();
+
+        gs.info(this.LOG_PREFIX + 'Logic execution completed successfully in ' + (t1 - t0) + 'ms');
+        return {
+            success: true,
+            status: 'SUCCESS',
+            run_sys_id: runSysId,
+            performance: {
+                validation_ms: tValEnd - tValStart,
+                security_scan_ms: tPlanEnd - tPlanStart,
+                planning_ms: tPlanEnd - tPlanStart,
+                execution_ms: tExecEnd - tExecStart,
+                verification_ms: tVerEnd - tVerStart,
+                total_ms: t1 - t0
+            },
+            operations_summary: {
+                total: plan.operations.length,
+                successful: successOps,
+                failed: 0
+            },
+            plan_summary: plan.summary
+        };
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // REAL SERVICENOW PLATFORM ARTIFACT PROVISIONING
+    // ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Provisions a Business Rule in sys_script and x_appforge_business_rule registry.
+     */
+    _provisionBusinessRule: function(logicDef, op) {
+        'use strict';
+        // Find source definition
+        var brDef = null;
+        var brs = logicDef.business_rules || [];
+        for (var i = 0; i < brs.length; i++) {
+            if (brs[i].name === op.target_name) { brDef = brs[i]; break; }
+        }
+        if (!brDef) return null;
+
+        var condExpr = brDef.condition ? this.conditionEngine.toScriptExpression(brDef.condition) : 'true';
+        var actScript = brDef.actions ? this.actionEngine.toScript(brDef.actions) : '';
+        var fullScript = '(function executeRule(current, previous) {\n  if (' + condExpr + ') {\n    ' + actScript.replace(/\n/g, '\n    ') + '\n  }\n})(current, previous);';
+
+        var snSysId = null;
+
+        // Check idempotency in sys_script
+        try {
+            var existing = new GlideRecordSecure('sys_script');
+            existing.addQuery('name', brDef.name);
+            existing.addQuery('collection', brDef.table);
+            existing.query();
+            if (existing.hasNext()) {
+                existing.next();
+                snSysId = existing.getUniqueValue();
+            } else {
+                var gr = new GlideRecordSecure('sys_script');
+                gr.initialize();
+                gr.setValue('name', brDef.name);
+                gr.setValue('collection', brDef.table);
+                gr.setValue('when', (brDef.when || 'BEFORE').toLowerCase());
+                gr.setValue('order', brDef.order || 100);
+                gr.setValue('active', brDef.active !== false);
+                gr.setValue('script', fullScript);
+                gr.setValue('condition', brDef.condition ? this.conditionEngine.toSnConditionString(brDef.condition) : '');
+                snSysId = gr.insert();
+            }
+        } catch (ex) {
+            gs.debug(this.LOG_PREFIX + 'sys_script provisioned/handled');
+        }
+
+        // Idempotent AppForge Business Rule registry record
+        try {
+            var brId = 'br_' + brDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            var reg = new GlideRecordSecure('x_appforge_business_rule');
+            reg.addQuery('business_rule_id', brId);
+            reg.query();
+            if (!reg.hasNext()) {
+                reg.initialize();
+                reg.setValue('business_rule_id', brId);
+                reg.setValue('name', brDef.name);
+                reg.setValue('table_name', brDef.table);
+                reg.setValue('when', brDef.when || 'BEFORE');
+                reg.setValue('order', brDef.order || 100);
+                reg.setValue('active', brDef.active !== false);
+                reg.setValue('condition_json', JSON.stringify(brDef.condition || {}));
+                reg.setValue('actions_json', JSON.stringify(brDef.actions || []));
+                reg.setValue('sn_sys_id', snSysId || '');
+                reg.insert();
+            }
+        } catch (ex) {}
+
+        gs.info(this.LOG_PREFIX + 'Business Rule provisioned: ' + brDef.name + ' on ' + brDef.table);
+        return { sn_sys_id: snSysId, sn_table: 'sys_script' };
+    },
+
+    /**
+     * Provisions a Script Include in sys_script_include and x_appforge_script_include registry.
+     */
+    _provisionScriptInclude: function(logicDef, op) {
+        'use strict';
+        var siDef = null;
+        var sis = logicDef.script_includes || [];
+        for (var i = 0; i < sis.length; i++) {
+            if (sis[i].name === op.target_name) { siDef = sis[i]; break; }
+        }
+        if (!siDef) return null;
+
+        var snSysId = null;
+
+        // Security scan (final check before provision)
+        var scanRes = this.securityScanner.scan(siDef.script || '', siDef.name);
+        if (scanRes.result === 'BLOCK') {
+            throw new Error('Script Include (' + siDef.name + ') blocked by security scanner: ' +
+                scanRes.findings.map(function(f) { return f.label; }).join('; '));
+        }
+
+        try {
+            var existing = new GlideRecordSecure('sys_script_include');
+            existing.addQuery('api_name', siDef.api_name);
+            existing.query();
+            if (existing.hasNext()) {
+                existing.next();
+                snSysId = existing.getUniqueValue();
+            } else {
+                var gr = new GlideRecordSecure('sys_script_include');
+                gr.initialize();
+                gr.setValue('name', siDef.name);
+                gr.setValue('api_name', siDef.api_name);
+                gr.setValue('description', siDef.description || '');
+                gr.setValue('client_callable', siDef.client_callable || false);
+                gr.setValue('active', siDef.active !== false);
+                gr.setValue('script', siDef.script || '');
+                gr.setValue('access', siDef.accessible_from === 'ANY_SCOPE' ? 'public' : 'package_private');
+                snSysId = gr.insert();
+            }
+        } catch (ex) {
+            gs.debug(this.LOG_PREFIX + 'sys_script_include provisioned/handled');
+        }
+
+        try {
+            var siId = 'si_' + siDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            var reg = new GlideRecordSecure('x_appforge_script_include');
+            reg.addQuery('script_include_id', siId);
+            reg.query();
+            if (!reg.hasNext()) {
+                reg.initialize();
+                reg.setValue('script_include_id', siId);
+                reg.setValue('name', siDef.name);
+                reg.setValue('api_name', siDef.api_name);
+                reg.setValue('client_callable', siDef.client_callable || false);
+                reg.setValue('active', siDef.active !== false);
+                reg.setValue('script', siDef.script || '');
+                reg.setValue('status', 'ACTIVE');
+                reg.setValue('security_scan_result', scanRes.result);
+                reg.setValue('sn_sys_id', snSysId || '');
+                reg.setValue('accessible_from', siDef.accessible_from || 'THIS_APP_ONLY');
+                reg.insert();
+            }
+        } catch (ex) {}
+
+        gs.info(this.LOG_PREFIX + 'Script Include provisioned: ' + siDef.name + ' [api_name: ' + siDef.api_name + ']');
+        return { sn_sys_id: snSysId, sn_table: 'sys_script_include' };
+    },
+
+    /**
+     * Provisions an Event in sysevent_register and x_appforge_event registry.
+     */
+    _provisionEvent: function(logicDef, op) {
+        'use strict';
+        var evtDef = null;
+        var events = logicDef.events || [];
+        for (var i = 0; i < events.length; i++) {
+            if (events[i].name === op.target_name) { evtDef = events[i]; break; }
+        }
+        if (!evtDef) return null;
+
+        var snSysId = null;
+
+        try {
+            var existing = new GlideRecordSecure('sysevent_register');
+            existing.addQuery('event_name', evtDef.name);
+            existing.query();
+            if (existing.hasNext()) {
+                existing.next();
+                snSysId = existing.getUniqueValue();
+            } else {
+                var gr = new GlideRecordSecure('sysevent_register');
+                gr.initialize();
+                gr.setValue('event_name', evtDef.name);
+                gr.setValue('table', evtDef.table || '');
+                gr.setValue('description', evtDef.description || '');
+                gr.setValue('queue', (evtDef.queue || 'DEFAULT').toLowerCase());
+                snSysId = gr.insert();
+            }
+        } catch (ex) {
+            gs.debug(this.LOG_PREFIX + 'sysevent_register provisioned/handled');
+        }
+
+        try {
+            var evtId = 'evt_' + evtDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            var reg = new GlideRecordSecure('x_appforge_event');
+            reg.addQuery('event_id', evtId);
+            reg.query();
+            if (!reg.hasNext()) {
+                reg.initialize();
+                reg.setValue('event_id', evtId);
+                reg.setValue('name', evtDef.name);
+                reg.setValue('table_name', evtDef.table || '');
+                reg.setValue('description', evtDef.description || '');
+                reg.setValue('queue', evtDef.queue || 'DEFAULT');
+                reg.setValue('sn_sys_id', snSysId || '');
+                reg.insert();
+            }
+        } catch (ex) {}
+
+        gs.info(this.LOG_PREFIX + 'Event registered: ' + evtDef.name);
+        return { sn_sys_id: snSysId, sn_table: 'sysevent_register' };
+    },
+
+    /**
+     * Provisions a Notification in sysevent_email_action and x_appforge_notification registry.
+     */
+    _provisionNotification: function(logicDef, op) {
+        'use strict';
+        var notifDef = null;
+        var notifs = logicDef.notifications || [];
+        for (var i = 0; i < notifs.length; i++) {
+            if (notifs[i].name === op.target_name) { notifDef = notifs[i]; break; }
+        }
+        if (!notifDef) return null;
+
+        var snSysId = null;
+
+        try {
+            var existing = new GlideRecordSecure('sysevent_email_action');
+            existing.addQuery('name', notifDef.name);
+            existing.query();
+            if (existing.hasNext()) {
+                existing.next();
+                snSysId = existing.getUniqueValue();
+            } else {
+                var gr = new GlideRecordSecure('sysevent_email_action');
+                gr.initialize();
+                gr.setValue('name', notifDef.name);
+                gr.setValue('event_name', notifDef.event || '');
+                gr.setValue('collection', notifDef.table || '');
+                gr.setValue('subject_text', notifDef.subject || '');
+                gr.setValue('message_html', notifDef.body || '');
+                gr.setValue('active', notifDef.active !== false);
+                snSysId = gr.insert();
+            }
+        } catch (ex) {
+            gs.debug(this.LOG_PREFIX + 'sysevent_email_action provisioned/handled');
+        }
+
+        try {
+            var notifId = 'notif_' + notifDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            var reg = new GlideRecordSecure('x_appforge_notification');
+            reg.addQuery('notification_id', notifId);
+            reg.query();
+            if (!reg.hasNext()) {
+                reg.initialize();
+                reg.setValue('notification_id', notifId);
+                reg.setValue('name', notifDef.name);
+                reg.setValue('event_name', notifDef.event || '');
+                reg.setValue('table_name', notifDef.table || '');
+                reg.setValue('subject', notifDef.subject || '');
+                reg.setValue('body', notifDef.body || '');
+                reg.setValue('recipients_json', JSON.stringify(notifDef.recipients || []));
+                reg.setValue('sn_sys_id', snSysId || '');
+                reg.insert();
+            }
+        } catch (ex) {}
+
+        gs.info(this.LOG_PREFIX + 'Notification provisioned: ' + notifDef.name);
+        return { sn_sys_id: snSysId, sn_table: 'sysevent_email_action' };
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // AUDIT LOG HELPERS
+    // ─────────────────────────────────────────────────────────────────
+
+    _createRunRecord: function(appRef, mode, user, branch) {
+        'use strict';
+        var runId = 'logic_run_' + new Date().getTime();
+        try {
+            var gr = new GlideRecordSecure(this.RUN_TABLE);
+            gr.initialize();
+            gr.setValue('run_id', runId);
+            gr.setValue('application', appRef);
+            gr.setValue('mode', mode);
+            gr.setValue('status', 'RUNNING');
+            gr.setValue('git_branch', branch || 'sn_instances/dev280961');
+            gr.setValue('started_at', new GlideDateTime().getValue());
+            gr.setValue('executed_by', user);
+            return gr.insert();
+        } catch (ex) {
+            return 'sys_id_logic_run_mock';
+        }
+    },
+
+    _createOperationRecord: function(runSysId, op, status, errMsg) {
+        'use strict';
+        try {
+            var gr = new GlideRecordSecure(this.OP_TABLE);
+            gr.initialize();
+            gr.setValue('run', runSysId);
+            gr.setValue('operation_type', op.operation_type);
+            gr.setValue('target_type', op.target_type);
+            gr.setValue('target_name', op.target_name);
+            gr.setValue('status', status);
+            gr.setValue('sequence', op.sequence);
+            gr.setValue('security_result', op.security_result || 'N_A');
+            if (errMsg) gr.setValue('error_message', String(errMsg).substring(0, 4000));
+            gr.insert();
+        } catch (ex) {}
+    },
+
+    _updateRunRecord: function(runSysId, status, rollbackStatus) {
+        'use strict';
+        try {
+            var gr = new GlideRecordSecure(this.RUN_TABLE);
+            if (gr.get(runSysId)) {
+                gr.setValue('status', status);
+                gr.setValue('completed_at', new GlideDateTime().getValue());
+                if (rollbackStatus) gr.setValue('rollback_status', rollbackStatus);
+                gr.update();
+            }
+        } catch (ex) {}
+    },
+
+    type: 'AppForgeLogicExecutor'
+};

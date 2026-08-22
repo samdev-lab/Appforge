@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_notification",
+  "label": "AppForge Notification Registry",
+  "description": "Registry tracking Notification definitions provisioned by AppForge",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "notification_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "logic_registry", "type": "Reference", "reference_table": "x_appforge_logic", "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "event_name", "type": "String", "max_length": 200 },
+    { "name": "table_name", "type": "String", "max_length": 100 },
+    { "name": "subject", "type": "String", "max_length": 500, "mandatory": true },
+    { "name": "body", "type": "String", "max_length": 8000 },
+    { "name": "recipients_json", "type": "String", "max_length": 4000, "description": "JSON array of recipient definitions" },
+    { "name": "active", "type": "Boolean", "default_value": true },
+    { "name": "version", "type": "String", "max_length": 20, "default_value": "1.0.0" },
+    { "name": "sn_sys_id", "type": "String", "max_length": 32, "description": "ServiceNow sysevent_email_action sys_id" }
+  ],
+  "indexes": [
+    { "name": "idx_notif_id", "fields": ["notification_id"], "unique": true }
+  ]
+}
