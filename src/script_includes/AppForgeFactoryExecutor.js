@@ -107,6 +107,7 @@ AppForgeFactoryExecutor.prototype = {
                     opRes = this.schemaRegistry.create({
                         schema_id: 'sch_' + op.target_name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
                         name: op.target_name,
+                        scope: appDef.scope || 'x_appforge',
                         application: parentAppSysId,
                         module: parentModSysId,
                         physical_table: op.physical_table

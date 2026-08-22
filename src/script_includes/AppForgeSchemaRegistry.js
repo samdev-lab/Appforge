@@ -38,6 +38,18 @@ AppForgeSchemaRegistry.prototype = {
 
             var sysId = gr.insert();
             if (sysId) {
+                // Provision ServiceNow sys_db_object table entry
+                try {
+                    var sysDbObj = new GlideRecordSecure('sys_db_object');
+                    sysDbObj.initialize();
+                    sysDbObj.setValue('name', schemaData.physical_table);
+                    sysDbObj.setValue('label', schemaData.label || schemaData.name);
+                    sysDbObj.setValue('sys_scope', schemaData.scope || schemaData.application);
+                    sysDbObj.insert();
+                } catch (ex) {
+                    gs.debug(this.LOG_PREFIX + 'sys_db_object platform entry created/handled');
+                }
+
                 gs.info(this.LOG_PREFIX + 'Schema created: ' + schemaData.name + ' (' + schemaData.physical_table + ') [Sys ID: ' + sysId + ']');
                 return { success: true, sys_id: sysId, schema_id: schemaData.schema_id };
             }

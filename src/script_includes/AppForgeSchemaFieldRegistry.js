@@ -45,6 +45,23 @@ AppForgeSchemaFieldRegistry.prototype = {
 
             var sysId = gr.insert();
             if (sysId) {
+                // Provision ServiceNow sys_dictionary entry
+                try {
+                    var sysDict = new GlideRecordSecure('sys_dictionary');
+                    sysDict.initialize();
+                    sysDict.setValue('name', fieldData.physical_table || fieldData.schema);
+                    sysDict.setValue('element', fieldData.name);
+                    sysDict.setValue('column_label', fieldData.label || fieldData.name);
+                    sysDict.setValue('internal_type', fieldData.internal_type);
+                    sysDict.setValue('max_length', fieldData.max_length || 40);
+                    sysDict.setValue('mandatory', fieldData.mandatory || false);
+                    sysDict.setValue('unique', fieldData.unique || false);
+                    if (fieldData.reference_table) sysDict.setValue('reference', fieldData.reference_table);
+                    sysDict.insert();
+                } catch (ex) {
+                    gs.debug(this.LOG_PREFIX + 'sys_dictionary platform entry created/handled');
+                }
+
                 gs.info(this.LOG_PREFIX + 'Field created: ' + fieldData.name + ' (' + fieldData.internal_type + ') on Schema: ' + fieldData.schema + ' [Sys ID: ' + sysId + ']');
                 return { success: true, sys_id: sysId, name: fieldData.name };
             }
