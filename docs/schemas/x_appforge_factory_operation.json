@@ -1,0 +1,82 @@
+{
+  "name": "x_appforge_factory_operation",
+  "label": "AppForge Factory Operation",
+  "description": "Granular audit table recording individual operations executed during a Factory run",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "run",
+      "type": "Reference",
+      "reference_table": "x_appforge_factory_run",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Parent Factory Run reference"
+    },
+    {
+      "name": "operation_type",
+      "type": "Choice",
+      "mandatory": true,
+      "choices": ["CREATE_APP", "CREATE_MODULE", "CREATE_SCHEMA", "CREATE_FIELD", "CREATE_REFERENCE", "ROLLBACK"],
+      "description": "Operation type"
+    },
+    {
+      "name": "target_type",
+      "type": "String",
+      "max_length": 50,
+      "description": "Target entity type"
+    },
+    {
+      "name": "target_name",
+      "type": "String",
+      "max_length": 100,
+      "description": "Target artifact name"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "choices": ["PENDING", "SUCCESS", "FAILED", "ROLLED_BACK"],
+      "default_value": "PENDING",
+      "description": "Operation status"
+    },
+    {
+      "name": "sequence",
+      "type": "Integer",
+      "description": "Execution order sequence"
+    },
+    {
+      "name": "before_state",
+      "type": "JSON",
+      "description": "Artifact state prior to execution"
+    },
+    {
+      "name": "after_state",
+      "type": "JSON",
+      "description": "Artifact state post execution"
+    },
+    {
+      "name": "error_message",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Sanitized error details"
+    },
+    {
+      "name": "started_at",
+      "type": "GlideDateTime",
+      "description": "Operation start timestamp"
+    },
+    {
+      "name": "completed_at",
+      "type": "GlideDateTime",
+      "description": "Operation completion timestamp"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_op_run", "fields": ["run"] }
+  ]
+}

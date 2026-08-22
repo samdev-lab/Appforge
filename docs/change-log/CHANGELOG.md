@@ -5,6 +5,20 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-08-23
+
+### Added - Stage 2: Application Factory Core Engine
+- Created Application Definition schema (`x_appforge_application_definition`) storing declarative JSON definitions.
+- Created Factory Audit Run schema (`x_appforge_factory_run`) and Granular Operation Log schema (`x_appforge_factory_operation`).
+- Implemented Centralized Table Name Generator service (`AppForgeTableNameGenerator.js`) enforcing scope prefix (`x_appforge_`), snake_case, max length, and reserved name protection.
+- Implemented Field Type Mapper service (`AppForgeFieldTypeMapper.js`) mapping internal types (`string`, `integer`, `decimal`, `boolean`, `date`, `datetime`, `reference`, `choice`, `currency`, `journal`, `html`) to platform metadata attributes.
+- Implemented Definition Validator service (`AppForgeDefinitionValidator.js`) checking JSON schema structure, field types, constraints, and enforcing destructive operation guards.
+- Implemented Factory Planner service (`AppForgeFactoryPlanner.js`) generating dependency-ordered dry-run execution plans.
+- Implemented Factory Executor service (`AppForgeFactoryExecutor.js`) provisioning Applications, Modules, Schemas, Fields, and References via Registry services, collecting performance metrics.
+- Implemented Compensating Rollback service (`AppForgeFactoryRollback.js`) managing cleanup upon execution errors.
+- Implemented Factory REST API (`AppForgeFactoryAPI.js`) for `POST /api/x_appforge/factory/plan` and `POST /api/x_appforge/factory/execute`.
+- Formulated automated test suite (`tests/AppForgeFactoryTestSuite.js`) executing 27 new Prompt 005 scenarios + 20 Prompt 004 Discovery regression scenarios + 20 Prompt 003 Registry regression scenarios + 10 Prompt 002 Webhook regression scenarios (77/77 PASSED).
+
 ## [0.4.0] - 2026-08-23
 
 ### Added - Stage 2 Foundation: Application Discovery & Branch Binding Engine

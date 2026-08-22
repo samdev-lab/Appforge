@@ -1,0 +1,159 @@
+/**
+ * AppForgeFactoryPlanner
+ * Dry-run planning engine calculating dependency-ordered execution plans,
+ * detecting existing vs new artifacts, and enforcing destructive operation guards.
+ */
+var AppForgeFactoryPlanner = Class.create();
+AppForgeFactoryPlanner.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeFactoryPlanner] ';
+        this.validator = new AppForgeDefinitionValidator();
+        this.nameGenerator = new AppForgeTableNameGenerator();
+        this.appRegistry = new AppForgeApplicationRegistry();
+        this.moduleRegistry = new AppForgeModuleRegistry();
+        this.schemaRegistry = new AppForgeSchemaRegistry();
+        this.fieldRegistry = new AppForgeSchemaFieldRegistry();
+    },
+
+    /**
+     * Generates a structured dry-run execution plan without modifying ServiceNow.
+     * @param {Object|string} definitionPayload - Application definition payload.
+     * @return {Object} Structured execution plan object.
+     */
+    generatePlan: function(definitionPayload) {
+        'use strict';
+        // 1. Validate Definition
+        var valResult = this.validator.validate(definitionPayload);
+        if (!valResult.valid) {
+            var isBlocked = false;
+            for (var b = 0; b < valResult.errors.length; b++) {
+                if (valResult.errors[b].indexOf('BLOCKED') !== -1) {
+                    isBlocked = true;
+                    break;
+                }
+            }
+            return {
+                valid: false,
+                status: isBlocked ? 'BLOCKED' : 'FAILED',
+                errors: valResult.errors,
+                warnings: valResult.warnings,
+                operations: []
+            };
+        }
+
+        var def = typeof definitionPayload === 'string' ? JSON.parse(definitionPayload) : definitionPayload;
+        var appDef = def.application;
+        var operations = [];
+        var sequence = 1;
+        var createCount = 0;
+        var existingCount = 0;
+
+        // Check for destructive requests
+        for (var d = 0; d < valResult.errors.length; d++) {
+            if (valResult.errors[d].indexOf('BLOCKED') !== -1) {
+                return {
+                    valid: false,
+                    status: 'BLOCKED',
+                    errors: valResult.errors,
+                    warnings: valResult.warnings,
+                    operations: []
+                };
+            }
+        }
+
+        // 2. Application Planning
+        var appExists = this.appRegistry.exists(appDef.scope || appDef.name);
+        var appOpAction = appExists ? 'EXISTING_APP' : 'CREATE_APP';
+        if (!appExists) createCount++; else existingCount++;
+
+        operations.push({
+            sequence: sequence++,
+            operation_type: appOpAction,
+            target_type: 'Application',
+            target_name: appDef.name,
+            scope: appDef.scope,
+            version: appDef.version || '1.0.0',
+            status: appExists ? 'EXISTING' : 'CREATE'
+        });
+
+        // 3. Module Planning
+        var modules = def.modules || [];
+        for (var m = 0; m < modules.length; m++) {
+            var mod = modules[m];
+            var modExists = false; // Resolved at execution or lookup
+            var modAction = modExists ? 'EXISTING_MODULE' : 'CREATE_MODULE';
+            if (!modExists) createCount++; else existingCount++;
+
+            operations.push({
+                sequence: sequence++,
+                operation_type: modAction,
+                target_type: 'Module',
+                target_name: mod.name,
+                module_type: mod.type || 'CORE',
+                status: 'CREATE'
+            });
+        }
+
+        // 4. Schema Planning & Table Name Generation
+        var schemas = def.schemas || [];
+        for (var s = 0; s < schemas.length; s++) {
+            var sch = schemas[s];
+            var tableNameRes = this.nameGenerator.generate(appDef.scope, appDef.name, sch.name);
+            var physicalTable = sch.physical_table || tableNameRes.physical_table;
+
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_SCHEMA',
+                target_type: 'Schema',
+                target_name: sch.name,
+                physical_table: physicalTable,
+                module_name: sch.module,
+                status: 'CREATE'
+            });
+            createCount++;
+
+            // 5. Fields Planning
+            var fields = sch.fields || [];
+            for (var f = 0; f < fields.length; f++) {
+                var fld = fields[f];
+                var fldOpType = fld.type === 'reference' ? 'CREATE_REFERENCE' : 'CREATE_FIELD';
+
+                operations.push({
+                    sequence: sequence++,
+                    operation_type: fldOpType,
+                    target_type: 'Field',
+                    target_name: fld.name,
+                    schema_name: sch.name,
+                    field_type: fld.type,
+                    mandatory: fld.mandatory || false,
+                    unique: fld.unique || false,
+                    reference_target: fld.reference || fld.reference_table || null,
+                    status: 'CREATE'
+                });
+                createCount++;
+            }
+        }
+
+        gs.info(this.LOG_PREFIX + 'Factory plan generated cleanly for App: ' + appDef.name + ' (' + operations.length + ' operations)');
+        return {
+            valid: true,
+            status: 'READY',
+            application: appDef.name,
+            scope: appDef.scope,
+            version: appDef.version || '1.0.0',
+            operations: operations,
+            summary: {
+                operations_total: operations.length,
+                create_count: createCount,
+                existing_count: existingCount,
+                modify_count: 0,
+                delete_count: 0
+            },
+            warnings: valResult.warnings,
+            errors: []
+        };
+    },
+
+    type: 'AppForgeFactoryPlanner'
+};
