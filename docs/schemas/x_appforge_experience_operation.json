@@ -1,0 +1,19 @@
+{
+  "name": "x_appforge_experience_operation",
+  "label": "AppForge Experience Operation",
+  "description": "Granular operation audit log recording individual UI metadata creation steps",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run", "type": "Reference", "reference_table": "x_appforge_experience_run", "mandatory": true, "indexed": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["CREATE_VIEW", "CREATE_FORM", "CREATE_SECTION", "ADD_FORM_FIELD", "CREATE_LIST", "ADD_LIST_FIELD", "CREATE_RELATED_LIST", "CREATE_NAVIGATION", "ROLLBACK"] },
+    { "name": "target_type", "type": "String", "max_length": 50 },
+    { "name": "target_name", "type": "String", "max_length": 100 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "sequence", "type": "Integer" },
+    { "name": "error_message", "type": "String", "max_length": 4000 }
+  ],
+  "indexes": [
+    { "name": "idx_exp_op_run", "fields": ["run"] }
+  ]
+}

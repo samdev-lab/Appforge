@@ -1,0 +1,18 @@
+{
+  "name": "x_appforge_form",
+  "label": "AppForge Form Registry",
+  "description": "Registry storing Form layout metadata definitions for AppForge Applications",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "form_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "schema", "type": "Reference", "reference_table": "x_appforge_schema", "mandatory": true, "indexed": true },
+    { "name": "view", "type": "String", "max_length": 50, "default_value": "default" },
+    { "name": "status", "type": "Choice", "choices": ["PLANNED", "ACTIVE", "DEPRECATED"], "default_value": "ACTIVE" }
+  ],
+  "indexes": [
+    { "name": "idx_form_id", "fields": ["form_id"], "unique": true },
+    { "name": "idx_form_schema_view", "fields": ["schema", "view"], "unique": true }
+  ]
+}

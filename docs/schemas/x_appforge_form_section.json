@@ -1,0 +1,16 @@
+{
+  "name": "x_appforge_form_section",
+  "label": "AppForge Form Section Registry",
+  "description": "Registry storing Form Section layout metadata",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "form", "type": "Reference", "reference_table": "x_appforge_form", "mandatory": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "order", "type": "Integer", "default_value": 100 },
+    { "name": "columns", "type": "Choice", "choices": ["1", "2"], "default_value": "2" }
+  ],
+  "indexes": [
+    { "name": "idx_sec_form", "fields": ["form"] }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "x_appforge_view",
+  "label": "AppForge View Registry",
+  "description": "Registry storing reusable View metadata definitions",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "view_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "title", "type": "String", "max_length": 100 },
+    { "name": "schema", "type": "Reference", "reference_table": "x_appforge_schema", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "is_default", "type": "Boolean", "default_value": false }
+  ],
+  "indexes": [
+    { "name": "idx_view_id", "fields": ["view_id"], "unique": true },
+    { "name": "idx_view_sch_name", "fields": ["schema", "name"], "unique": true }
+  ]
+}

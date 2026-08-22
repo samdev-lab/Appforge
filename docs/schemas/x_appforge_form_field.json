@@ -1,0 +1,15 @@
+{
+  "name": "x_appforge_form_field",
+  "label": "AppForge Form Field Position Registry",
+  "description": "Registry storing field placement and order on form sections",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "section", "type": "Reference", "reference_table": "x_appforge_form_section", "mandatory": true, "indexed": true },
+    { "name": "field_name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "order", "type": "Integer", "default_value": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_fld_pos_sec", "fields": ["section"] }
+  ]
+}

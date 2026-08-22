@@ -1,0 +1,18 @@
+{
+  "name": "x_appforge_navigation",
+  "label": "AppForge Navigation Menu Registry",
+  "description": "Registry storing Application Menu and Module navigation layout metadata",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "navigation_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "target_type", "type": "Choice", "choices": ["LIST", "FORM", "URL"], "default_value": "LIST" },
+    { "name": "target_table", "type": "String", "max_length": 100 },
+    { "name": "order", "type": "Integer", "default_value": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_nav_id", "fields": ["navigation_id"], "unique": true }
+  ]
+}

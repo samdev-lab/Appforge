@@ -1,0 +1,15 @@
+{
+  "name": "x_appforge_list_field",
+  "label": "AppForge List Field Position Registry",
+  "description": "Registry storing column placement and order on list views",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "list", "type": "Reference", "reference_table": "x_appforge_list", "mandatory": true, "indexed": true },
+    { "name": "field_name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "order", "type": "Integer", "default_value": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_lst_fld_list", "fields": ["list"] }
+  ]
+}

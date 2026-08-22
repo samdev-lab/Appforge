@@ -1,0 +1,20 @@
+{
+  "name": "x_appforge_experience_run",
+  "label": "AppForge Experience Audit Run",
+  "description": "Audit log recording Experience Factory runs, dry runs, and execution status",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "mode", "type": "Choice", "choices": ["PLAN", "DRY_RUN", "EXECUTE"], "default_value": "PLAN" },
+    { "name": "status", "type": "Choice", "choices": ["RUNNING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "RUNNING" },
+    { "name": "rollback_status", "type": "Choice", "choices": ["NONE", "COMPLETE", "PARTIAL", "NOT_POSSIBLE"], "default_value": "NONE" },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "executed_by", "type": "String", "max_length": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_exp_run_id", "fields": ["run_id"], "unique": true }
+  ]
+}

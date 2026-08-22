@@ -5,6 +5,20 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-08-23
+
+### Added - Stage 3: Experience Factory — Forms, Lists, Views & UI Layout Engine
+- Created Form Registry schemas (`x_appforge_form`, `x_appforge_form_section`, `x_appforge_form_field`).
+- Created List & View Registry schemas (`x_appforge_list`, `x_appforge_list_field`, `x_appforge_view`).
+- Created Navigation & Related List Registry schemas (`x_appforge_navigation`, `x_appforge_related_list`).
+- Created Experience Audit Run schema (`x_appforge_experience_run`) and Granular UI Operation Log schema (`x_appforge_experience_operation`).
+- Implemented Experience Validator service (`AppForgeExperienceValidator.js`) checking table existence, section uniqueness, field placement, and enforcing destructive UI guards.
+- Implemented Experience Planner service (`AppForgeExperiencePlanner.js`) generating dependency-ordered dry-run UI execution plans.
+- Implemented Experience Executor service (`AppForgeExperienceExecutor.js`) provisioning real ServiceNow platform UI metadata (`sys_ui_view`, `sys_ui_form`, `sys_ui_section`, `sys_ui_element`, `sys_ui_list`, `sys_ui_list_element`, `sys_app_application`, `sys_app_module`, `sys_ui_related_list`) and AppForge Experience Registries.
+- Implemented Experience Compensating Rollback service (`AppForgeExperienceRollback.js`).
+- Implemented Experience REST API (`AppForgeExperienceAPI.js`) for `POST /api/x_appforge/experience/plan` and `POST /api/x_appforge/experience/execute`.
+- Formulated automated test suite (`tests/AppForgeExperienceTestSuite.js`) executing 25 new Prompt 006 scenarios + 27 Prompt 005 Factory regression scenarios + 20 Prompt 004 Discovery regression scenarios + 20 Prompt 003 Registry regression scenarios + 10 Prompt 002 Webhook regression scenarios (102/102 PASSED).
+
 ## [0.5.0] - 2026-08-23
 
 ### Added - Stage 2: Application Factory Core Engine

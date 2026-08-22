@@ -1,0 +1,16 @@
+{
+  "name": "x_appforge_list",
+  "label": "AppForge List Registry",
+  "description": "Registry storing List view layout metadata",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "list_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "schema", "type": "Reference", "reference_table": "x_appforge_schema", "mandatory": true, "indexed": true },
+    { "name": "view", "type": "String", "max_length": 50, "default_value": "default" }
+  ],
+  "indexes": [
+    { "name": "idx_list_id", "fields": ["list_id"], "unique": true }
+  ]
+}

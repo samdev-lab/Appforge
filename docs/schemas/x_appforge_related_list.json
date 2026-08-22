@@ -1,0 +1,15 @@
+{
+  "name": "x_appforge_related_list",
+  "label": "AppForge Related List Registry",
+  "description": "Registry storing Related List layout relationships between parent and child schemas",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "parent_schema", "type": "Reference", "reference_table": "x_appforge_schema", "mandatory": true, "indexed": true },
+    { "name": "child_schema", "type": "Reference", "reference_table": "x_appforge_schema", "mandatory": true, "indexed": true },
+    { "name": "relationship_field", "type": "String", "max_length": 100, "mandatory": true }
+  ],
+  "indexes": [
+    { "name": "idx_rel_list_parent", "fields": ["parent_schema"] }
+  ]
+}
