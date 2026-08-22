@@ -1,0 +1,65 @@
+{
+  "name": "x_appforge_repository",
+  "label": "AppForge Repository Mapping",
+  "description": "Mapping table associating GitHub repositories with AppForge ServiceNow applications",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "repository_id",
+      "type": "String",
+      "max_length": 50,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "GitHub Repository Numeric ID"
+    },
+    {
+      "name": "repository_name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Full Repository Name (e.g. samdev-lab/Appforge)"
+    },
+    {
+      "name": "repository_url",
+      "type": "String",
+      "max_length": 255,
+      "description": "GitHub Repository HTML URL"
+    },
+    {
+      "name": "organization",
+      "type": "String",
+      "max_length": 100,
+      "description": "GitHub Organization or Owner Account"
+    },
+    {
+      "name": "default_branch",
+      "type": "String",
+      "max_length": 100,
+      "default_value": "main",
+      "description": "Default Git branch"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "sys_app",
+      "description": "Associated ServiceNow Scoped Application"
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "default_value": true,
+      "description": "Active mapping indicator"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_repo_id", "fields": ["repository_id"], "unique": true },
+    { "name": "idx_repo_name", "fields": ["repository_name"] }
+  ]
+}

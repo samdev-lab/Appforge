@@ -5,6 +5,18 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-08-23
+
+### Added - Stage 0.2: GitHub → ServiceNow Webhook Integration
+- Created Scripted REST API endpoint `POST /api/x_appforge/github/webhook` (`AppForgeGitHubWebhookAPI.js`).
+- Implemented HMAC-SHA256 signature verification service (`AppForgeWebhookSecurity.js`) utilizing private property `x_appforge.github.webhook_secret` and constant-time string comparison.
+- Created Git Event Persistence & Audit table schema (`x_appforge_git_event`) with unique indexed `delivery_id`.
+- Created AppForge Repository Mapping table schema (`x_appforge_repository`).
+- Implemented Webhook Ingestion & Idempotency engine (`AppForgeGitHubWebhookService.js`) using `X-GitHub-Delivery` header to reject duplicate deliveries.
+- Implemented Event Router and State Processor service (`AppForgeGitEventService.js`).
+- Implemented event-specific processors: `AppForgePushProcessor`, `AppForgePullRequestProcessor`, `AppForgeReviewProcessor`, `AppForgeWorkflowProcessor`.
+- Formulated automated test runner suite (`tests/AppForgeGitHubWebhookTestSuite.js`) executing the 10 mandatory test scenarios.
+
 ## [0.1.0] - 2026-08-22
 
 ### Added - Stage 0: Engineering Foundation & ServiceNow Source Control Baseline
