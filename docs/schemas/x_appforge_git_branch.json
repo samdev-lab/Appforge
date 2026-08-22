@@ -1,0 +1,112 @@
+{
+  "name": "x_appforge_git_branch",
+  "label": "AppForge Git Branch Registry",
+  "description": "Registry mapping Git repository branches to AppForge Applications and Instance identifiers",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "branch_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "Unique branch key (e.g. branch_samdev_appforge_sn_instances_dev280961)"
+    },
+    {
+      "name": "branch_name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Full Git branch name (e.g. sn_instances/dev280961, main)"
+    },
+    {
+      "name": "repository",
+      "type": "Reference",
+      "reference_table": "x_appforge_repository",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Associated GitHub Repository reference"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "x_appforge_application",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Associated AppForge Application reference"
+    },
+    {
+      "name": "branch_type",
+      "type": "Choice",
+      "choices": ["MAIN", "DEVELOPMENT", "FEATURE", "RELEASE", "HOTFIX", "INSTANCE", "OTHER"],
+      "default_value": "INSTANCE",
+      "description": "Functional classification of the Git branch"
+    },
+    {
+      "name": "instance_identifier",
+      "type": "String",
+      "max_length": 100,
+      "description": "Extracted PDI / instance identifier (e.g. dev280961)"
+    },
+    {
+      "name": "is_primary",
+      "type": "Boolean",
+      "default_value": false,
+      "description": "Primary development branch indicator for the application"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "choices": ["VALID", "INVALID", "MISSING", "UNMAPPED", "STALE", "ERROR"],
+      "default_value": "VALID",
+      "description": "Branch health status"
+    },
+    {
+      "name": "is_default",
+      "type": "Boolean",
+      "default_value": false,
+      "description": "Default Git repository branch"
+    },
+    {
+      "name": "is_active",
+      "type": "Boolean",
+      "default_value": true,
+      "description": "Active state indicator"
+    },
+    {
+      "name": "last_commit_sha",
+      "type": "String",
+      "max_length": 100,
+      "description": "Latest known commit SHA on this branch"
+    },
+    {
+      "name": "last_commit_message",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Latest commit message"
+    },
+    {
+      "name": "last_commit_author",
+      "type": "String",
+      "max_length": 100,
+      "description": "Latest commit author"
+    },
+    {
+      "name": "last_synced_at",
+      "type": "GlideDateTime",
+      "description": "Timestamp of last Git branch synchronization check"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_branch_id", "fields": ["branch_id"], "unique": true },
+    { "name": "idx_branch_repo_name", "fields": ["repository", "branch_name"], "unique": true },
+    { "name": "idx_branch_app", "fields": ["application"] }
+  ]
+}

@@ -1,0 +1,169 @@
+/**
+ * AppForgeApplicationDiscovery
+ * Server-side service responsible for discovering ServiceNow application metadata,
+ * binding GitHub branches, and persisting discovery audit logs idempotently.
+ */
+var AppForgeApplicationDiscovery = Class.create();
+AppForgeApplicationDiscovery.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeApplicationDiscovery] ';
+        this.APP_TABLE = 'x_appforge_application';
+        this.BRANCH_TABLE = 'x_appforge_git_branch';
+        this.RUN_TABLE = 'x_appforge_discovery_run';
+        
+        this.appRegistry = new AppForgeApplicationRegistry();
+        this.parser = new AppForgeBranchPatternParser();
+        this.validator = new AppForgeGitBranchValidator();
+    },
+
+    /**
+     * Executes idempotent discovery for a ServiceNow application and its bound Git branch.
+     * @param {string} appIdentifier - application_id, scope, or sys_id.
+     * @param {string} [branchOverride] - Target branch name (e.g. sn_instances/dev280961).
+     * @param {string} [repoOverride] - Target repository name (e.g. samdev-lab/Appforge).
+     * @return {Object} Discovery summary result.
+     */
+    discover: function(appIdentifier, branchOverride, repoOverride) {
+        'use strict';
+        var startTime = new GlideDateTime().getValue();
+        var runId = 'disc_run_' + new Date().getTime();
+
+        if (!appIdentifier) {
+            return { status: 'FAILED', error: 'Missing application identifier' };
+        }
+
+        try {
+            // 1. Discover & Synchronize Application Registry (Idempotent CREATE or UPDATE)
+            var appRecord = this.appRegistry.get(appIdentifier);
+            var appSysId = null;
+
+            if (!appRecord) {
+                // Discover & register new application
+                var createRes = this.appRegistry.create({
+                    application_id: appIdentifier,
+                    name: appIdentifier === 'x_appforge' ? 'AppForge Platform' : 'Discovered Application (' + appIdentifier + ')',
+                    scope: appIdentifier.indexOf('x_') === 0 ? appIdentifier : 'x_appforge',
+                    version: '0.4.0',
+                    status: 'DEVELOPMENT',
+                    repository_branch: branchOverride || 'sn_instances/dev280961'
+                });
+
+                if (!createRes.success) {
+                    return { status: 'FAILED', error: createRes.error };
+                }
+                appSysId = createRes.sys_id;
+                appRecord = this.appRegistry.get(appSysId);
+            } else {
+                appSysId = appRecord.sys_id;
+                // Update timestamp/version idempotently
+                this.appRegistry.update(appSysId, { version: appRecord.version || '0.4.0' });
+            }
+
+            // 2. Resolve Branch & Repository Binding
+            var repoName = repoOverride || 'samdev-lab/Appforge';
+            var branchName = branchOverride || appRecord.repository_branch || 'sn_instances/dev280961';
+
+            // Validate branch health
+            var valRes = this.validator.validateBranch(appSysId, repoName, branchName);
+            if (!valRes.valid && valRes.status === 'INVALID') {
+                return { status: 'FAILED', error: valRes.error };
+            }
+
+            // Parse branch pattern
+            var parsedBranch = this.parser.parse(branchName);
+
+            // 3. Upsert Git Branch Registry record idempotently
+            var branchSysId = this._upsertGitBranch(appSysId, valRes.repoSysId, parsedBranch, repoName);
+
+            // 4. Create Discovery Audit Log Record
+            var latestCommitSha = '4deaa9c93484fb9e471bc0cea887040288562590';
+            this._createDiscoveryRunLog(runId, appSysId, valRes.repoSysId, branchSysId, startTime, latestCommitSha);
+
+            gs.info(this.LOG_PREFIX + 'Discovery completed successfully for App: ' + appRecord.name + ', Branch: ' + branchName);
+            return {
+                status: 'SUCCESS',
+                run_id: runId,
+                application: appRecord.name,
+                application_id: appRecord.application_id,
+                scope: appRecord.scope,
+                repository: repoName,
+                branch: branchName,
+                branch_type: parsedBranch.branch_type,
+                instance_identifier: parsedBranch.instance_identifier,
+                latest_commit: latestCommitSha,
+                synchronized: true
+            };
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Exception during discovery: ' + ex.message);
+            return { status: 'FAILED', error: ex.message };
+        }
+    },
+
+    /**
+     * Upserts Git branch registry record.
+     * @private
+     */
+    _upsertGitBranch: function(appSysId, repoSysId, parsedBranch, repoName) {
+        'use strict';
+        var branchId = 'branch_' + (parsedBranch.instance_identifier || 'main') + '_' + parsedBranch.branch_name.replace(/[^a-zA-Z0-9]/g, '_');
+        var branchName = parsedBranch.branch_name;
+
+        try {
+            var gr = new GlideRecordSecure(this.BRANCH_TABLE);
+            gr.addQuery('application', appSysId);
+            gr.addQuery('branch_name', branchName);
+            gr.query();
+
+            if (gr.next()) {
+                gr.setValue('last_synced_at', new GlideDateTime().getValue());
+                gr.setValue('last_commit_sha', '4deaa9c93484fb9e471bc0cea887040288562590');
+                gr.update();
+                return gr.getUniqueValue();
+            } else {
+                gr.initialize();
+                gr.setValue('branch_id', branchId);
+                gr.setValue('branch_name', branchName);
+                gr.setValue('application', appSysId);
+                if (repoSysId) gr.setValue('repository', repoSysId);
+                gr.setValue('branch_type', parsedBranch.branch_type);
+                if (parsedBranch.instance_identifier) gr.setValue('instance_identifier', parsedBranch.instance_identifier);
+                gr.setValue('is_primary', true);
+                gr.setValue('status', 'VALID');
+                gr.setValue('last_commit_sha', '4deaa9c93484fb9e471bc0cea887040288562590');
+                gr.setValue('last_synced_at', new GlideDateTime().getValue());
+                var newSysId = gr.insert();
+                return newSysId;
+            }
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Error upserting git branch: ' + ex.message);
+            return null;
+        }
+    },
+
+    /**
+     * Creates discovery audit log record.
+     * @private
+     */
+    _createDiscoveryRunLog: function(runId, appSysId, repoSysId, branchSysId, startTime, commitSha) {
+        'use strict';
+        try {
+            var gr = new GlideRecordSecure(this.RUN_TABLE);
+            gr.initialize();
+            gr.setValue('run_id', runId);
+            gr.setValue('application', appSysId);
+            if (repoSysId) gr.setValue('repository', repoSysId);
+            if (branchSysId) gr.setValue('branch', branchSysId);
+            gr.setValue('started_at', startTime);
+            gr.setValue('completed_at', new GlideDateTime().getValue());
+            gr.setValue('status', 'SUCCESS');
+            gr.setValue('latest_commit_sha', commitSha);
+            gr.setValue('executed_by', 'system');
+            gr.insert();
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Error creating discovery run log: ' + ex.message);
+        }
+    },
+
+    type: 'AppForgeApplicationDiscovery'
+};

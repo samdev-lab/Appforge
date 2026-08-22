@@ -1,0 +1,90 @@
+{
+  "name": "x_appforge_discovery_run",
+  "label": "AppForge Discovery Audit Run",
+  "description": "Audit log recording application discovery and branch binding execution runs",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "run_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "Unique discovery run execution key"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "x_appforge_application",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Target AppForge Application reference"
+    },
+    {
+      "name": "repository",
+      "type": "Reference",
+      "reference_table": "x_appforge_repository",
+      "description": "Target Repository reference"
+    },
+    {
+      "name": "branch",
+      "type": "Reference",
+      "reference_table": "x_appforge_git_branch",
+      "description": "Target Git Branch reference"
+    },
+    {
+      "name": "started_at",
+      "type": "GlideDateTime",
+      "description": "Discovery start timestamp"
+    },
+    {
+      "name": "completed_at",
+      "type": "GlideDateTime",
+      "description": "Discovery completion timestamp"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "mandatory": true,
+      "indexed": true,
+      "choices": ["RUNNING", "SUCCESS", "FAILED", "PARTIAL"],
+      "default_value": "RUNNING",
+      "description": "Execution status"
+    },
+    {
+      "name": "latest_commit_sha",
+      "type": "String",
+      "max_length": 100,
+      "description": "Discovered Git commit SHA"
+    },
+    {
+      "name": "changes_detected",
+      "type": "JSON",
+      "description": "Difference detection summary JSON"
+    },
+    {
+      "name": "error_message",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Error details if status is FAILED"
+    },
+    {
+      "name": "executed_by",
+      "type": "String",
+      "max_length": 100,
+      "description": "User or service account executing discovery"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_disc_run_id", "fields": ["run_id"], "unique": true },
+    { "name": "idx_disc_app", "fields": ["application"] },
+    { "name": "idx_disc_status", "fields": ["status"] }
+  ]
+}

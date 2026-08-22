@@ -1,0 +1,94 @@
+{
+  "name": "x_appforge_schema_field",
+  "label": "AppForge Schema Field Registry",
+  "description": "Registry metadata for individual attributes/fields defined on AppForge schemas",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "field_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Unique field identifier"
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Internal field name (snake_case)"
+    },
+    {
+      "name": "label",
+      "type": "String",
+      "max_length": 100,
+      "description": "UI display label"
+    },
+    {
+      "name": "schema",
+      "type": "Reference",
+      "reference_table": "x_appforge_schema",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Parent Schema reference"
+    },
+    {
+      "name": "internal_type",
+      "type": "Choice",
+      "mandatory": true,
+      "choices": ["string", "integer", "decimal", "boolean", "date", "datetime", "reference", "choice", "currency", "journal", "html"],
+      "description": "Supported ServiceNow field type"
+    },
+    {
+      "name": "max_length",
+      "type": "Integer",
+      "default_value": 40,
+      "description": "Maximum string length"
+    },
+    {
+      "name": "mandatory",
+      "type": "Boolean",
+      "default_value": false,
+      "description": "Mandatory flag"
+    },
+    {
+      "name": "unique",
+      "type": "Boolean",
+      "default_value": false,
+      "description": "Uniqueness constraint"
+    },
+    {
+      "name": "default_value",
+      "type": "String",
+      "max_length": 255,
+      "description": "Default field value"
+    },
+    {
+      "name": "reference_table",
+      "type": "String",
+      "max_length": 100,
+      "description": "Target ServiceNow table for reference fields"
+    },
+    {
+      "name": "sequence",
+      "type": "Integer",
+      "default_value": 10,
+      "description": "UI order sequence"
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "default_value": true,
+      "description": "Active state indicator"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_fld_sch_name", "fields": ["schema", "name"], "unique": true }
+  ]
+}

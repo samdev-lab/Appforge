@@ -1,0 +1,69 @@
+{
+  "name": "x_appforge_application_definition",
+  "label": "AppForge Application Definition",
+  "description": "Table storing declarative application definitions for the AppForge Application Factory",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "definition_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "Unique definition key (e.g. def_employee_onboarding_v1)"
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Internal definition name"
+    },
+    {
+      "name": "version",
+      "type": "String",
+      "max_length": 20,
+      "default_value": "1.0.0",
+      "description": "Definition semantic version"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "x_appforge_application",
+      "description": "Associated AppForge Application reference"
+    },
+    {
+      "name": "definition",
+      "type": "JSON",
+      "mandatory": true,
+      "description": "Complete raw JSON declarative definition payload"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "mandatory": true,
+      "indexed": true,
+      "choices": ["DRAFT", "VALIDATED", "PLANNED", "APPROVED", "EXECUTING", "COMPLETED", "FAILED", "ROLLED_BACK"],
+      "default_value": "DRAFT",
+      "description": "Definition lifecycle status"
+    },
+    {
+      "name": "source",
+      "type": "String",
+      "max_length": 100,
+      "default_value": "declarative",
+      "description": "Definition source mechanism"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_def_id", "fields": ["definition_id"], "unique": true },
+    { "name": "idx_def_status", "fields": ["status"] }
+  ]
+}

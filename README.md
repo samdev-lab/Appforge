@@ -6,7 +6,7 @@
 
 AppForge is a long-term **ServiceNow-native application platform** — an Application Factory built inside ServiceNow that allows administrators and developers to create, configure, secure, automate, integrate, and operate completely custom business applications (such as ITSM, CSM, SPM, HR, Vendor Management, Asset Management, Procurement, and custom line-of-business apps) using metadata-driven engines.
 
-> **Phase 001 Status**: Engineering Foundation & Source Control Integration Baseline established. No business functionality or custom business tables have been created yet.
+> **Phase 005 Status**: AppForge Application Factory Core established (`x_appforge_application_definition`, `x_appforge_factory_run`, `x_appforge_factory_operation`). Provisioning engine features declarative JSON definitions, dry-run planning, table name generator, field type mapper, compensating rollback engine, destructive operation protection, REST APIs (`POST /api/x_appforge/factory/plan` & `/execute`), and 77/77 automated test scenarios passed (100%).
 
 ---
 

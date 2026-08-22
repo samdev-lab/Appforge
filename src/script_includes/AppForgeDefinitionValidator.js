@@ -1,0 +1,140 @@
+/**
+ * AppForgeDefinitionValidator
+ * Validation service checking declarative application definition payload structure,
+ * constraints, field type mappings, reference targets, and destructive action guards.
+ */
+var AppForgeDefinitionValidator = Class.create();
+AppForgeDefinitionValidator.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeDefinitionValidator] ';
+        this.mapper = new AppForgeFieldTypeMapper();
+    },
+
+    /**
+     * Validates a declarative application definition JSON object or string.
+     * @param {Object|string} definitionPayload - Definition payload object or string.
+     * @return {Object} { valid: boolean, errors: Array, warnings: Array }.
+     */
+    validate: function(definitionPayload) {
+        'use strict';
+        var errors = [];
+        var warnings = [];
+
+        var def = definitionPayload;
+        if (typeof definitionPayload === 'string') {
+            try {
+                def = JSON.parse(definitionPayload);
+            } catch (ex) {
+                return { valid: false, errors: ['Invalid JSON definition payload string'], warnings: [] };
+            }
+        }
+
+        if (!def || typeof def !== 'object') {
+            return { valid: false, errors: ['Definition payload must be an object'], warnings: [] };
+        }
+
+        // 1. Validate Application block
+        var app = def.application;
+        if (!app) {
+            errors.push('Missing application metadata block');
+        } else {
+            if (!app.name) errors.push('Application metadata missing mandatory attribute: name');
+            if (!app.scope) errors.push('Application metadata missing mandatory attribute: scope');
+            if (!app.version) warnings.push('Application metadata missing version attribute, default 1.0.0 will be applied');
+        }
+
+        // 2. Validate Modules
+        var modules = def.modules || [];
+        var moduleNames = [];
+        for (var i = 0; i < modules.length; i++) {
+            var mod = modules[i];
+            if (!mod.name) {
+                errors.push('Module at index ' + i + ' missing mandatory attribute: name');
+            } else {
+                if (moduleNames.indexOf(mod.name) !== -1) {
+                    errors.push('Duplicate module name detected in definition: ' + mod.name);
+                } else {
+                    moduleNames.push(mod.name);
+                }
+            }
+        }
+
+        // 3. Validate Schemas & Fields
+        var schemas = def.schemas || [];
+        var schemaNames = [];
+        var knownSchemas = [];
+        for (var k = 0; k < schemas.length; k++) {
+            if (schemas[k].name) knownSchemas.push(schemas[k].name);
+        }
+
+        for (var j = 0; j < schemas.length; j++) {
+            var sch = schemas[j];
+            if (!sch.name) {
+                errors.push('Schema at index ' + j + ' missing mandatory attribute: name');
+                continue;
+            }
+
+            if (schemaNames.indexOf(sch.name) !== -1) {
+                errors.push('Duplicate schema name detected in definition: ' + sch.name);
+            } else {
+                schemaNames.push(sch.name);
+            }
+
+            // Destructive Action Guard
+            if (sch.action === 'delete' || sch.action === 'drop') {
+                errors.push('Destructive operation on schema (' + sch.name + ') BLOCKED: Destructive operation requires Migration Engine.');
+            }
+
+            // Validate Fields within Schema
+            var fields = sch.fields || [];
+            var fieldNames = [];
+
+            for (var f = 0; f < fields.length; f++) {
+                var fld = fields[f];
+                if (!fld.name) {
+                    errors.push('Field at index ' + f + ' on schema (' + sch.name + ') missing mandatory attribute: name');
+                    continue;
+                }
+
+                if (fieldNames.indexOf(fld.name) !== -1) {
+                    errors.push('Schema (' + sch.name + ') has duplicate field name: ' + fld.name);
+                } else {
+                    fieldNames.push(fld.name);
+                }
+
+                // Destructive Field Guard
+                if (fld.action === 'delete' || fld.action === 'drop') {
+                    errors.push('Destructive operation on field (' + fld.name + ') BLOCKED: Destructive operation requires Migration Engine.');
+                }
+
+                // Field Type Mapping check
+                if (!fld.type) {
+                    errors.push('Field (' + fld.name + ') on schema (' + sch.name + ') missing mandatory attribute: type');
+                } else {
+                    var typeResult = this.mapper.map(fld.type);
+                    if (!typeResult.valid) {
+                        errors.push('Field (' + fld.name + ') on schema (' + sch.name + '): ' + typeResult.error);
+                    }
+                }
+
+                // Reference Target Check
+                if (fld.type === 'reference') {
+                    if (!fld.reference && !fld.reference_table) {
+                        errors.push('Reference field (' + fld.name + ') on schema (' + sch.name + ') requires reference or reference_table target');
+                    } else if (fld.reference && knownSchemas.indexOf(fld.reference) === -1 && fld.reference.indexOf('sys_') !== 0) {
+                        warnings.push('Reference field (' + fld.name + ') references external or unlisted schema: ' + fld.reference);
+                    }
+                }
+            }
+        }
+
+        return {
+            valid: errors.length === 0,
+            errors: errors,
+            warnings: warnings
+        };
+    },
+
+    type: 'AppForgeDefinitionValidator'
+};

@@ -1,0 +1,85 @@
+{
+  "name": "x_appforge_schema",
+  "label": "AppForge Schema Registry",
+  "description": "Registry mapping logical entity metadata to physical ServiceNow platform tables",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "schema_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Unique schema identifier within the parent application"
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Logical entity name"
+    },
+    {
+      "name": "label",
+      "type": "String",
+      "max_length": 100,
+      "description": "UI display label"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "x_appforge_application",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Parent Application reference"
+    },
+    {
+      "name": "module",
+      "type": "Reference",
+      "reference_table": "x_appforge_module",
+      "description": "Parent Module reference (Optional)"
+    },
+    {
+      "name": "physical_table",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Actual physical ServiceNow table name (e.g. x_appforge_crm_customer)"
+    },
+    {
+      "name": "description",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Schema entity description"
+    },
+    {
+      "name": "version",
+      "type": "String",
+      "max_length": 20,
+      "default_value": "1.0.0",
+      "description": "Schema metadata version"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "choices": ["PLANNED", "DEVELOPMENT", "ACTIVE", "DEPRECATED", "RETIRED"],
+      "default_value": "ACTIVE",
+      "description": "Schema status"
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "default_value": true,
+      "description": "Active state indicator"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_sch_app_id", "fields": ["application", "schema_id"], "unique": true },
+    { "name": "idx_sch_phys_table", "fields": ["physical_table"] }
+  ]
+}

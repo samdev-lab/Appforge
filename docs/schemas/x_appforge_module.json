@@ -1,0 +1,85 @@
+{
+  "name": "x_appforge_module",
+  "label": "AppForge Module Registry",
+  "description": "Registry table holding module definitions owned by AppForge applications",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "module_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Unique module identifier within the parent application"
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Module internal name"
+    },
+    {
+      "name": "display_name",
+      "type": "String",
+      "max_length": 100,
+      "description": "UI display name"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "x_appforge_application",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Parent Application reference"
+    },
+    {
+      "name": "description",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Module functionality description"
+    },
+    {
+      "name": "type",
+      "type": "Choice",
+      "choices": ["CORE", "DATA", "UI", "API", "INTEGRATION", "WORKFLOW", "SECURITY", "REPORTING"],
+      "default_value": "CORE",
+      "description": "Functional domain type of module"
+    },
+    {
+      "name": "version",
+      "type": "String",
+      "max_length": 20,
+      "default_value": "1.0.0",
+      "description": "Module version"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "choices": ["PLANNED", "DEVELOPMENT", "ACTIVE", "DEPRECATED", "RETIRED"],
+      "default_value": "ACTIVE",
+      "description": "Module lifecycle status"
+    },
+    {
+      "name": "owner",
+      "type": "String",
+      "max_length": 100,
+      "description": "Module lead/owner"
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "default_value": true,
+      "description": "Active state indicator"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_mod_app_id", "fields": ["application", "module_id"], "unique": true },
+    { "name": "idx_mod_app_name", "fields": ["application", "name"], "unique": true }
+  ]
+}

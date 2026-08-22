@@ -1,0 +1,112 @@
+{
+  "name": "x_appforge_factory_run",
+  "label": "AppForge Factory Audit Run",
+  "description": "Audit log recording Factory execution runs, dry runs, and rollback status",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "run_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "Unique factory run execution key"
+    },
+    {
+      "name": "definition",
+      "type": "Reference",
+      "reference_table": "x_appforge_application_definition",
+      "mandatory": true,
+      "indexed": true,
+      "description": "Application Definition reference"
+    },
+    {
+      "name": "application",
+      "type": "Reference",
+      "reference_table": "x_appforge_application",
+      "description": "AppForge Application reference"
+    },
+    {
+      "name": "version",
+      "type": "String",
+      "max_length": 20,
+      "description": "Execution version"
+    },
+    {
+      "name": "mode",
+      "type": "Choice",
+      "mandatory": true,
+      "choices": ["PLAN", "DRY_RUN", "EXECUTE"],
+      "default_value": "PLAN",
+      "description": "Execution mode"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "mandatory": true,
+      "indexed": true,
+      "choices": ["RUNNING", "SUCCESS", "FAILED", "ROLLED_BACK"],
+      "default_value": "RUNNING",
+      "description": "Factory run status"
+    },
+    {
+      "name": "started_at",
+      "type": "GlideDateTime",
+      "description": "Execution start timestamp"
+    },
+    {
+      "name": "completed_at",
+      "type": "GlideDateTime",
+      "description": "Execution completion timestamp"
+    },
+    {
+      "name": "executed_by",
+      "type": "String",
+      "max_length": 100,
+      "description": "User executing factory run"
+    },
+    {
+      "name": "operations_total",
+      "type": "Integer",
+      "default_value": 0,
+      "description": "Total planned operations count"
+    },
+    {
+      "name": "operations_successful",
+      "type": "Integer",
+      "default_value": 0,
+      "description": "Successful operations count"
+    },
+    {
+      "name": "operations_failed",
+      "type": "Integer",
+      "default_value": 0,
+      "description": "Failed operations count"
+    },
+    {
+      "name": "rollback_status",
+      "type": "Choice",
+      "choices": ["NONE", "COMPLETE", "PARTIAL", "NOT_POSSIBLE"],
+      "default_value": "NONE",
+      "description": "Compensating rollback status"
+    },
+    {
+      "name": "error_message",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Execution error details"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_fac_run_id", "fields": ["run_id"], "unique": true },
+    { "name": "idx_fac_def", "fields": ["definition"] },
+    { "name": "idx_fac_status", "fields": ["status"] }
+  ]
+}

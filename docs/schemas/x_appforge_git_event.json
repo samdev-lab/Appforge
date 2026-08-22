@@ -1,0 +1,165 @@
+{
+  "name": "x_appforge_git_event",
+  "label": "AppForge Git Event",
+  "description": "Audit and persistence table for GitHub webhook events in AppForge",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "delivery_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "X-GitHub-Delivery header value for idempotency enforcement"
+    },
+    {
+      "name": "event_type",
+      "type": "String",
+      "max_length": 50,
+      "mandatory": true,
+      "indexed": true,
+      "description": "GitHub Event type (push, pull_request, pull_request_review, workflow_run)"
+    },
+    {
+      "name": "event_id",
+      "type": "String",
+      "max_length": 100,
+      "description": "Internal event identifier"
+    },
+    {
+      "name": "repository_id",
+      "type": "String",
+      "max_length": 50,
+      "indexed": true,
+      "description": "GitHub Repository Numeric ID"
+    },
+    {
+      "name": "repository_name",
+      "type": "String",
+      "max_length": 100,
+      "description": "Full repository name (e.g. samdev-lab/Appforge)"
+    },
+    {
+      "name": "repository_url",
+      "type": "String",
+      "max_length": 255,
+      "description": "GitHub Repository HTML URL"
+    },
+    {
+      "name": "branch",
+      "type": "String",
+      "max_length": 100,
+      "description": "Git branch name"
+    },
+    {
+      "name": "source_branch",
+      "type": "String",
+      "max_length": 100,
+      "description": "PR Source branch"
+    },
+    {
+      "name": "target_branch",
+      "type": "String",
+      "max_length": 100,
+      "description": "PR Target/Base branch"
+    },
+    {
+      "name": "commit_sha",
+      "type": "String",
+      "max_length": 100,
+      "indexed": true,
+      "description": "Head Commit SHA"
+    },
+    {
+      "name": "previous_commit_sha",
+      "type": "String",
+      "max_length": 100,
+      "description": "Before/Previous Commit SHA"
+    },
+    {
+      "name": "commit_message",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Head commit message text"
+    },
+    {
+      "name": "author",
+      "type": "String",
+      "max_length": 100,
+      "description": "Commit/PR Author Name or Email"
+    },
+    {
+      "name": "github_username",
+      "type": "String",
+      "max_length": 100,
+      "description": "GitHub User Login Handle"
+    },
+    {
+      "name": "pull_request_number",
+      "type": "Integer",
+      "description": "Pull Request Number"
+    },
+    {
+      "name": "pull_request_url",
+      "type": "String",
+      "max_length": 255,
+      "description": "Pull Request HTML URL"
+    },
+    {
+      "name": "action",
+      "type": "String",
+      "max_length": 50,
+      "description": "Event action (opened, synchronize, closed, submitted, etc.)"
+    },
+    {
+      "name": "payload",
+      "type": "JSON",
+      "description": "Complete raw JSON webhook payload"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "mandatory": true,
+      "indexed": true,
+      "choices": ["RECEIVED", "PROCESSING", "PROCESSED", "FAILED", "IGNORED", "UNMAPPED"],
+      "default_value": "RECEIVED",
+      "description": "Lifecycle processing status"
+    },
+    {
+      "name": "processing_attempts",
+      "type": "Integer",
+      "default_value": 1,
+      "description": "Number of processing attempts"
+    },
+    {
+      "name": "processed_at",
+      "type": "GlideDateTime",
+      "description": "Timestamp when processing finished"
+    },
+    {
+      "name": "received_at",
+      "type": "GlideDateTime",
+      "description": "Timestamp when payload was received"
+    },
+    {
+      "name": "error_message",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Sanitized error details if status is FAILED"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_delivery_id", "fields": ["delivery_id"], "unique": true },
+    { "name": "idx_event_type", "fields": ["event_type"] },
+    { "name": "idx_repository_id", "fields": ["repository_id"] },
+    { "name": "idx_commit_sha", "fields": ["commit_sha"] },
+    { "name": "idx_status", "fields": ["status"] }
+  ]
+}
