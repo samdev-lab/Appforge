@@ -6,7 +6,7 @@
 
 AppForge is a long-term **ServiceNow-native application platform** — an Application Factory built inside ServiceNow that allows administrators and developers to create, configure, secure, automate, integrate, and operate completely custom business applications (such as ITSM, CSM, SPM, HR, Vendor Management, Asset Management, Procurement, and custom line-of-business apps) using metadata-driven engines.
 
-> **Phase 003 Status**: AppForge Platform Foundation & Registries established (`x_appforge_application`, `x_appforge_module`, `x_appforge_schema`, `x_appforge_schema_field`). Controlled lifecycle state machine, composite module/schema uniqueness, REST query APIs, and 30/30 automated test suite scenarios verified. Zero automatic code deployment or table generation executed.
+> **Phase 004 Status**: AppForge Application Discovery & Branch Binding Engine established (`x_appforge_git_branch`, `x_appforge_discovery_run`). Binds real ServiceNow Application (`x_appforge`) to GitHub branch (`sn_instances/dev280961` on `samdev-lab/Appforge`), parses instance pattern (`dev280961`), executes difference detection (`MATCH`/`DIFFERENCE`), and passes 50/50 automated test scenarios (100%). Zero code deployment or branch reset executed.
 
 ---
 

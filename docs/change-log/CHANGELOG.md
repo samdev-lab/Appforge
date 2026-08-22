@@ -5,6 +5,18 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-08-23
+
+### Added - Stage 2 Foundation: Application Discovery & Branch Binding Engine
+- Created Git Branch Registry schema (`x_appforge_git_branch`) mapping Git branches (`sn_instances/dev280961`) to AppForge Applications.
+- Created Discovery Audit Run schema (`x_appforge_discovery_run`) logging discovery execution runs and latest commit SHAs.
+- Implemented Branch Pattern Parser service (`AppForgeBranchPatternParser.js`) recognizing instance pattern `sn_instances/{instance_identifier}` (`INSTANCE` type with instance `dev280961`).
+- Implemented Branch Validator service (`AppForgeGitBranchValidator.js`) evaluating relationship health (`VALID`, `INVALID`, `MISSING`, `UNMAPPED`, `STALE`, `ERROR`).
+- Implemented Application Discovery service (`AppForgeApplicationDiscovery.js`) for idempotent discovery of ServiceNow application metadata and branch binding.
+- Implemented Metadata Difference Detector service (`AppForgeDifferenceDetector.js`) comparing registered vs actual state (`MATCH`, `DIFFERENCE`, `MISSING`, `ERROR`).
+- Implemented Discovery REST API (`AppForgeDiscoveryAPI.js`) for `POST /api/x_appforge/applications/{application_id}/discover`.
+- Formulated automated test suite (`tests/AppForgeDiscoveryTestSuite.js`) executing 20 new Prompt 004 scenarios + 20 Prompt 003 Registry regression scenarios + 10 Prompt 002 Webhook regression scenarios (50/50 PASSED).
+
 ## [0.3.0] - 2026-08-23
 
 ### Added - Stage 0.3: Platform Foundation & Registries
