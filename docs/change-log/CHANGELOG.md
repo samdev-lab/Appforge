@@ -5,6 +5,20 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-08-23
+
+### Added — Stage 5: Security & Access Control Factory
+- Created Security Registry schemas: `x_appforge_role`, `x_appforge_acl`, `x_appforge_data_policy`, `x_appforge_security_policy`, `x_appforge_security_run`, `x_appforge_security_operation`.
+- Implemented `AppForgeSecurityValidator.js` — validates application-scoped roles, role hierarchy (cycle/circular inheritance detection), table/field/record ACLs, data policies, and cross-scope restrictions.
+- Implemented `AppForgeSecurityAnalyzer.js` — pre-flight security analyzer scanning for admin lockout risk, privilege escalation, cross-scope access, public access risk, wildcard write rules, and sensitive field exposure.
+- Implemented `AppForgeSecurityPlanner.js` — dependency-ordered dry-run planner (Roles by inheritance → Table ACLs → Field ACLs → Record ACLs → Data Policies).
+- Implemented `AppForgeSecurityRollback.js` — compensating rollback manager for reversible security artifacts.
+- Implemented `AppForgeSecurityExecutor.js` — provisions real ServiceNow platform security artifacts: `sys_user_role`, `sys_user_role_contains`, `sys_security_acl`, `sys_security_acl_role`, `sys_data_policy2`, `sys_data_policy_rule`, and updates AppForge security registries.
+- Implemented `AppForgeSecurityAPI.js` — Scripted REST API for `POST /api/x_appforge/security/plan` & `POST /api/x_appforge/security/execute` with strict RBAC.
+- Created `tests/AppForgeSecurityTestSuite.js` — 40 automated test scenarios covering Roles, ACLs, Field Security, Record Security, Data Policies, Security Analysis, API Security, and End-to-End Integration.
+- Created `scratch/test_security_artifact_audit.js` — real positive/negative authorization testing matrix across normal user, manager, admin, field security (`salary`), record security (`manager = current_user`), and data policy enforcement.
+- All 177/177 automated test scenarios passed (40 Prompt 008 + 137 regressions).
+
 ## [0.7.0] - 2026-08-23
 
 ### Added — Stage 4: Logic & Automation Factory

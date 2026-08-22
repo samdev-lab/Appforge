@@ -1,0 +1,19 @@
+{
+  "name": "x_appforge_security_policy",
+  "label": "AppForge Master Security Policy",
+  "description": "Centralized registry linking Application to its comprehensive security posture (Roles, ACLs, Policies)",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "policy_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "default_deny", "type": "Boolean", "default_value": true },
+    { "name": "lockout_protection_enabled", "type": "Boolean", "default_value": true },
+    { "name": "status", "type": "Choice", "choices": ["ACTIVE", "DRAFT", "ARCHIVED"], "default_value": "ACTIVE" },
+    { "name": "version", "type": "String", "max_length": 20, "default_value": "1.0.0" }
+  ],
+  "indexes": [
+    { "name": "idx_sec_pol_id", "fields": ["policy_id"], "unique": true }
+  ]
+}

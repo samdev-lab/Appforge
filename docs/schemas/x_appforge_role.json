@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_role",
+  "label": "AppForge Role Registry",
+  "description": "Registry storing application-scoped security roles and inheritance mappings",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "role_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "description", "type": "String", "max_length": 1000 },
+    { "name": "inherits_from", "type": "String", "max_length": 100, "description": "Parent role name for inheritance" },
+    { "name": "active", "type": "Boolean", "default_value": true },
+    { "name": "version", "type": "String", "max_length": 20, "default_value": "1.0.0" },
+    { "name": "status", "type": "Choice", "choices": ["ACTIVE", "INACTIVE", "DEPRECATED"], "default_value": "ACTIVE" },
+    { "name": "sn_sys_id", "type": "String", "max_length": 32, "description": "ServiceNow sys_user_role sys_id" }
+  ],
+  "indexes": [
+    { "name": "idx_role_id", "fields": ["role_id"], "unique": true },
+    { "name": "idx_role_app_name", "fields": ["application", "name"], "unique": true }
+  ]
+}

@@ -6,7 +6,7 @@
 
 AppForge is a long-term **ServiceNow-native application platform** — an Application Factory built inside ServiceNow that allows administrators and developers to create, configure, secure, automate, integrate, and operate completely custom business applications (such as ITSM, CSM, SPM, HR, Vendor Management, Asset Management, Procurement, and custom line-of-business apps) using metadata-driven engines.
 
-> **Phase 007 Status**: AppForge Logic & Automation Factory established. Provisions real ServiceNow platform automation artifacts (`sys_script` Business Rules, `sys_script_include` Script Includes, `sysevent_register` Events, `sysevent_email_action` Notifications) using declarative definitions with security scanning (AppForgeScriptSecurityScanner), condition engine (AppForgeConditionEngine), action engine (AppForgeActionEngine), cross-scope protection, destructive operation guards, dry-run planning, REST APIs (`POST /api/x_appforge/logic/plan` & `/execute`), and 137/137 automated test scenarios passed (100%).
+> **Phase 008 Status**: AppForge Security & Access Control Factory established (`x_appforge_role`, `x_appforge_acl`, `x_appforge_data_policy`, `x_appforge_security_policy`). Provisions real ServiceNow platform security artifacts (`sys_user_role`, `sys_user_role_contains`, `sys_security_acl`, `sys_security_acl_role`, `sys_data_policy2`, `sys_data_policy_rule`) with static security analysis (AppForgeSecurityAnalyzer), lockout protection, cross-scope enforcement, least-privilege, dry-run planning, REST APIs (`POST /api/x_appforge/security/plan` & `/execute`), and 177/177 automated test scenarios passed (100%).
 
 ---
 

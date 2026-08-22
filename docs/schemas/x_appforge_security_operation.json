@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_security_operation",
+  "label": "AppForge Security Operation Audit",
+  "description": "Granular operation audit log recording individual security provisioning steps",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run", "type": "Reference", "reference_table": "x_appforge_security_run", "mandatory": true, "indexed": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["CREATE_ROLE", "UPDATE_ROLE", "CREATE_ACL", "UPDATE_ACL", "CREATE_DATA_POLICY", "ROLLBACK"] },
+    { "name": "target_type", "type": "String", "max_length": 50 },
+    { "name": "target_name", "type": "String", "max_length": 200 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "sequence", "type": "Integer" },
+    { "name": "before_state_json", "type": "String", "max_length": 8000 },
+    { "name": "after_state_json", "type": "String", "max_length": 8000 },
+    { "name": "security_result", "type": "Choice", "choices": ["PASS", "WARN", "BLOCK", "N_A"], "default_value": "PASS" },
+    { "name": "error_message", "type": "String", "max_length": 4000 }
+  ],
+  "indexes": [
+    { "name": "idx_sec_op_run", "fields": ["run"] }
+  ]
+}
