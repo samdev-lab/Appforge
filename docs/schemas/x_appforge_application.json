@@ -1,0 +1,103 @@
+{
+  "name": "x_appforge_application",
+  "label": "AppForge Application Registry",
+  "description": "Registry table holding metadata definitions for AppForge hosted applications",
+  "scope": "x_appforge",
+  "fields": [
+    {
+      "name": "sys_id",
+      "type": "GUID",
+      "mandatory": true,
+      "primary_key": true
+    },
+    {
+      "name": "application_id",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "Unique system identifier for the application (snake_case)"
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "max_length": 100,
+      "mandatory": true,
+      "description": "Internal name of the application"
+    },
+    {
+      "name": "display_name",
+      "type": "String",
+      "max_length": 100,
+      "description": "Human-readable label for UI display"
+    },
+    {
+      "name": "scope",
+      "type": "String",
+      "max_length": 50,
+      "mandatory": true,
+      "unique": true,
+      "indexed": true,
+      "description": "ServiceNow application scope prefix (e.g. x_appforge)"
+    },
+    {
+      "name": "version",
+      "type": "String",
+      "max_length": 20,
+      "default_value": "0.1.0",
+      "description": "Application semantic version (MAJOR.MINOR.PATCH)"
+    },
+    {
+      "name": "description",
+      "type": "String",
+      "max_length": 4000,
+      "description": "Detailed functional summary of the application"
+    },
+    {
+      "name": "publisher",
+      "type": "String",
+      "max_length": 100,
+      "description": "Publishing organization or author"
+    },
+    {
+      "name": "status",
+      "type": "Choice",
+      "mandatory": true,
+      "indexed": true,
+      "choices": ["PLANNED", "DEVELOPMENT", "TESTING", "UAT", "PRODUCTION", "RETIRED"],
+      "default_value": "PLANNED",
+      "description": "Controlled lifecycle status"
+    },
+    {
+      "name": "repository",
+      "type": "Reference",
+      "reference_table": "x_appforge_repository",
+      "description": "Associated GitHub Repository Mapping record"
+    },
+    {
+      "name": "repository_branch",
+      "type": "String",
+      "max_length": 100,
+      "default_value": "main",
+      "description": "Target Git release branch"
+    },
+    {
+      "name": "owner",
+      "type": "String",
+      "max_length": 100,
+      "description": "Product Owner / Lead Engineer username or email"
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "default_value": true,
+      "description": "Active state indicator"
+    }
+  ],
+  "indexes": [
+    { "name": "idx_app_id", "fields": ["application_id"], "unique": true },
+    { "name": "idx_app_scope", "fields": ["scope"], "unique": true },
+    { "name": "idx_app_status", "fields": ["status"] }
+  ]
+}

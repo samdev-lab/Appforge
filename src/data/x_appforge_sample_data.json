@@ -1,0 +1,72 @@
+{
+  "applications": [
+    {
+      "application_id": "appforge_platform",
+      "name": "AppForge Platform",
+      "display_name": "AppForge Application Platform Engine",
+      "scope": "x_appforge",
+      "version": "0.3.0",
+      "publisher": "ServiceNow Platform Team",
+      "status": "DEVELOPMENT",
+      "repository_branch": "main",
+      "owner": "admin@appforge.local",
+      "description": "Native Application Factory platform engine inside ServiceNow",
+      "active": true
+    }
+  ],
+  "modules": [
+    {
+      "module_id": "mod_foundation",
+      "name": "Platform Foundation",
+      "display_name": "AppForge Core Registries & Security Foundation",
+      "application_id": "appforge_platform",
+      "type": "CORE",
+      "version": "1.0.0",
+      "status": "ACTIVE",
+      "owner": "admin@appforge.local",
+      "active": true
+    }
+  ],
+  "schemas": [
+    {
+      "schema_id": "sch_application",
+      "name": "Application",
+      "label": "AppForge Application Registry",
+      "application_id": "appforge_platform",
+      "module_id": "mod_foundation",
+      "physical_table": "x_appforge_application",
+      "version": "1.0.0",
+      "status": "ACTIVE"
+    },
+    {
+      "schema_id": "sch_module",
+      "name": "Module",
+      "label": "AppForge Module Registry",
+      "application_id": "appforge_platform",
+      "module_id": "mod_foundation",
+      "physical_table": "x_appforge_module",
+      "version": "1.0.0",
+      "status": "ACTIVE"
+    },
+    {
+      "schema_id": "sch_schema",
+      "name": "Schema",
+      "label": "AppForge Schema Registry",
+      "application_id": "appforge_platform",
+      "module_id": "mod_foundation",
+      "physical_table": "x_appforge_schema",
+      "version": "1.0.0",
+      "status": "ACTIVE"
+    },
+    {
+      "schema_id": "sch_schema_field",
+      "name": "Schema Field",
+      "label": "AppForge Schema Field Registry",
+      "application_id": "appforge_platform",
+      "module_id": "mod_foundation",
+      "physical_table": "x_appforge_schema_field",
+      "version": "1.0.0",
+      "status": "ACTIVE"
+    }
+  ]
+}

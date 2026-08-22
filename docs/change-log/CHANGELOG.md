@@ -5,6 +5,18 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-23
+
+### Added - Stage 0.3: Platform Foundation & Registries
+- Created Application Registry schema (`x_appforge_application`) with unique `application_id`, `scope`, and controlled lifecycle state machine (`PLANNED` → `DEVELOPMENT` → `TESTING` → `UAT` → `PRODUCTION` → `RETIRED`).
+- Created Module Registry schema (`x_appforge_module`) with composite application-scoped uniqueness.
+- Created Schema Registry schema (`x_appforge_schema`) mapping logical application entities to physical ServiceNow platform tables (`physical_table`).
+- Created Schema Field Registry schema (`x_appforge_schema_field`) supporting field types (`string`, `integer`, `decimal`, `boolean`, `date`, `datetime`, `reference`, `choice`, `currency`, `journal`, `html`).
+- Implemented Server-Side Registry Services: `AppForgeApplicationRegistry`, `AppForgeModuleRegistry`, `AppForgeSchemaRegistry`, `AppForgeSchemaFieldRegistry`.
+- Implemented Registry Read-Only REST APIs (`AppForgeRegistryRESTAPI.js`) for querying `/applications`, `/modules`, `/schemas`, `/schemas/{id}/fields`.
+- Created sample seed dataset (`src/data/x_appforge_sample_data.json`) for `AppForge Platform` (`0.3.0`), `Platform Foundation` module, and core schemas.
+- Formulated automated test runner suite (`tests/AppForgeRegistryTestSuite.js`) executing 20 new registry scenarios + 10 Phase 002 Webhook regression scenarios (30/30 PASSED).
+
 ## [0.2.0] - 2026-08-23
 
 ### Added - Stage 0.2: GitHub → ServiceNow Webhook Integration

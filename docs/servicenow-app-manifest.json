@@ -2,7 +2,7 @@
   "name": "AppForge",
   "scope": "x_appforge",
   "vendor_prefix": "x_appforge",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "short_description": "Application Factory and native platform engine for ServiceNow",
   "category": "Platform / Custom Application",
   "dependencies": [],
