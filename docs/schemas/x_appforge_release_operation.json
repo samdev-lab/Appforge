@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_release_operation",
+  "label": "AppForge Release Operation Audit",
+  "description": "Granular operation audit log recording individual release and migration steps",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run", "type": "Reference", "reference_table": "x_appforge_release_run", "mandatory": true, "indexed": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["CREATE_PACKAGE", "REGISTER_VERSION", "VALIDATE_DEPENDENCY", "CREATE_SNAPSHOT", "PLAN_MIGRATION", "APPLY_UPGRADE", "ROLLBACK"] },
+    { "name": "target_type", "type": "String", "max_length": 50 },
+    { "name": "target_name", "type": "String", "max_length": 200 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "sequence", "type": "Integer" },
+    { "name": "before_state_json", "type": "String", "max_length": 8000 },
+    { "name": "after_state_json", "type": "String", "max_length": 8000 },
+    { "name": "error_message", "type": "String", "max_length": 4000 }
+  ],
+  "indexes": [
+    { "name": "idx_rel_op_run", "fields": ["run"] }
+  ]
+}

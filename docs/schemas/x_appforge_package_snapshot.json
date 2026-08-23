@@ -1,0 +1,19 @@
+{
+  "name": "x_appforge_package_snapshot",
+  "label": "AppForge Package State Snapshot",
+  "description": "Registry capturing serialized pre-upgrade application state for backup and comparison",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "snapshot_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "state_json", "type": "String", "max_length": 32000, "description": "Serialized JSON snapshot of all 5 application layers" },
+    { "name": "checksum", "type": "String", "max_length": 64, "mandatory": true },
+    { "name": "created_by", "type": "String", "max_length": 100 },
+    { "name": "created_at", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_snap_id", "fields": ["snapshot_id"], "unique": true }
+  ]
+}

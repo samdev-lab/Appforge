@@ -1,0 +1,23 @@
+{
+  "name": "x_appforge_application_version",
+  "label": "AppForge Application Version Registry",
+  "description": "Registry tracking authoritative semantic version history, change classifications, and release notes for applications",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "version_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "version", "type": "String", "max_length": 30, "mandatory": true, "indexed": true },
+    { "name": "previous_version", "type": "String", "max_length": 30 },
+    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package", "indexed": true },
+    { "name": "change_type", "type": "Choice", "choices": ["MAJOR", "MINOR", "PATCH", "INITIAL"], "default_value": "MINOR" },
+    { "name": "release_notes", "type": "String", "max_length": 8000 },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "RELEASED", "DEPRECATED"], "default_value": "DRAFT" },
+    { "name": "created_by", "type": "String", "max_length": 100 },
+    { "name": "created_at", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_ver_id", "fields": ["version_id"], "unique": true },
+    { "name": "idx_ver_app_ver", "fields": ["application", "version"], "unique": true }
+  ]
+}

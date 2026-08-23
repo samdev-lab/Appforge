@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_migration",
+  "label": "AppForge Migration Manifest Registry",
+  "description": "Registry tracking schema, data policy, logic, and security migration steps between application versions",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "migration_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package", "mandatory": true, "indexed": true },
+    { "name": "source_version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "target_version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "operation", "type": "Choice", "choices": ["ADD_FIELD", "MODIFY_FIELD", "UPDATE_FORM", "UPDATE_LIST", "CREATE_RULE", "UPDATE_RULE", "UPDATE_ACL", "UPDATE_API"], "mandatory": true },
+    { "name": "target_artifact", "type": "String", "max_length": 200 },
+    { "name": "risk_level", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "BREAKING"], "default_value": "LOW" },
+    { "name": "status", "type": "Choice", "choices": ["PLANNED", "EXECUTED", "ROLLED_BACK", "SKIPPED"], "default_value": "PLANNED" },
+    { "name": "rollback_strategy", "type": "String", "max_length": 1000 }
+  ],
+  "indexes": [
+    { "name": "idx_mig_id", "fields": ["migration_id"], "unique": true }
+  ]
+}

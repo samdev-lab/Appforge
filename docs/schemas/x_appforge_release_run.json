@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_release_run",
+  "label": "AppForge Release Audit Run",
+  "description": "Audit log recording release and migration lifecycle runs and execution status",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "source_environment", "type": "String", "max_length": 50, "default_value": "DEV" },
+    { "name": "target_environment", "type": "String", "max_length": 50, "default_value": "TEST" },
+    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package" },
+    { "name": "mode", "type": "Choice", "choices": ["PLAN", "DRY_RUN", "IMPORT", "UPGRADE"], "default_value": "PLAN" },
+    { "name": "status", "type": "Choice", "choices": ["RUNNING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "RUNNING" },
+    { "name": "git_branch", "type": "String", "max_length": 200 },
+    { "name": "git_commit", "type": "String", "max_length": 100 },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "executed_by", "type": "String", "max_length": 100 }
+  ]
+}

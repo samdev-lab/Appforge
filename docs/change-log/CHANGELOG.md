@@ -5,6 +5,25 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-08-23
+
+### Added — Stage 7: Application Packaging, Versioning & Lifecycle Governance Factory
+- Created Packaging & Lifecycle Registry schemas: `x_appforge_package`, `x_appforge_application_version`, `x_appforge_migration`, `x_appforge_package_snapshot`, `x_appforge_release_approval`, `x_appforge_release_run`, `x_appforge_release_operation`.
+- Implemented `AppForgePackageInventory.js` — inventories all 5 application layers (Data, Experience, Behavior, Security, Integration) and performs completeness checks.
+- Implemented `AppForgeChecksumEngine.js` — calculates deterministic, order-independent SHA-256 checksums from canonicalized component metadata.
+- Implemented `AppForgePackageSigner.js` — cryptographically signs and verifies application packages using HMAC-SHA256 digests.
+- Implemented `AppForgePackageDiffEngine.js` — compares application versions, identifying ADDED, MODIFIED, UNCHANGED, REMOVED, and BREAKING changes.
+- Implemented `AppForgeReleaseNotesGenerator.js` — generates structured, deterministic release notes markdown from package diffs.
+- Implemented `AppForgePackageCompatibilityChecker.js` — verifies platform, AppForge version, and environment compatibility (`DEV`, `TEST`, `UAT`, `PRODUCTION`) while enforcing strict downgrade protection.
+- Implemented `AppForgePackageSecurityAnalyzer.js` — scans packages for raw secrets, unsafe scripts, admin escalation, and destructive drop operations.
+- Implemented `AppForgePackagePlanner.js` — dependency-ordered dry-run planner for application imports and upgrades, generating migration steps and rollback strategies.
+- Implemented `AppForgeLifecycleManager.js` — manages application lifecycle gates (`PLANNED` → `DEVELOPMENT` → `TESTING` → `UAT` → `PRODUCTION-READY`) with release approvals.
+- Implemented `AppForgePackageExecutor.js` — builds packages, serializes snapshots, registers semantic versions, and records audit logs.
+- Implemented `AppForgePackageAPI.js` — Scripted REST API for `POST /api/x_appforge/package/export`, `/plan`, `/import`, and `/approve` with strict RBAC.
+- Created `tests/AppForgePackageTestSuite.js` — 45 automated test scenarios covering Packaging, Versioning, Dependencies, Security, Planning, Lifecycle, GitHub Tracking, and Real Platform Operations.
+- Created `scratch/test_package_artifact_audit.js` — real platform verification of 5-layer inventory, packaging v1.0.0 & v1.1.0, checksums, diff engine, release notes, migration & rollback planning, and idempotency.
+- All 267/267 automated test scenarios passed (45 Prompt 010 + 222 regressions).
+
 ## [0.9.0] - 2026-08-23
 
 ### Added — Stage 6: Integration & API Factory

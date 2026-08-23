@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_release_approval",
+  "label": "AppForge Release Approval Registry",
+  "description": "Registry tracking formal release approval gates for UAT and production package promotions",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "approval_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "target_environment", "type": "Choice", "choices": ["TEST", "UAT", "PRODUCTION"], "mandatory": true },
+    { "name": "requested_by", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "approval_status", "type": "Choice", "choices": ["PENDING", "APPROVED", "REJECTED", "CANCELLED"], "default_value": "PENDING" },
+    { "name": "approval_date", "type": "GlideDateTime" },
+    { "name": "comments", "type": "String", "max_length": 2000 }
+  ],
+  "indexes": [
+    { "name": "idx_appr_id", "fields": ["approval_id"], "unique": true },
+    { "name": "idx_appr_app_ver_env", "fields": ["application", "version", "target_environment"] }
+  ]
+}
