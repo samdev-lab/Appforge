@@ -1,0 +1,25 @@
+{
+  "name": "x_appforge_intelligence_run",
+  "label": "AppForge Intelligence Run Audit",
+  "description": "Audit log recording intelligence analysis executions, input context hashes, and diagnostic results",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "environment", "type": "String", "max_length": 50 },
+    { "name": "analysis_type", "type": "Choice", "choices": ["HEALTH", "ANOMALY", "DIAGNOSIS", "RECOMMENDATION", "FULL_AUDIT"], "default_value": "DIAGNOSIS" },
+    { "name": "requested_by", "type": "String", "max_length": 100 },
+    { "name": "input_context_hash", "type": "String", "max_length": 64 },
+    { "name": "health_score", "type": "Integer" },
+    { "name": "anomalies_detected", "type": "Integer", "default_value": 0 },
+    { "name": "confidence", "type": "Decimal", "default_value": 1.0 },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "duration_ms", "type": "Integer", "default_value": 0 },
+    { "name": "status", "type": "Choice", "choices": ["SUCCESS", "FAILED"], "default_value": "SUCCESS" },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_intel_run_id", "fields": ["run_id"], "unique": true }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_remediation",
+  "label": "AppForge Remediation Action Registry",
+  "description": "Registry of proposed self-healing and operational remediation actions with strict safety gating",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "remediation_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "incident", "type": "Reference", "reference_table": "x_appforge_incident" },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "action_type", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "safety_classification", "type": "Choice", "choices": ["READ_ONLY", "SAFE_AUTOMATION", "APPROVAL_REQUIRED", "FORBIDDEN"], "default_value": "APPROVAL_REQUIRED" },
+    { "name": "status", "type": "Choice", "choices": ["PROPOSED", "APPROVED", "EXECUTING", "COMPLETED", "FAILED", "REJECTED"], "default_value": "PROPOSED" },
+    { "name": "reason", "type": "String", "max_length": 2000 },
+    { "name": "evidence_json", "type": "String", "max_length": 4000 },
+    { "name": "requested_by", "type": "String", "max_length": 100 },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "execution_result", "type": "String", "max_length": 4000 },
+    { "name": "created_on", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_rem_id", "fields": ["remediation_id"], "unique": true }
+  ]
+}

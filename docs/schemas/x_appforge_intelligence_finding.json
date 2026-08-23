@@ -1,0 +1,23 @@
+{
+  "name": "x_appforge_intelligence_finding",
+  "label": "AppForge Intelligence Finding Log",
+  "description": "Log of detected anomalies, performance regressions, and health degradation findings",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "finding_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "intelligence_run", "type": "Reference", "reference_table": "x_appforge_intelligence_run", "mandatory": true, "indexed": true },
+    { "name": "finding_type", "type": "Choice", "choices": ["THRESHOLD", "RATE_SPIKE", "ERROR_SPIKE", "LATENCY_SPIKE", "FAILURE_PATTERN", "DRIFT_DETECTED", "REPEATED_FAILURE", "UNUSUAL_VOLUME"], "mandatory": true },
+    { "name": "severity", "type": "Choice", "choices": ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "MEDIUM" },
+    { "name": "metric_name", "type": "String", "max_length": 100 },
+    { "name": "observed_value", "type": "String", "max_length": 100 },
+    { "name": "expected_value", "type": "String", "max_length": 100 },
+    { "name": "confidence", "type": "Decimal", "default_value": 0.9 },
+    { "name": "evidence_json", "type": "String", "max_length": 4000 },
+    { "name": "status", "type": "Choice", "choices": ["OPEN", "ACKNOWLEDGED", "RESOLVED", "FALSE_POSITIVE"], "default_value": "OPEN" },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_finding_id", "fields": ["finding_id"], "unique": true }
+  ]
+}

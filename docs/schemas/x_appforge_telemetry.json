@@ -1,0 +1,31 @@
+{
+  "name": "x_appforge_telemetry",
+  "label": "AppForge Telemetry Registry",
+  "description": "Normalized application telemetry log capturing multi-layer events, latencies, and status with secret masking",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "telemetry_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "module", "type": "String", "max_length": 100 },
+    { "name": "schema", "type": "String", "max_length": 100 },
+    { "name": "environment", "type": "String", "max_length": 50, "default_value": "DEV" },
+    { "name": "event_type", "type": "Choice", "choices": ["APPLICATION", "DEPLOYMENT", "MIGRATION", "API", "WEBHOOK", "BUSINESS_RULE", "SCRIPT_INCLUDE", "NOTIFICATION", "SECURITY", "DATABASE", "UI", "INTEGRATION", "ERROR", "PERFORMANCE", "SYSTEM"], "mandatory": true },
+    { "name": "severity", "type": "Choice", "choices": ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "INFO" },
+    { "name": "source", "type": "String", "max_length": 100 },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "transaction_id", "type": "String", "max_length": 100 },
+    { "name": "duration_ms", "type": "Integer", "default_value": 0 },
+    { "name": "status", "type": "Choice", "choices": ["SUCCESS", "FAILURE", "WARNING", "TIMEOUT"], "default_value": "SUCCESS" },
+    { "name": "operation", "type": "String", "max_length": 100 },
+    { "name": "actor", "type": "String", "max_length": 100 },
+    { "name": "metadata_json", "type": "String", "max_length": 8000, "description": "Sanitized JSON payload with [REDACTED_SECRET]" },
+    { "name": "timestamp", "type": "GlideDateTime", "indexed": true },
+    { "name": "created_on", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_tel_id", "fields": ["telemetry_id"], "unique": true },
+    { "name": "idx_tel_app_time", "fields": ["application", "timestamp"] },
+    { "name": "idx_tel_corr", "fields": ["correlation_id"] }
+  ]
+}

@@ -5,6 +5,27 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-08-23
+
+### Added — Stage 10: Application Intelligence & Observability Factory
+- Created Telemetry & Intelligence Registry schemas: `x_appforge_telemetry`, `x_appforge_incident`, `x_appforge_remediation`, `x_appforge_intelligence_run`, `x_appforge_intelligence_finding`, `x_appforge_intelligence_recommendation`.
+- Implemented `AppForgeTelemetryService.js` — cross-layer telemetry ingestion across all 5 architectural tiers with automatic secret sanitization (`[REDACTED_SECRET]`), deduplication, and retention policies.
+- Implemented `AppForgeMetricsEngine.js` — metrics engine calculating Counters, Gauges, Histograms, Latencies (avg, p50, p95, p99), Error Rates, and Success Rates.
+- Implemented `AppForgeBaselineEngine.js` — statistical baseline engine (min, max, average, median, p95, std dev) over configurable time windows without claiming ML.
+- Implemented `AppForgeAnomalyDetector.js` — detects threshold violations, latency spikes, error spikes, failure patterns, and security anomalies.
+- Implemented `AppForgeApplicationHealthEngine.js` — deterministic 0–100 health scoring (`HEALTHY`, `DEGRADED`, `WARNING`, `CRITICAL`, `UNKNOWN`) across weighted architectural layers.
+- Implemented `AppForgeIncidentCorrelationEngine.js` — correlates multi-layer event cascades by correlation ID into singular incident groups.
+- Implemented `AppForgeRootCauseEngine.js` — evidence-based root cause analysis tracing through architectural dependency graphs.
+- Implemented `AppForgeChangeCorrelationEngine.js` — correlates incidents with recent deployments, migrations, and package changes (`POSSIBLE_CHANGE_CORRELATION`).
+- Implemented `AppForgeRecommendationEngine.js` — deterministic recommendation generator with safety classifications (`READ_ONLY`, `SAFE_AUTOMATION`, `APPROVAL_REQUIRED`, `FORBIDDEN`).
+- Implemented `AppForgeDiagnosticEngine.js` — master diagnostic coordinator aggregating health, metrics, anomalies, incidents, and root causes into audit logs.
+- Implemented `AppForgeIntelligenceContext.js` — prepares sanitized, secret-free context packages for downstream AI reasoning.
+- Implemented `MockIntelligenceProvider.js` — provider-neutral AI interface abstraction.
+- Implemented `AppForgeIntelligenceAPI.js` — Scripted REST API for `/health`, `/anomalies`, `/diagnose`, `/recommend`, `/summary/{id}` with strict RBAC.
+- Created `tests/AppForgeIntelligenceTestSuite.js` — 66 automated test scenarios covering Telemetry, Metrics, Baselines, Health Scoring, Anomaly Detection, Incident Correlation, Root Cause, Recommendations, Safety Model, AI Context, and Failure Scenarios.
+- Created `scratch/test_intelligence_artifact_audit.js` — real platform verification of multi-layer telemetry ingestion, health scoring, latency spike anomaly detection, incident correlation, root cause diagnosis, and remediation gating.
+- All 456/456 automated test scenarios passed (66 Prompt 013 + 390 regressions).
+
 ## [0.12.0] - 2026-08-23
 
 ### Added — Stage 9: Enterprise Migration & High-Volume Data Transformation Factory

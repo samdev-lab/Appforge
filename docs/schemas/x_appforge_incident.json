@@ -1,0 +1,27 @@
+{
+  "name": "x_appforge_incident",
+  "label": "AppForge Incident Registry",
+  "description": "Correlated application incident chains grouping multi-component anomalies and errors",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "incident_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "environment", "type": "String", "max_length": 50, "default_value": "DEV" },
+    { "name": "severity", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "MEDIUM" },
+    { "name": "title", "type": "String", "max_length": 255, "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["OPEN", "INVESTIGATING", "RESOLVED", "CLOSED"], "default_value": "OPEN" },
+    { "name": "root_event", "type": "String", "max_length": 100 },
+    { "name": "first_seen", "type": "GlideDateTime" },
+    { "name": "last_seen", "type": "GlideDateTime" },
+    { "name": "event_count", "type": "Integer", "default_value": 1 },
+    { "name": "probable_cause", "type": "String", "max_length": 255 },
+    { "name": "evidence_json", "type": "String", "max_length": 8000 },
+    { "name": "resolution", "type": "String", "max_length": 4000 },
+    { "name": "created_on", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_inc_id", "fields": ["incident_id"], "unique": true },
+    { "name": "idx_inc_app_status", "fields": ["application", "status"] }
+  ]
+}
