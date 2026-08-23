@@ -1,0 +1,25 @@
+{
+  "name": "x_appforge_integration_operation",
+  "label": "AppForge Integration Operation Audit",
+  "description": "Granular operation audit log recording individual integration provisioning steps and sanitized request/response traces",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run", "type": "Reference", "reference_table": "x_appforge_integration_run", "mandatory": true, "indexed": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["CREATE_AUTH", "CREATE_API", "CREATE_RESOURCE", "CREATE_OUTBOUND", "CREATE_WEBHOOK", "EXECUTE_CALL", "ROLLBACK"] },
+    { "name": "target_type", "type": "String", "max_length": 50 },
+    { "name": "target_name", "type": "String", "max_length": 200 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "sequence", "type": "Integer" },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "duration_ms", "type": "Integer", "default_value": 0 },
+    { "name": "retry_count", "type": "Integer", "default_value": 0 },
+    { "name": "sanitized_request_metadata", "type": "String", "max_length": 8000, "description": "Masked request metadata (no credentials, no auth headers)" },
+    { "name": "sanitized_response_metadata", "type": "String", "max_length": 8000, "description": "Masked response metadata" },
+    { "name": "error_message", "type": "String", "max_length": 4000 }
+  ],
+  "indexes": [
+    { "name": "idx_int_op_run", "fields": ["run"] },
+    { "name": "idx_int_op_corr", "fields": ["correlation_id"] }
+  ]
+}

@@ -5,6 +5,27 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-08-23
+
+### Added — Stage 6: Integration & API Factory
+- Created Integration Registry schemas: `x_appforge_integration`, `x_appforge_api`, `x_appforge_api_resource`, `x_appforge_outbound_integration`, `x_appforge_webhook`, `x_appforge_authentication`, `x_appforge_integration_run`, `x_appforge_integration_operation`.
+- Implemented `AppForgeTransformationEngine.js` — transforms fields across 9 data types (`STRING`, `INTEGER`, `DECIMAL`, `BOOLEAN`, `DATE`, `DATETIME`, `UPPERCASE`, `LOWERCASE`, `TRIM`).
+- Implemented `AppForgeRequestMappingEngine.js` — evaluates declarative request mapping templates (`${current.<field>}`).
+- Implemented `AppForgeResponseMappingEngine.js` — maps external HTTP response fields back to ServiceNow target record fields with type transformations.
+- Implemented `AppForgeRetryEngine.js` — retry policies (`NONE`, `FIXED`, `EXPONENTIAL`) while skipping non-retryable 4xx/authentication errors.
+- Implemented `AppForgeIdempotencyManager.js` — prevents duplicate record creation by caching request keys and delivery IDs.
+- Implemented `AppForgeRateLimiter.js` — enforces integration-level rate limits per minute/hour with 429 response handling.
+- Implemented `AppForgeIntegrationValidator.js` — validates endpoints, HTTP methods, authentication references, mappings, timeouts, and cross-scope restrictions.
+- Implemented `AppForgeIntegrationSecurityAnalyzer.js` — pre-flight scanner detecting raw credential leakage, public anonymous write APIs, cross-scope access, and destructive DELETE API endpoints.
+- Implemented `AppForgeIntegrationPlanner.js` — dependency-ordered dry-run planner (Authentications → Integrations → Inbound APIs & Resources → Outbound REST & Mappings → Webhooks).
+- Implemented `AppForgeIntegrationRollback.js` — compensating rollback manager for reversible integration artifacts.
+- Implemented `AppForgeIntegrationExecutor.js` — provisions real ServiceNow platform integration artifacts: `sys_ws_definition`, `sys_ws_operation`, `sys_rest_message`, `sys_rest_message_fn`, and writes AppForge integration registries with correlation IDs (`X-Correlation-ID`) and header/cookie secret masking.
+- Implemented `MockEmployeeHRProvider.js` — controlled mock endpoint provider for automated tests and connectivity testing.
+- Implemented `AppForgeIntegrationAPI.js` — Scripted REST API for `POST /api/x_appforge/integration/plan`, `/execute`, and `/test` with strict RBAC (`x_appforge.admin` / `x_appforge.developer`).
+- Created `tests/AppForgeIntegrationTestSuite.js` — 45 automated test scenarios covering Registry, REST API, Authentication, Request/Response, Webhook, Retry, Security, Integration Mocks, and Real Platform Integration.
+- Created `scratch/test_integration_artifact_audit.js` — real platform verification of inbound API, outbound REST, webhook HMAC, mapping, transformation, idempotency, and audit masking.
+- All 222/222 automated test scenarios passed (45 Prompt 009 + 177 regressions).
+
 ## [0.8.0] - 2026-08-23
 
 ### Added — Stage 5: Security & Access Control Factory

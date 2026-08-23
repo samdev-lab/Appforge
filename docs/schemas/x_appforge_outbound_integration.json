@@ -1,0 +1,26 @@
+{
+  "name": "x_appforge_outbound_integration",
+  "label": "AppForge Outbound REST Integration Registry",
+  "description": "Registry storing Outbound REST message configurations mapped to sys_rest_message and sys_rest_message_fn",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "outbound_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "integration", "type": "Reference", "reference_table": "x_appforge_integration", "mandatory": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "endpoint", "type": "String", "max_length": 500, "mandatory": true },
+    { "name": "http_method", "type": "Choice", "choices": ["GET", "POST", "PUT", "PATCH", "DELETE"], "default_value": "POST" },
+    { "name": "authentication_reference", "type": "String", "max_length": 100 },
+    { "name": "request_mapping_json", "type": "String", "max_length": 8000, "description": "Declarative request body mapping definition" },
+    { "name": "response_mapping_json", "type": "String", "max_length": 8000, "description": "Declarative response body mapping definition" },
+    { "name": "timeout_seconds", "type": "Integer", "default_value": 30 },
+    { "name": "retry_policy", "type": "Choice", "choices": ["NONE", "FIXED", "EXPONENTIAL"], "default_value": "EXPONENTIAL" },
+    { "name": "max_retries", "type": "Integer", "default_value": 3 },
+    { "name": "active", "type": "Boolean", "default_value": true },
+    { "name": "version", "type": "String", "max_length": 20, "default_value": "1.0.0" },
+    { "name": "sn_sys_id", "type": "String", "max_length": 32, "description": "ServiceNow sys_rest_message sys_id" }
+  ],
+  "indexes": [
+    { "name": "idx_outbound_id", "fields": ["outbound_id"], "unique": true }
+  ]
+}

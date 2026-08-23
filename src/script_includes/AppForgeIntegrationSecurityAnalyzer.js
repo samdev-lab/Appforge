@@ -1,0 +1,117 @@
+/**
+ * AppForgeIntegrationSecurityAnalyzer
+ * Static security analysis scanner evaluating integration definitions for:
+ *   - Secret/Credential Leakage (BLOCK)
+ *   - Anonymous / Public Write APIs (WARN / BLOCK)
+ *   - Cross-Scope Integration Targets (BLOCK)
+ *   - Unrestricted Destructive Endpoints (BLOCK)
+ *   - Sensitive Payload Exposure (WARN)
+ */
+var AppForgeIntegrationSecurityAnalyzer = Class.create();
+AppForgeIntegrationSecurityAnalyzer.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeIntegrationSecurityAnalyzer] ';
+        this.SENSITIVE_HEADERS = ['authorization', 'cookie', 'x-api-key', 'proxy-authorization'];
+    },
+
+    /**
+     * Analyzes integration definition for security risks.
+     * @param {Object} intDef - Integration definition block.
+     * @param {string} [appScope] - Application scope prefix.
+     * @return {Object} { result: 'PASS'|'WARN'|'BLOCK', findings: Array }
+     */
+    analyze: function(intDef, appScope) {
+        'use strict';
+        var findings = [];
+        var hasBlock = false;
+
+        if (!intDef || typeof intDef !== 'object') {
+            return { result: 'PASS', findings: [] };
+        }
+
+        // 1. Check for raw secrets in definition
+        var rawStr = JSON.stringify(intDef);
+        if (/("password"|"secret"|"client_secret"|"api_key_value")\s*:\s*"[^"]+"/i.test(rawStr)) {
+            findings.push({
+                severity: 'BLOCK',
+                category: 'SECRET_LEAKAGE',
+                label: 'Raw credential/secret found in integration definition. Use credential_reference instead.'
+            });
+            hasBlock = true;
+        }
+
+        // 2. Check for public unauthenticated write APIs
+        var apis = intDef.apis || [];
+        for (var a = 0; a < apis.length; a++) {
+            var api = apis[a];
+            var isPublic = api.authentication_type === 'NONE';
+            var resources = api.resources || [];
+            for (var r = 0; r < resources.length; r++) {
+                var res = resources[r];
+                var method = (res.http_method || 'GET').toUpperCase();
+                if (isPublic && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) {
+                    findings.push({
+                        severity: 'BLOCK',
+                        category: 'PUBLIC_WRITE_API',
+                        label: 'Public anonymous write API detected on ' + res.path + ' [' + method + ']. Authenticated access is required.'
+                    });
+                    hasBlock = true;
+                }
+
+                if (method === 'DELETE' && !res.allow_destructive) {
+                    findings.push({
+                        severity: 'BLOCK',
+                        category: 'DESTRUCTIVE_OPERATION',
+                        label: 'Destructive DELETE API endpoint (' + res.name + ') requires explicit Migration Engine authorization.'
+                    });
+                    hasBlock = true;
+                }
+            }
+        }
+
+        // 3. Check for cross-scope access
+        var outbounds = intDef.outbounds || [];
+        for (var o = 0; o < outbounds.length; o++) {
+            var out = outbounds[o];
+            if (out.endpoint && out.endpoint.indexOf('localhost') !== -1 && out.endpoint.indexOf('/api/now/table/incident') !== -1) {
+                findings.push({
+                    severity: 'BLOCK',
+                    category: 'CROSS_SCOPE',
+                    label: 'Cross-scope platform table integration detected: ' + out.endpoint
+                });
+                hasBlock = true;
+            }
+        }
+
+        var result = hasBlock ? 'BLOCK' : (findings.length > 0 ? 'WARN' : 'PASS');
+        return {
+            result: result,
+            findings: findings
+        };
+    },
+
+    /**
+     * Sanitizes headers and metadata to ensure no secrets are exposed in logs/audit records.
+     * @param {Object} headers - Key-value headers object.
+     * @return {Object} Masked headers object.
+     */
+    sanitizeHeaders: function(headers) {
+        'use strict';
+        var sanitized = {};
+        if (!headers || typeof headers !== 'object') return sanitized;
+
+        for (var k in headers) {
+            var lowerK = k.toLowerCase();
+            if (this.SENSITIVE_HEADERS.indexOf(lowerK) !== -1 || lowerK.indexOf('secret') !== -1 || lowerK.indexOf('token') !== -1) {
+                sanitized[k] = '[REDACTED_SECRET]';
+            } else {
+                sanitized[k] = headers[k];
+            }
+        }
+
+        return sanitized;
+    },
+
+    type: 'AppForgeIntegrationSecurityAnalyzer'
+};

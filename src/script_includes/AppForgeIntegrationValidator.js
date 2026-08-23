@@ -1,0 +1,106 @@
+/**
+ * AppForgeIntegrationValidator
+ * Validates complete Integration and API definition blocks (Inbound APIs, Resources, Outbound Integrations, Webhooks, Auth configs).
+ * Enforces cross-scope rules, mapping checks, timeout bounds, and secret protection.
+ */
+var AppForgeIntegrationValidator = Class.create();
+AppForgeIntegrationValidator.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeIntegrationValidator] ';
+        this.VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+        this.VALID_AUTH_TYPES = ['NONE', 'BASIC', 'API_KEY', 'OAUTH2', 'BEARER_TOKEN'];
+        this.requestMapper = new AppForgeRequestMappingEngine();
+        this.responseMapper = new AppForgeResponseMappingEngine();
+    },
+
+    /**
+     * Validates an Integration Definition block.
+     * @param {Object} intDef - Integration configuration block.
+     * @param {string} [appScope] - Application scope prefix.
+     * @return {Object} { valid: boolean, errors: Array, warnings: Array }
+     */
+    validate: function(intDef, appScope) {
+        'use strict';
+        var errors = [];
+        var warnings = [];
+
+        if (!intDef || typeof intDef !== 'object') {
+            return { valid: false, errors: ['Integration definition must be an object'], warnings: [] };
+        }
+
+        // 1. Secret Protection check (prevent raw passwords/keys in definitions)
+        var rawJson = JSON.stringify(intDef);
+        if (/("password"|"secret"|"client_secret"|"api_key_value")\s*:\s*"[^"]{3,}"/i.test(rawJson)) {
+            errors.push('RAW SECRET DETECTED: Integration definition must use credential_reference instead of raw secrets.');
+        }
+
+        // 2. Validate Inbound APIs & Resources
+        var apis = intDef.apis || [];
+        for (var a = 0; a < apis.length; a++) {
+            var api = apis[a];
+            if (!api.name) errors.push('API at index ' + a + ' missing name');
+            if (!api.base_path) errors.push('API (' + (api.name || a) + ') missing base_path');
+
+            var resources = api.resources || [];
+            for (var r = 0; r < resources.length; r++) {
+                var res = resources[r];
+                if (!res.name) errors.push('API Resource at index ' + r + ' missing name');
+                if (!res.path) errors.push('API Resource (' + (res.name || r) + ') missing path');
+                if (!res.http_method || this.VALID_HTTP_METHODS.indexOf(res.http_method.toUpperCase()) === -1) {
+                    errors.push('API Resource (' + (res.name || r) + ') invalid http_method: ' + res.http_method);
+                }
+
+                // Cross-scope table check
+                if (res.table_name && appScope && res.table_name.indexOf(appScope) === -1 && res.table_name.indexOf('x_appforge') === -1) {
+                    errors.push('CROSS-SCOPE VIOLATION: API Resource (' + res.name + ') targets out-of-scope table: ' + res.table_name);
+                }
+
+                // Destructive operation guard: DELETE method blocked by default
+                if (res.http_method && res.http_method.toUpperCase() === 'DELETE' && !res.allow_destructive) {
+                    errors.push('DESTRUCTIVE OPERATION BLOCKED: DELETE API (' + res.name + ') requires privileged Migration Engine authorization.');
+                }
+            }
+        }
+
+        // 3. Validate Outbound Integrations
+        var outbounds = intDef.outbounds || [];
+        for (var o = 0; o < outbounds.length; o++) {
+            var out = outbounds[o];
+            if (!out.name) errors.push('Outbound integration at index ' + o + ' missing name');
+            if (!out.endpoint) errors.push('Outbound integration (' + (out.name || o) + ') missing endpoint URL');
+
+            if (out.timeout_seconds !== undefined) {
+                if (out.timeout_seconds < 1 || out.timeout_seconds > 300) {
+                    errors.push('Outbound integration (' + out.name + ') timeout out of range (1-300s): ' + out.timeout_seconds);
+                }
+            }
+
+            if (out.request_mapping) {
+                var reqVal = this.requestMapper.validate(out.request_mapping);
+                if (!reqVal.valid) errors = errors.concat(reqVal.errors);
+            }
+
+            if (out.response_mapping) {
+                var respVal = this.responseMapper.validate(out.response_mapping);
+                if (!respVal.valid) errors = errors.concat(respVal.errors);
+            }
+        }
+
+        // 4. Validate Webhooks
+        var webhooks = intDef.webhooks || [];
+        for (var w = 0; w < webhooks.length; w++) {
+            var wh = webhooks[w];
+            if (!wh.name) errors.push('Webhook at index ' + w + ' missing name');
+            if (!wh.endpoint_path) errors.push('Webhook (' + (wh.name || w) + ') missing endpoint_path');
+        }
+
+        return {
+            valid: errors.length === 0,
+            errors: errors,
+            warnings: warnings
+        };
+    },
+
+    type: 'AppForgeIntegrationValidator'
+};

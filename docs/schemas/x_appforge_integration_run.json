@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_integration_run",
+  "label": "AppForge Integration Audit Run",
+  "description": "Audit log recording Integration Factory provisioning runs and execution status",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "mode", "type": "Choice", "choices": ["PLAN", "DRY_RUN", "EXECUTE"], "default_value": "PLAN" },
+    { "name": "status", "type": "Choice", "choices": ["RUNNING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "RUNNING" },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "security_analysis_result", "type": "Choice", "choices": ["PASS", "WARN", "BLOCK"], "default_value": "PASS" },
+    { "name": "rollback_status", "type": "Choice", "choices": ["NONE", "COMPLETE", "PARTIAL", "NOT_POSSIBLE"], "default_value": "NONE" },
+    { "name": "git_branch", "type": "String", "max_length": 200 },
+    { "name": "git_commit", "type": "String", "max_length": 100 },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "executed_by", "type": "String", "max_length": 100 }
+  ]
+}

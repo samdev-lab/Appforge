@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_api_resource",
+  "label": "AppForge API Resource Registry",
+  "description": "Registry storing individual REST endpoints / methods mapped to sys_ws_operation",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "resource_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "api", "type": "Reference", "reference_table": "x_appforge_api", "mandatory": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "path", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "http_method", "type": "Choice", "choices": ["GET", "POST", "PUT", "PATCH", "DELETE"], "mandatory": true },
+    { "name": "table_name", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "operation", "type": "Choice", "choices": ["query", "create", "update", "custom"], "default_value": "create" },
+    { "name": "request_schema", "type": "String", "max_length": 4000, "description": "JSON schema for request validation" },
+    { "name": "response_schema", "type": "String", "max_length": 4000, "description": "JSON schema for response structure" },
+    { "name": "active", "type": "Boolean", "default_value": true },
+    { "name": "sn_sys_id", "type": "String", "max_length": 32, "description": "ServiceNow sys_ws_operation sys_id" }
+  ],
+  "indexes": [
+    { "name": "idx_res_id", "fields": ["resource_id"], "unique": true },
+    { "name": "idx_res_api_path_method", "fields": ["api", "path", "http_method"] }
+  ]
+}
