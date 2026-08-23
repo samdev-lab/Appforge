@@ -1,0 +1,19 @@
+{
+  "name": "x_appforge_organization",
+  "label": "AppForge Organization Registry",
+  "description": "Tenant-scoped organization hierarchy supporting business units and departments without circular loops",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "org_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "parent_org", "type": "Reference", "reference_table": "x_appforge_organization" },
+    { "name": "type", "type": "Choice", "choices": ["BUSINESS_UNIT", "DEPARTMENT", "DIVISION", "SUBSIDIARY"], "default_value": "DEPARTMENT" },
+    { "name": "status", "type": "Choice", "choices": ["ACTIVE", "INACTIVE"], "default_value": "ACTIVE" }
+  ],
+  "indexes": [
+    { "name": "idx_org_id", "fields": ["org_id"], "unique": true },
+    { "name": "idx_org_tenant", "fields": ["tenant"] }
+  ]
+}

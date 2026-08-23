@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_marketplace_audit",
+  "label": "AppForge Marketplace Audit Log",
+  "description": "Comprehensive audit log of marketplace publishing, subscription, installation, and entitlement actions",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "audit_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant" },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application" },
+    { "name": "action", "type": "Choice", "choices": ["PUBLISH", "APPROVE", "REJECT", "SUBSCRIBE", "INSTALL", "UPGRADE", "SUSPEND", "UNINSTALL", "LICENSE_VALIDATE"], "mandatory": true },
+    { "name": "actor", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "result", "type": "Choice", "choices": ["SUCCESS", "FAILED", "DENIED"], "default_value": "SUCCESS" },
+    { "name": "reason", "type": "String", "max_length": 2000 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_mkt_audit_id", "fields": ["audit_id"], "unique": true }
+  ]
+}

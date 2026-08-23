@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_tenant",
+  "label": "AppForge Tenant Registry",
+  "description": "Master multi-tenant registry providing strict logical tenant isolation",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "tenant_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "display_name", "type": "String", "max_length": 200 },
+    { "name": "status", "type": "Choice", "choices": ["PROVISIONING", "ACTIVE", "SUSPENDED", "LOCKED", "TERMINATED"], "default_value": "ACTIVE" },
+    { "name": "type", "type": "Choice", "choices": ["CUSTOMER", "PARTNER", "INTERNAL", "DEVELOPER"], "default_value": "CUSTOMER" },
+    { "name": "owner", "type": "String", "max_length": 100 },
+    { "name": "primary_contact", "type": "String", "max_length": 100 },
+    { "name": "region", "type": "String", "max_length": 50, "default_value": "us-east" },
+    { "name": "timezone", "type": "String", "max_length": 50, "default_value": "UTC" },
+    { "name": "isolation_mode", "type": "Choice", "choices": ["LOGICAL", "DEDICATED", "HYBRID"], "default_value": "LOGICAL" },
+    { "name": "created_on", "type": "GlideDateTime" },
+    { "name": "updated_on", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_tenant_id", "fields": ["tenant_id"], "unique": true }
+  ]
+}

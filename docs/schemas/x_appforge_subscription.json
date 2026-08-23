@@ -1,0 +1,23 @@
+{
+  "name": "x_appforge_subscription",
+  "label": "AppForge Application Subscription Registry",
+  "description": "Registry of tenant application subscriptions and entitlements",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "subscription_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "marketplace_app", "type": "Reference", "reference_table": "x_appforge_marketplace_app", "mandatory": true, "indexed": true },
+    { "name": "version", "type": "String", "max_length": 30 },
+    { "name": "status", "type": "Choice", "choices": ["TRIAL", "ACTIVE", "SUSPENDED", "EXPIRED", "CANCELLED"], "default_value": "ACTIVE" },
+    { "name": "license_key", "type": "String", "max_length": 100 },
+    { "name": "started_on", "type": "GlideDateTime" },
+    { "name": "expires_on", "type": "GlideDateTime" },
+    { "name": "auto_renew", "type": "Boolean", "default_value": true },
+    { "name": "seat_limit", "type": "Integer", "default_value": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_sub_id", "fields": ["subscription_id"], "unique": true },
+    { "name": "idx_sub_tenant_app", "fields": ["tenant", "marketplace_app"], "unique": true }
+  ]
+}

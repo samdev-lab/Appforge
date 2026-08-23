@@ -1,0 +1,17 @@
+{
+  "name": "x_appforge_feature_entitlement",
+  "label": "AppForge Feature Entitlement Registry",
+  "description": "Registry of granular feature, module, API, and integration entitlements per tenant",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "entitlement_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "feature_key", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["ENABLED", "DISABLED", "NOT_ENTITLED"], "default_value": "ENABLED" }
+  ],
+  "indexes": [
+    { "name": "idx_feat_ent_key", "fields": ["tenant", "application", "feature_key"], "unique": true }
+  ]
+}

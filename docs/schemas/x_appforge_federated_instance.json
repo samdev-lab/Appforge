@@ -1,0 +1,23 @@
+{
+  "name": "x_appforge_federated_instance",
+  "label": "AppForge Federated Instance Registry",
+  "description": "Registry of cross-instance federated targets and credential references",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "instance_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "instance_name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "instance_identifier", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "environment", "type": "Choice", "choices": ["DEV", "TEST", "UAT", "PRODUCTION"], "default_value": "DEV" },
+    { "name": "endpoint", "type": "String", "max_length": 255, "mandatory": true },
+    { "name": "credential_reference", "type": "String", "max_length": 100, "mandatory": true, "description": "Credential reference key only — raw secrets forbidden" },
+    { "name": "status", "type": "Choice", "choices": ["ONLINE", "UNAVAILABLE", "UNAUTHORIZED", "LOCKED"], "default_value": "ONLINE" },
+    { "name": "appforge_version", "type": "String", "max_length": 30, "default_value": "0.14.0" },
+    { "name": "servicenow_version", "type": "String", "max_length": 50, "default_value": "WashingtonDC" }
+  ],
+  "indexes": [
+    { "name": "idx_fed_inst_id", "fields": ["instance_id"], "unique": true },
+    { "name": "idx_fed_tenant", "fields": ["tenant"] }
+  ]
+}

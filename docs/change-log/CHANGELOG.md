@@ -5,6 +5,25 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-08-23
+
+### Added — Stage 11: Enterprise Federation & Multi-Tenant Marketplace Foundation
+- Created Federation & Marketplace Registry schemas: `x_appforge_tenant`, `x_appforge_tenant_member`, `x_appforge_organization`, `x_appforge_marketplace_app`, `x_appforge_subscription`, `x_appforge_application_installation`, `x_appforge_federated_instance`, `x_appforge_tenant_configuration`, `x_appforge_feature_entitlement`, `x_appforge_marketplace_audit`.
+- Implemented `AppForgeTenantManager.js` — tenant provisioning, lifecycle states (`PROVISIONING`, `ACTIVE`, `SUSPENDED`, `LOCKED`, `TERMINATED`), tenant-scoped user roles (`TENANT_OWNER`, `TENANT_ADMIN`, `TENANT_DEVELOPER`, `TENANT_OPERATOR`, `TENANT_VIEWER`), anti-circular organization hierarchy validation, and strict multi-tenant isolation.
+- Implemented `AppForgeMarketplaceSecurityAnalyzer.js` — scans application packages for raw credentials, eval/Function, SQL/JDBC, and unapproved cross-scope modifications (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`).
+- Implemented `AppForgeMarketplacePublisher.js` — multi-stage application publishing workflow with Four-Eyes principle (`requested_by != approved_by`) preventing self-approval.
+- Implemented `AppForgeLicenseProvider.js` — provider-neutral licensing abstraction (Free, Trial, User-Based, App-Based, Subscription, Enterprise) without storing raw payment credentials.
+- Implemented `AppForgeEntitlementEngine.js` — determines tenant application, feature flag, API, and user seat limit entitlements (`ENTITLED`, `NOT_ENTITLED`, `EXPIRED`, `SUSPENDED`, `LIMIT_EXCEEDED`).
+- Implemented `AppForgeSubscriptionManager.js` — tenant subscription lifecycle management (`subscribe`, `activate`, `suspend`, `renew`, `cancel`, `expire`).
+- Implemented `AppForgeDistributionEngine.js` — package version resolution, canonical SHA-256 checksum verification, and HMAC digital signature validation.
+- Implemented `AppForgeMarketplaceCatalog.js` — catalog searching, category filtering, publisher queries, and visibility enforcement.
+- Implemented `AppForgeFederationManager.js` — cross-instance federation controller validating instance identity and credential references (never raw credentials).
+- Implemented `AppForgeApplicationInstaller.js` — multi-stage application installation orchestrator reusing existing Package, Deployment, Migration, and Security engines.
+- Implemented `AppForgeMarketplaceAPI.js` — Scripted REST API for tenant management, marketplace publishing, subscriptions, licensing, installation, and federation.
+- Created `tests/AppForgeFederationTestSuite.js` — 70 automated test scenarios covering Tenant Isolation, Marketplace Publishing, Security Scanning, Licensing, Entitlements, Package Integrity, and Cross-Instance Federation.
+- Created `scratch/test_federation_artifact_audit.js` — real platform verification of multi-tenant provisioning, cross-tenant isolation, package tampering blocking, and marketplace installation on `Employee Onboarding`.
+- All 526/526 automated test scenarios passed (70 Prompt 014 + 456 regressions).
+
 ## [0.13.0] - 2026-08-23
 
 ### Added — Stage 10: Application Intelligence & Observability Factory

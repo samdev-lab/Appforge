@@ -1,0 +1,17 @@
+{
+  "name": "x_appforge_tenant_member",
+  "label": "AppForge Tenant User Membership",
+  "description": "Mapping of platform users to tenants and tenant-scoped RBAC roles",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "user", "type": "String", "max_length": 100, "mandatory": true, "indexed": true },
+    { "name": "role", "type": "Choice", "choices": ["TENANT_OWNER", "TENANT_ADMIN", "TENANT_DEVELOPER", "TENANT_OPERATOR", "TENANT_VIEWER"], "default_value": "TENANT_VIEWER" },
+    { "name": "status", "type": "Choice", "choices": ["ACTIVE", "INVITED", "DISABLED"], "default_value": "ACTIVE" },
+    { "name": "joined_on", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_tenant_user", "fields": ["tenant", "user"], "unique": true }
+  ]
+}

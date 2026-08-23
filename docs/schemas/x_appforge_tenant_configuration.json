@@ -1,0 +1,18 @@
+{
+  "name": "x_appforge_tenant_configuration",
+  "label": "AppForge Tenant Configuration Registry",
+  "description": "Tenant-specific configuration and branding overrides without altering package contents",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "config_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application" },
+    { "name": "config_key", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "config_value", "type": "String", "max_length": 4000 },
+    { "name": "is_secret", "type": "Boolean", "default_value": false }
+  ],
+  "indexes": [
+    { "name": "idx_tenant_cfg_key", "fields": ["tenant", "application", "config_key"], "unique": true }
+  ]
+}

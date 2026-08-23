@@ -1,0 +1,28 @@
+{
+  "name": "x_appforge_marketplace_app",
+  "label": "AppForge Marketplace Application Registry",
+  "description": "Catalog of published AppForge applications and packages available for multi-tenant subscription",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "marketplace_app_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "publisher", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true },
+    { "name": "name", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "display_name", "type": "String", "max_length": 200 },
+    { "name": "description", "type": "String", "max_length": 4000 },
+    { "name": "category", "type": "Choice", "choices": ["HR", "ITSM", "CSM", "FINANCE", "SECURITY", "OPERATIONS", "CUSTOM"], "default_value": "CUSTOM" },
+    { "name": "version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "latest_version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "SUBMITTED", "REVIEW", "APPROVED", "PUBLISHED", "SUSPENDED", "RETIRED"], "default_value": "DRAFT" },
+    { "name": "visibility", "type": "Choice", "choices": ["PRIVATE", "TENANT", "PUBLIC"], "default_value": "PUBLIC" },
+    { "name": "license_type", "type": "Choice", "choices": ["FREE", "TRIAL", "USER_BASED", "APPLICATION_BASED", "SUBSCRIPTION", "ENTERPRISE"], "default_value": "FREE" },
+    { "name": "pricing_model", "type": "String", "max_length": 100, "default_value": "FREE_TIER" },
+    { "name": "support_contact", "type": "String", "max_length": 100 },
+    { "name": "published_on", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_mkt_id", "fields": ["marketplace_app_id"], "unique": true },
+    { "name": "idx_mkt_cat", "fields": ["category", "status"] }
+  ]
+}

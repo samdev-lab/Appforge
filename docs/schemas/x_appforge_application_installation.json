@@ -1,0 +1,25 @@
+{
+  "name": "x_appforge_application_installation",
+  "label": "AppForge Application Installation Registry",
+  "description": "Registry tracking installed marketplace applications per tenant and target environment",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "installation_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "package_version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "target_instance", "type": "String", "max_length": 100, "default_value": "dev280961" },
+    { "name": "installation_status", "type": "Choice", "choices": ["PLANNED", "INSTALLING", "INSTALLED", "FAILED", "UPGRADE_AVAILABLE", "SUSPENDED", "UNINSTALLED"], "default_value": "PLANNED" },
+    { "name": "installed_version", "type": "String", "max_length": 30 },
+    { "name": "installed_on", "type": "GlideDateTime" },
+    { "name": "installed_by", "type": "String", "max_length": 100 },
+    { "name": "deployment_run", "type": "String", "max_length": 100 },
+    { "name": "checksum", "type": "String", "max_length": 64 },
+    { "name": "signature", "type": "String", "max_length": 128 }
+  ],
+  "indexes": [
+    { "name": "idx_inst_id", "fields": ["installation_id"], "unique": true },
+    { "name": "idx_inst_tenant_app", "fields": ["tenant", "application"] }
+  ]
+}
