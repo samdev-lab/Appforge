@@ -1,0 +1,20 @@
+{
+  "name": "x_appforge_deployment_approval",
+  "label": "AppForge Deployment Approval Gate",
+  "description": "Four-Eyes Principle approval gate registry enforcing separation of duties for promotion to UAT and Production",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "approval_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "deployment_run", "type": "Reference", "reference_table": "x_appforge_deployment_run", "mandatory": true, "indexed": true },
+    { "name": "environment", "type": "Choice", "choices": ["DEV", "TEST", "UAT", "PRODUCTION"], "mandatory": true },
+    { "name": "requested_by", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "APPROVED", "REJECTED", "EXPIRED", "CANCELLED"], "default_value": "PENDING" },
+    { "name": "comments", "type": "String", "max_length": 2000 },
+    { "name": "approved_at", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_deploy_appr_id", "fields": ["approval_id"], "unique": true }
+  ]
+}

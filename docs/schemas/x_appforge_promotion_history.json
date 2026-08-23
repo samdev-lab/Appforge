@@ -1,0 +1,20 @@
+{
+  "name": "x_appforge_promotion_history",
+  "label": "AppForge Promotion History Registry",
+  "description": "Historical log tracking end-to-end version promotions across DEV -> TEST -> UAT -> PRODUCTION",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "source_env", "type": "String", "max_length": 50, "mandatory": true },
+    { "name": "target_env", "type": "String", "max_length": 50, "mandatory": true },
+    { "name": "deployment_run", "type": "Reference", "reference_table": "x_appforge_deployment_run" },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "status", "type": "Choice", "choices": ["SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "SUCCESS" },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_promo_app_ver", "fields": ["application", "version", "target_env"] }
+  ]
+}

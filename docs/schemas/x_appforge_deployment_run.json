@@ -1,0 +1,26 @@
+{
+  "name": "x_appforge_deployment_run",
+  "label": "AppForge Deployment Execution Run",
+  "description": "Master execution log for an individual deployment run with correlation ID and checkpointing state",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "pipeline", "type": "Reference", "reference_table": "x_appforge_deployment_pipeline", "mandatory": true, "indexed": true },
+    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package", "mandatory": true, "indexed": true },
+    { "name": "source_version", "type": "String", "max_length": 30 },
+    { "name": "target_version", "type": "String", "max_length": 30, "mandatory": true },
+    { "name": "source_environment", "type": "String", "max_length": 50, "default_value": "DEV" },
+    { "name": "target_environment", "type": "String", "max_length": 50, "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["RUNNING", "VERIFYING", "SUCCESS", "FAILED", "ROLLED_BACK", "ROLLBACK_FAILED"], "default_value": "RUNNING" },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "rollback_available", "type": "Boolean", "default_value": true },
+    { "name": "failure_reason", "type": "String", "max_length": 4000 },
+    { "name": "executed_by", "type": "String", "max_length": 100 },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_deploy_run_id", "fields": ["run_id"], "unique": true }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_instance_target",
+  "label": "AppForge Instance Target Registry",
+  "description": "Registry tracking physical instance endpoints, credential references, and connectivity health",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "target_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "environment", "type": "Reference", "reference_table": "x_appforge_environment", "mandatory": true, "indexed": true },
+    { "name": "instance_identifier", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "display_name", "type": "String", "max_length": 200 },
+    { "name": "credential_reference", "type": "String", "max_length": 100, "mandatory": true, "description": "Reference identifier for service account credential (no raw secrets)" },
+    { "name": "endpoint_reference", "type": "String", "max_length": 255 },
+    { "name": "status", "type": "Choice", "choices": ["HEALTHY", "WARNING", "UNAVAILABLE", "INCOMPATIBLE"], "default_value": "HEALTHY" },
+    { "name": "last_health_check", "type": "GlideDateTime" },
+    { "name": "last_successful_deployment", "type": "GlideDateTime" },
+    { "name": "created_at", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_target_id", "fields": ["target_id"], "unique": true }
+  ]
+}

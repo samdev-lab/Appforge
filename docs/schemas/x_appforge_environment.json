@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_environment",
+  "label": "AppForge Environment Registry",
+  "description": "Registry storing environment definitions (DEV, TEST, UAT, PRODUCTION) and target lock status",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "environment_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 200, "mandatory": true },
+    { "name": "type", "type": "Choice", "choices": ["DEV", "TEST", "UAT", "PRODUCTION"], "mandatory": true },
+    { "name": "instance_identifier", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["ACTIVE", "MAINTENANCE", "LOCKED", "INACTIVE"], "default_value": "ACTIVE" },
+    { "name": "appforge_version", "type": "String", "max_length": 30, "default_value": "1.0.0" },
+    { "name": "servicenow_version", "type": "String", "max_length": 50, "default_value": "WashingtonDC" },
+    { "name": "is_production", "type": "Boolean", "default_value": false },
+    { "name": "deployment_locked", "type": "Boolean", "default_value": false },
+    { "name": "created_at", "type": "GlideDateTime" },
+    { "name": "updated_at", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_env_id", "fields": ["environment_id"], "unique": true },
+    { "name": "idx_env_type", "fields": ["type"] }
+  ]
+}

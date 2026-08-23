@@ -5,6 +5,25 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-08-23
+
+### Added — Stage 8: Deployment Pipeline & Multi-Environment Orchestration Factory
+- Created Deployment Registry schemas: `x_appforge_environment`, `x_appforge_instance_target`, `x_appforge_deployment_pipeline`, `x_appforge_deployment_run`, `x_appforge_deployment_operation`, `x_appforge_deployment_approval`, `x_appforge_deployment_audit`, `x_appforge_promotion_history`.
+- Implemented `AppForgeTargetHealthChecker.js` — validates instance reachability, credential references, AppForge versions, and target lock state.
+- Implemented `AppForgeDeploymentLockManager.js` — exclusive deployment locks per environment to block concurrent writes with timeout safeguards.
+- Implemented `AppForgeDeploymentPreflight.js` — multi-criteria pre-flight engine validating integrity, health, security, compatibility, locks, and approvals.
+- Implemented `AppForgeDeploymentPlanner.js` — dry-run deployment planner generating dependency-ordered operation manifests.
+- Implemented `AppForgeDeploymentRollback.js` — reverse-order compensating rollback orchestrator with restoration verification.
+- Implemented `AppForgeDeploymentVerifier.js` — post-deployment verification of Data, Experience, Behavior, Security, and Integration layers.
+- Implemented `AppForgeDeploymentSmokeTest.js` — non-destructive automated smoke test suite for deployed applications.
+- Implemented `AppForgeApplicationHealthChecker.js` — runtime health assessment engine (`HEALTHY`, `DEGRADED`, `FAILED`).
+- Implemented `AppForgeEnvironmentDriftDetector.js` — detects version, schema, and security drift across environments.
+- Implemented `AppForgeDeploymentExecutor.js` — coordinates end-to-end checkpointed deployments, audit logging (`X-Correlation-ID`), and secret sanitization (`[REDACTED_SECRET]`).
+- Implemented `AppForgeDeploymentAPI.js` — Scripted REST API for `/plan`, `/dry-run`, `/validate`, `/start`, `/approve`, `/rollback` with RBAC (`x_appforge.deployer`, `x_appforge.release_manager`, `x_appforge.admin`).
+- Created `tests/AppForgeDeploymentTestSuite.js` — 57 automated test scenarios covering Environment, Pipeline, Preflight, Four-Eyes Approval, Deployment, Checkpointing, Rollback, Security, GitHub Tracking, Drift, and Real Operations.
+- Created `scratch/test_deployment_artifact_audit.js` — real platform verification of health checks, pre-flight, Four-Eyes approval gate, locking, dry-run, execution, verification, rollback, and drift detection.
+- All 324/324 automated test scenarios passed (57 Prompt 011 + 267 regressions).
+
 ## [0.10.0] - 2026-08-23
 
 ### Added — Stage 7: Application Packaging, Versioning & Lifecycle Governance Factory

@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_deployment_operation",
+  "label": "AppForge Deployment Operation Checkpoint",
+  "description": "Granular deployment operation log and execution checkpoint",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run", "type": "Reference", "reference_table": "x_appforge_deployment_run", "mandatory": true, "indexed": true },
+    { "name": "sequence", "type": "Integer", "mandatory": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["CREATE_SCHEMA", "CREATE_FIELD", "UPDATE_FORM", "SYNC_BUSINESS_RULE", "SYNC_ACL", "SYNC_API", "VERIFY_DEPLOYMENT"], "mandatory": true },
+    { "name": "component_type", "type": "String", "max_length": 50 },
+    { "name": "component_id", "type": "String", "max_length": 200 },
+    { "name": "action", "type": "Choice", "choices": ["CREATE", "UPDATE", "SKIP", "VERIFY"], "default_value": "CREATE" },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "EXECUTING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "risk", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "LOW" },
+    { "name": "rollback_action", "type": "String", "max_length": 500 },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "error", "type": "String", "max_length": 2000 }
+  ],
+  "indexes": [
+    { "name": "idx_deploy_op_run_seq", "fields": ["run", "sequence"] }
+  ]
+}

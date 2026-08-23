@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_deployment_pipeline",
+  "label": "AppForge Deployment Pipeline",
+  "description": "State machine tracking promotion pipelines across environments (DEV -> TEST -> UAT -> PROD)",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "pipeline_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package", "mandatory": true, "indexed": true },
+    { "name": "source_environment", "type": "Choice", "choices": ["DEV", "TEST", "UAT", "PRODUCTION"], "default_value": "DEV" },
+    { "name": "target_environment", "type": "Choice", "choices": ["DEV", "TEST", "UAT", "PRODUCTION"], "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "VALIDATING", "READY", "APPROVAL_REQUIRED", "APPROVED", "DEPLOYING", "VERIFYING", "SUCCEEDED", "FAILED", "ROLLING_BACK", "ROLLED_BACK", "CANCELLED"], "default_value": "DRAFT" },
+    { "name": "trigger_type", "type": "Choice", "choices": ["MANUAL", "PROMOTION", "HOTFIX", "EMERGENCY"], "default_value": "PROMOTION" },
+    { "name": "requested_by", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "failure_reason", "type": "String", "max_length": 2000 }
+  ],
+  "indexes": [
+    { "name": "idx_pipe_id", "fields": ["pipeline_id"], "unique": true }
+  ]
+}

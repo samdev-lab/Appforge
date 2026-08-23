@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_deployment_audit",
+  "label": "AppForge Deployment Audit Trail",
+  "description": "Comprehensive sanitized audit log of all deployment actions, correlation IDs, and outcomes",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package", "mandatory": true },
+    { "name": "source_env", "type": "String", "max_length": 50 },
+    { "name": "target_env", "type": "String", "max_length": 50, "mandatory": true },
+    { "name": "user", "type": "String", "max_length": 100 },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "result", "type": "Choice", "choices": ["SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "SUCCESS" },
+    { "name": "risk_level", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "LOW" },
+    { "name": "sanitized_payload_json", "type": "String", "max_length": 32000, "description": "Deployment audit payload with credentials replaced by [REDACTED_SECRET]" },
+    { "name": "error_message", "type": "String", "max_length": 4000 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ]
+}
