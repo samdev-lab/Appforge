@@ -1,0 +1,23 @@
+{
+  "name": "x_appforge_migration_audit",
+  "label": "AppForge Migration Audit Trail",
+  "description": "Comprehensive sanitized audit log of migration operations, batch counts, and correlation IDs",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "migration_id", "type": "String", "max_length": 100, "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
+    { "name": "operation", "type": "String", "max_length": 100 },
+    { "name": "record_count", "type": "Integer", "default_value": 0 },
+    { "name": "user", "type": "String", "max_length": 100 },
+    { "name": "environment", "type": "String", "max_length": 50 },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "result", "type": "Choice", "choices": ["SUCCESS", "FAILED", "ROLLED_BACK", "PARTIAL"], "default_value": "SUCCESS" },
+    { "name": "risk_level", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "LOW" },
+    { "name": "error", "type": "String", "max_length": 4000 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_mig_audit_mig", "fields": ["migration_id"] }
+  ]
+}

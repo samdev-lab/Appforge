@@ -1,0 +1,19 @@
+{
+  "name": "x_appforge_migration_error",
+  "label": "AppForge Migration Error Quarantine",
+  "description": "Quarantine table tracking failed record migrations and validation errors without exposing sensitive data",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "migration", "type": "Reference", "reference_table": "x_appforge_migration", "mandatory": true, "indexed": true },
+    { "name": "operation", "type": "Reference", "reference_table": "x_appforge_migration_operation" },
+    { "name": "record_reference", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "error_code", "type": "String", "max_length": 50 },
+    { "name": "error_message", "type": "String", "max_length": 2000 },
+    { "name": "retryable", "type": "Boolean", "default_value": false },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_mig_err_mig", "fields": ["migration"] }
+  ]
+}

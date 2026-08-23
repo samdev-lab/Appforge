@@ -1,0 +1,28 @@
+{
+  "name": "x_appforge_migration_operation",
+  "label": "AppForge Migration Operation Registry",
+  "description": "Granular migration operation log tracking batch execution and checkpoints",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "migration", "type": "Reference", "reference_table": "x_appforge_migration", "mandatory": true, "indexed": true },
+    { "name": "sequence", "type": "Integer", "mandatory": true },
+    { "name": "operation_type", "type": "Choice", "choices": ["ADD_FIELD", "ALTER_FIELD_SAFE", "ADD_REFERENCE", "ADD_INDEX", "RENAME_FIELD_LOGICAL", "DEPRECATE_FIELD", "TRANSFORM_DATA", "MAP_REFERENCE", "BACKFILL_FIELD"], "mandatory": true },
+    { "name": "source", "type": "String", "max_length": 200 },
+    { "name": "target", "type": "String", "max_length": 200 },
+    { "name": "action", "type": "String", "max_length": 100 },
+    { "name": "status", "type": "Choice", "choices": ["PENDING", "EXECUTING", "SUCCESS", "FAILED", "ROLLED_BACK"], "default_value": "PENDING" },
+    { "name": "batch_size", "type": "Integer", "default_value": 500 },
+    { "name": "records_affected", "type": "Integer", "default_value": 0 },
+    { "name": "records_failed", "type": "Integer", "default_value": 0 },
+    { "name": "checkpoint", "type": "String", "max_length": 100 },
+    { "name": "rollback_strategy", "type": "String", "max_length": 500 },
+    { "name": "risk", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "LOW" },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "error", "type": "String", "max_length": 2000 }
+  ],
+  "indexes": [
+    { "name": "idx_mig_op_mig_seq", "fields": ["migration", "sequence"] }
+  ]
+}

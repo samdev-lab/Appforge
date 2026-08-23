@@ -1,21 +1,31 @@
 {
   "name": "x_appforge_migration",
-  "label": "AppForge Migration Manifest Registry",
-  "description": "Registry tracking schema, data policy, logic, and security migration steps between application versions",
+  "label": "AppForge Migration Registry",
+  "description": "Master registry tracking schema, data, reference, and transformation migrations across versions and environments",
   "scope": "x_appforge",
   "fields": [
     { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
     { "name": "migration_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
-    { "name": "package", "type": "Reference", "reference_table": "x_appforge_package", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "mandatory": true, "indexed": true },
     { "name": "source_version", "type": "String", "max_length": 30, "mandatory": true },
     { "name": "target_version", "type": "String", "max_length": 30, "mandatory": true },
-    { "name": "operation", "type": "Choice", "choices": ["ADD_FIELD", "MODIFY_FIELD", "UPDATE_FORM", "UPDATE_LIST", "CREATE_RULE", "UPDATE_RULE", "UPDATE_ACL", "UPDATE_API"], "mandatory": true },
-    { "name": "target_artifact", "type": "String", "max_length": 200 },
-    { "name": "risk_level", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "BREAKING"], "default_value": "LOW" },
-    { "name": "status", "type": "Choice", "choices": ["PLANNED", "EXECUTED", "ROLLED_BACK", "SKIPPED"], "default_value": "PLANNED" },
-    { "name": "rollback_strategy", "type": "String", "max_length": 1000 }
+    { "name": "source_environment", "type": "String", "max_length": 50, "default_value": "DEV" },
+    { "name": "target_environment", "type": "String", "max_length": 50, "mandatory": true },
+    { "name": "migration_type", "type": "Choice", "choices": ["SCHEMA", "DATA", "REFERENCE", "TRANSFORMATION", "COMBINED"], "default_value": "COMBINED" },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "VALIDATING", "PLANNED", "APPROVAL_REQUIRED", "APPROVED", "EXECUTING", "VERIFYING", "SUCCEEDED", "FAILED", "ROLLING_BACK", "ROLLED_BACK", "PARTIAL", "CANCELLED"], "default_value": "DRAFT" },
+    { "name": "risk_level", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "LOW" },
+    { "name": "requested_by", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "started_at", "type": "GlideDateTime" },
+    { "name": "completed_at", "type": "GlideDateTime" },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "rollback_available", "type": "Boolean", "default_value": true },
+    { "name": "failure_reason", "type": "String", "max_length": 4000 },
+    { "name": "created_at", "type": "GlideDateTime" },
+    { "name": "updated_at", "type": "GlideDateTime" }
   ],
   "indexes": [
-    { "name": "idx_mig_id", "fields": ["migration_id"], "unique": true }
+    { "name": "idx_mig_id", "fields": ["migration_id"], "unique": true },
+    { "name": "idx_mig_app_ver", "fields": ["application", "target_version"] }
   ]
 }

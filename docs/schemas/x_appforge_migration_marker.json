@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_migration_marker",
+  "label": "AppForge Migration Record Marker",
+  "description": "Registry tracking transformed record state checksums before and after migration for reconciliation and rollback",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "migration_id", "type": "String", "max_length": 100, "mandatory": true, "indexed": true },
+    { "name": "record_sys_id", "type": "String", "max_length": 100, "mandatory": true, "indexed": true },
+    { "name": "operation_id", "type": "String", "max_length": 100 },
+    { "name": "status", "type": "Choice", "choices": ["MIGRATED", "REVERTED", "FAILED"], "default_value": "MIGRATED" },
+    { "name": "checksum_before", "type": "String", "max_length": 64 },
+    { "name": "checksum_after", "type": "String", "max_length": 64 },
+    { "name": "before_value", "type": "String", "max_length": 4000 },
+    { "name": "after_value", "type": "String", "max_length": 4000 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_mig_marker_rec", "fields": ["migration_id", "record_sys_id"], "unique": true }
+  ]
+}

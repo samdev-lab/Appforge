@@ -5,6 +5,24 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-08-23
+
+### Added — Stage 9: Enterprise Migration & High-Volume Data Transformation Factory
+- Created Migration Registry schemas: `x_appforge_migration`, `x_appforge_migration_operation`, `x_appforge_reference_mapping`, `x_appforge_migration_error`, `x_appforge_migration_marker`, `x_appforge_migration_audit`.
+- Implemented `AppForgeMigrationValidator.js` — validates schema operations, 12 transformation types, reference mappings, data types, and strictly blocks unsafe SQL/JDBC/eval and cross-scope modifications.
+- Implemented `AppForgeMigrationRiskEngine.js` — assesses migration risks (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) based on volume, schema alterations, and reversibility.
+- Implemented `AppForgeMigrationPlanner.js` — dry-run dependency-ordered migration planner modifying 0 target database records during planning.
+- Implemented `AppForgeMigrationLockManager.js` — mutex locking on applications and tables to prevent concurrent colliding migrations.
+- Implemented `AppForgeMigrationBatchProcessor.js` — chunked high-volume batch processor with per-batch checkpointing, pause/resume/cancel controls, before/after SHA-256 state checksums, and execution markers.
+- Implemented `AppForgeMigrationReconciler.js` — post-migration reconciliation engine verifying record counts, checksums, reference integrity, and failure thresholds.
+- Implemented `AppForgeMigrationRollback.js` — compensating rollback manager restoring transformed records from before-values with rollback reconciliation.
+- Implemented `AppForgeMigrationCutover.js` — zero/minimal-downtime cutover coordinator (`PREPARED` → `READY` → `APPROVED` → `CUTOVER` → `VERIFIED`).
+- Implemented `AppForgeMigrationExecutor.js` — end-to-end migration coordinator with audit logging (`X-Correlation-ID`) and secret protection.
+- Implemented `AppForgeMigrationAPI.js` — Scripted REST API for `/plan`, `/dry-run`, `/validate`, `/start`, `/pause`, `/resume`, `/cancel`, `/rollback`, `/status` with strict RBAC.
+- Created `tests/AppForgeMigrationTestSuite.js` — 66 automated test scenarios covering Registry, Schema, Planning, Transformations, Batching, Idempotency, Reconciliation, Failure/Quarantine, Rollback, Security/Anti-SQL, Approvals, and Real Operations.
+- Created `scratch/test_migration_artifact_audit.js` — real platform verification of schema evolution (`onboarding_status`), data normalization (`department` → `UPPERCASE`), 10-record & 1,000-record batch execution, pause/resume, rollback, and reconciliation.
+- All 390/390 automated test scenarios passed (66 Prompt 012 + 324 regressions).
+
 ## [0.11.0] - 2026-08-23
 
 ### Added — Stage 8: Deployment Pipeline & Multi-Environment Orchestration Factory
