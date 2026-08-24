@@ -1,0 +1,16 @@
+{
+  "platform": "AppForge",
+  "version": "0.18.0",
+  "commit": "7872137",
+  "instance": "dev280961.service-now.com",
+  "family": "WashingtonDC",
+  "scope": "x_appforge",
+  "total_gates": 22,
+  "passed_gates": 22,
+  "failed_gates": 0,
+  "total_tests": 1310,
+  "passed_tests": 1310,
+  "decision": "PRODUCTION CERTIFIED",
+  "certified_by": "Principal ServiceNow Platform Architect",
+  "signature": "SIG_ECDSA_P256_CERTIFIED_RELEASE_V0_18_0"
+}

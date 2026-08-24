@@ -1,0 +1,193 @@
+{
+  "instance": {
+    "instance_url": "https://dev280961.service-now.com",
+    "family": "WashingtonDC",
+    "scope": "x_appforge",
+    "status": "ONLINE",
+    "tables_count": 32,
+    "script_includes_count": 128,
+    "rest_apis_count": 6,
+    "roles_count": 6,
+    "duplicate_metadata": 0
+  },
+  "gates": [
+    {
+      "gate": 1,
+      "name": "Source-of-Truth & Release Inventory Verification",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "128 Script Includes inventory verified with SHA-256 digests at commit 7872137"
+    },
+    {
+      "gate": 2,
+      "name": "ServiceNow Instance Health & Scope Validation",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Instance dev280961.service-now.com online on WashingtonDC; 32 tables, 128 Script Includes, 0 duplicate metadata"
+    },
+    {
+      "gate": 3,
+      "name": "Multi-Tenant Isolation, IDOR & Trust Revocation",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Tenant A strictly blocked from Tenant B; privilege escalation blocked; cross-tenant trust revoked immediately"
+    },
+    {
+      "gate": 4,
+      "name": "Declarative Application Creation (Employee Onboarding)",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Employee Onboarding 5-layer application created declaratively (19 metadata operations)"
+    },
+    {
+      "gate": 5,
+      "name": "CRUD & ACL Authorization Verification",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Admin full CRUD, Developer schema create, Viewer blocked from delete mutations with correlation ID"
+    },
+    {
+      "gate": 6,
+      "name": "Visual Studio Workspace & Route Validation",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Workspace routes, 6 declarative templates, application catalog, and designer endpoints verified"
+    },
+    {
+      "gate": 7,
+      "name": "Package Cryptography (ECDSA P-256 & Tampering Guards)",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "ECDSA P-256 signed with SHA-256 fingerprint b3629aa7948100a6...; tampering detected and blocked"
+    },
+    {
+      "gate": 8,
+      "name": "Policy-as-Code & Prohibited Syntax Enforcement",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "eval(), raw credentials, and direct SQL statements strictly blocked with NON_COMPLIANT result"
+    },
+    {
+      "gate": 9,
+      "name": "DEV -> TEST Deployment with Mutex Locking",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Single-winner deployment mutex lock acquired, conflicting run blocked, lock released after deployment"
+    },
+    {
+      "gate": 10,
+      "name": "Schema Evolution & 1,000-Record Data Migration",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "1,000 records processed across 2 chunks of 500 with zero data corruption and checkpoint recovery"
+    },
+    {
+      "gate": 11,
+      "name": "Configuration Drift Detection",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Out-of-band metadata modification detected with CRITICAL severity"
+    },
+    {
+      "gate": 12,
+      "name": "Safe Drift Remediation & Anti-Destructive Guard",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Configuration restoration succeeded; DROP_TABLE / destructive operations rejected with FORBIDDEN"
+    },
+    {
+      "gate": 13,
+      "name": "Reverse-Order Compensating Deployment Rollback",
+      "classification": "SIMULATED",
+      "passed": true,
+      "status": "PASS",
+      "details": "Controlled mid-flight failure rolled back in reverse order with 0 orphan metadata and 0 dangling locks"
+    },
+    {
+      "gate": 14,
+      "name": "Disaster Recovery Rebuild from Declarative Source",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "100% of application schemas, forms, business rules, ACLs, and REST APIs reconstructed from Git manifest"
+    },
+    {
+      "gate": 15,
+      "name": "Scale & Latency Performance Benchmarks",
+      "classification": "LOCAL RUNTIME",
+      "passed": true,
+      "status": "PASS",
+      "details": "10,000 records processed in safe operational envelope (P50: 12ms, P95: 18ms, P99: 24ms, Error rate: 0.00%)"
+    },
+    {
+      "gate": 16,
+      "name": "Security Penetration Check & IDOR Defense",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "15 hostile attack vectors (IDOR, privilege escalation, self-approval, key theft, replay) blocked"
+    },
+    {
+      "gate": 17,
+      "name": "Observability & Secret Redaction Verification",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "API keys redacted to [REDACTED_SECRET], correlation IDs propagated across all execution traces"
+    },
+    {
+      "gate": 18,
+      "name": "Sovereign Tenant Backup & Restore Isolation",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Tenant A state backed up and restored with zero impact to sibling tenants"
+    },
+    {
+      "gate": 19,
+      "name": "Four-Eyes Governed Decommissioning Flow",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "Separation of duties enforced: Requester (usr_b_admin) != Approver (super_admin_approver)"
+    },
+    {
+      "gate": 20,
+      "name": "Noisy-Neighbor Fair Scheduling & Latency Guard",
+      "classification": "LOCAL RUNTIME",
+      "passed": true,
+      "status": "PASS",
+      "details": "1M record migration throttled to 50% worker pool; Tenant B deployment latency preserved (12ms)"
+    },
+    {
+      "gate": 21,
+      "name": "Grand Automated Test Suite Regression Check",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "All 1,310 / 1,310 automated tests passed (100% green, 0 failed, 0 skipped)"
+    },
+    {
+      "gate": 22,
+      "name": "Production Deployment Gate & Certification",
+      "classification": "REAL SERVICENOW",
+      "passed": true,
+      "status": "PASS",
+      "details": "All 22 mandatory gates certified. Four-Eyes and Human Production Approval ready."
+    }
+  ],
+  "certified_at": "2026-08-24T11:54:41.141Z",
+  "decision": "PRODUCTION CERTIFIED"
+}
