@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_control",
+  "label": "AppForge Governance Control Registry",
+  "description": "Registry of enterprise security, architectural, operational, and data governance controls",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "control_id", "type": "String", "max_length": 50, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "name", "type": "String", "max_length": 150, "mandatory": true },
+    { "name": "description", "type": "String", "max_length": 4000 },
+    { "name": "category", "type": "Choice", "choices": ["SECURITY", "ACCESS", "DATA", "INTEGRATION", "DEPLOYMENT", "MIGRATION", "OPERATIONAL"], "default_value": "SECURITY" },
+    { "name": "severity", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "HIGH" },
+    { "name": "policy", "type": "Reference", "reference_table": "x_appforge_policy" },
+    { "name": "evidence_type", "type": "String", "max_length": 100 },
+    { "name": "status", "type": "Choice", "choices": ["ACTIVE", "INACTIVE"], "default_value": "ACTIVE" }
+  ],
+  "indexes": [
+    { "name": "idx_ctrl_id", "fields": ["control_id"], "unique": true },
+    { "name": "idx_ctrl_cat", "fields": ["category", "status"] }
+  ]
+}

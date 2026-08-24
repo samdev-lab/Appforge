@@ -1,0 +1,24 @@
+{
+  "name": "x_appforge_policy_exception",
+  "label": "AppForge Policy Exception Registry",
+  "description": "Registry of time-bounded, Four-Eyes approved exceptions to platform governance policies",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "exception_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "policy", "type": "Reference", "reference_table": "x_appforge_policy", "mandatory": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "indexed": true },
+    { "name": "reason", "type": "String", "max_length": 4000, "mandatory": true },
+    { "name": "risk", "type": "Choice", "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "MEDIUM" },
+    { "name": "requested_by", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "approved_by", "type": "String", "max_length": 100 },
+    { "name": "expires_on", "type": "GlideDateTime", "mandatory": true },
+    { "name": "status", "type": "Choice", "choices": ["REQUESTED", "APPROVED", "REJECTED", "EXPIRED", "REVOKED"], "default_value": "REQUESTED" },
+    { "name": "approval_reference", "type": "String", "max_length": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_exc_id", "fields": ["exception_id"], "unique": true },
+    { "name": "idx_exc_tenant_pol", "fields": ["tenant", "policy", "status"] }
+  ]
+}

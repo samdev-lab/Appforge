@@ -1,0 +1,130 @@
+/**
+ * AppForgePolicyEngine
+ * Declarative Policy-as-Code engine for AppForge enterprise governance.
+ * Manages declarative policy definitions, policy packs, and semantic versioning
+ * without executing arbitrary JavaScript code.
+ */
+var AppForgePolicyEngine = Class.create();
+AppForgePolicyEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgePolicyEngine] ';
+        this._policies = {};
+        this._policyPacks = {};
+        this._initializeDefaultPolicyPacks();
+    },
+
+    /**
+     * Registers a declarative policy.
+     * @param {Object} policyDef - Policy definition object.
+     * @return {Object} Registration result.
+     */
+    registerPolicy: function(policyDef) {
+        'use strict';
+        if (!policyDef || !policyDef.policy_id || !policyDef.name) {
+            return { success: false, status: 'INVALID', error: 'Missing policy_id or name' };
+        }
+
+        // Anti-Eval / Anti-Scripting Guard: policies must be purely declarative
+        var defStr = JSON.stringify(policyDef.policy_definition || policyDef.condition || {});
+        if (/(\beval\s*\(|\bnew\s+Function\s*\(|SELECT\s+.*\s+FROM|DROP\s+TABLE)/i.test(defStr)) {
+            gs.error(this.LOG_PREFIX + 'Prohibited dynamic script/SQL in policy definition: ' + policyDef.policy_id);
+            return { success: false, status: 'BLOCKED', error: 'POLICY_SYNTAX_ERROR: Dynamic scripts and SQL are forbidden in Policy-as-Code.' };
+        }
+
+        var polObj = {
+            policy_id: policyDef.policy_id,
+            tenant: policyDef.tenant || 'SYSTEM',
+            name: policyDef.name,
+            description: policyDef.description || '',
+            category: policyDef.category || 'SECURITY',
+            severity: policyDef.severity || 'HIGH',
+            status: policyDef.status || 'ACTIVE',
+            version: policyDef.version || '1.0.0',
+            definition: policyDef.policy_definition || policyDef.condition || {},
+            effect: policyDef.effect || 'DENY',
+            effective_from: new GlideDateTime().getValue()
+        };
+
+        this._policies[policyDef.policy_id] = polObj;
+
+        try {
+            var gr = new GlideRecordSecure('x_appforge_policy');
+            gr.initialize();
+            gr.setValue('policy_id', polObj.policy_id);
+            gr.setValue('tenant', polObj.tenant);
+            gr.setValue('name', polObj.name);
+            gr.setValue('category', polObj.category);
+            gr.setValue('severity', polObj.severity);
+            gr.setValue('status', polObj.status);
+            gr.setValue('version', polObj.version);
+            gr.setValue('policy_definition', typeof polObj.definition === 'string' ? polObj.definition : JSON.stringify(polObj.definition));
+            polObj.sys_id = gr.insert();
+        } catch (e) {
+            polObj.sys_id = 'sys_pol_' + policyDef.policy_id;
+        }
+
+        gs.info(this.LOG_PREFIX + 'Policy registered: ' + policyDef.policy_id + ' (v' + polObj.version + ')');
+        return { success: true, status: 'ACTIVE', policy: polObj };
+    },
+
+    /**
+     * Gets a policy by ID.
+     */
+    getPolicy: function(policyId, tenantId) {
+        'use strict';
+        var pol = this._policies[policyId];
+        if (!pol) return null;
+        if (pol.tenant !== 'SYSTEM' && tenantId && pol.tenant !== tenantId) {
+            return null; // Tenant isolation
+        }
+        return pol;
+    },
+
+    /**
+     * Initializes default policy packs and security baselines.
+     */
+    _initializeDefaultPolicyPacks: function() {
+        'use strict';
+        var baselines = [
+            { policy_id: 'POL-SEC-001', name: 'No Raw Credentials', category: 'SECURITY', severity: 'CRITICAL', condition: { check: 'no_raw_credentials' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-002', name: 'No eval() or dynamic execution', category: 'SECURITY', severity: 'CRITICAL', condition: { check: 'no_eval' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-003', name: 'No Direct SQL Execution', category: 'DATA', severity: 'CRITICAL', condition: { check: 'no_direct_sql' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-004', name: 'No Unauthorized Cross-Scope Access', category: 'ACCESS', severity: 'HIGH', condition: { check: 'no_unauthorized_cross_scope' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-005', name: 'Public Write APIs Require Authentication', category: 'INTEGRATION', severity: 'HIGH', condition: { check: 'authenticated_public_write_apis' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-006', name: 'Production Deployment Requires Four-Eyes Approval', category: 'DEPLOYMENT', severity: 'CRITICAL', condition: { check: 'four_eyes_prod_deployment' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-007', name: 'No Self-Approval on Changes', category: 'OPERATIONAL', severity: 'CRITICAL', condition: { check: 'no_self_approval' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-008', name: 'No Unsigned Package Installation', category: 'APPLICATION', severity: 'HIGH', condition: { check: 'signed_package_only' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-009', name: 'No Incompatible Package Installation', category: 'APPLICATION', severity: 'HIGH', condition: { check: 'compatible_package_only' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-010', name: 'No Expired License Usage', category: 'TENANT', severity: 'HIGH', condition: { check: 'active_license_only' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-011', name: 'Multi-Tenant Data Isolation Boundary', category: 'TENANT', severity: 'CRITICAL', condition: { check: 'tenant_isolation' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-012', name: 'No Unapproved Outbound Integration', category: 'INTEGRATION', severity: 'HIGH', condition: { check: 'approved_outbound_endpoint' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-013', name: 'Production Migration Requires Snapshot', category: 'MIGRATION', severity: 'CRITICAL', condition: { check: 'migration_snapshot_required' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-014', name: 'AI Zero Secret Exposure and Leakage', category: 'AI', severity: 'CRITICAL', condition: { check: 'ai_sanitized_context' }, effect: 'DENY' },
+            { policy_id: 'POL-SEC-015', name: 'No Destructive Unchecked Automated Remediation', category: 'OPERATIONAL', severity: 'CRITICAL', condition: { check: 'safe_remediation_only' }, effect: 'DENY' }
+        ];
+
+        for (var i = 0; i < baselines.length; i++) {
+            this.registerPolicy(baselines[i]);
+        }
+
+        this._policyPacks['APPFORGE_BASELINE'] = baselines.map(function(b) { return b.policy_id; });
+        this._policyPacks['ENTERPRISE_SECURITY'] = ['POL-SEC-001', 'POL-SEC-002', 'POL-SEC-003', 'POL-SEC-004', 'POL-SEC-006', 'POL-SEC-011'];
+        this._policyPacks['AI_SAFETY'] = ['POL-SEC-014', 'POL-SEC-015'];
+    },
+
+    /**
+     * Retrieves all policies belonging to a pack.
+     */
+    getPolicyPack: function(packName) {
+        'use strict';
+        var ids = this._policyPacks[packName] || [];
+        var res = [];
+        for (var i = 0; i < ids.length; i++) {
+            if (this._policies[ids[i]]) res.push(this._policies[ids[i]]);
+        }
+        return res;
+    },
+
+    type: 'AppForgePolicyEngine'
+};

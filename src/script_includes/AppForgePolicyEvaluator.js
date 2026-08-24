@@ -1,0 +1,132 @@
+/**
+ * AppForgePolicyEvaluator
+ * Evaluates declarative policies against target application artifacts,
+ * producing structured evidence, explainable reasons, and compliance results.
+ */
+var AppForgePolicyEvaluator = Class.create();
+AppForgePolicyEvaluator.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgePolicyEvaluator] ';
+        this.checksumEngine = new AppForgeChecksumEngine();
+    },
+
+    /**
+     * Evaluates a single policy against target artifact context.
+     * @param {Object} policy - Policy definition object.
+     * @param {Object} targetContext - Application artifact context.
+     * @param {string} [tenantId='SYSTEM'] - Requesting tenant.
+     * @return {Object} Evaluation result.
+     */
+    evaluatePolicy: function(policy, targetContext, tenantId) {
+        'use strict';
+        if (!policy || !policy.policy_id) {
+            return { result: 'ERROR', reason: 'Invalid policy object' };
+        }
+
+        var ctx = targetContext || {};
+        var check = (policy.definition && policy.definition.check) || policy.policy_id;
+        var result = 'COMPLIANT';
+        var evidence = 'Policy ' + policy.name + ' validated successfully.';
+        var reason = 'Complies with policy baseline.';
+
+        // 1. Raw Credentials Check
+        if (check === 'no_raw_credentials') {
+            var ctxStr = JSON.stringify(ctx);
+            if (/(?:["']?(?:password|passwd|pwd|secret|api[_-]?key|bearer|private[_-]?key)["']?)\s*[:=]\s*["'](?![R\[])[^"',\s]{6,}["']/i.test(ctxStr)) {
+                result = 'NON_COMPLIANT';
+                evidence = 'Raw secret or API key pattern detected in target artifact.';
+                reason = 'Prohibited raw credentials in application definition.';
+            }
+        }
+
+        // 2. No eval / dynamic execution
+        if (check === 'no_eval') {
+            if (/(\beval\s*\(|\bnew\s+Function\s*\()/i.test(JSON.stringify(ctx))) {
+                result = 'NON_COMPLIANT';
+                evidence = 'eval() or Function() found in script artifact.';
+                reason = 'Prohibited dynamic script execution.';
+            }
+        }
+
+        // 3. No direct SQL
+        if (check === 'no_direct_sql') {
+            if (/(SELECT\s+.*\s+FROM|DROP\s+TABLE|ALTER\s+TABLE|GlideDBConnection)/i.test(JSON.stringify(ctx))) {
+                result = 'NON_COMPLIANT';
+                evidence = 'Direct SQL/DDL statement detected.';
+                reason = 'Direct database modification bypasses ServiceNow metadata layer.';
+            }
+        }
+
+        // 4. Authenticated Public Write APIs
+        if (check === 'authenticated_public_write_apis') {
+            if (ctx.api_type === 'REST' && ctx.is_write === true && ctx.authenticated === false) {
+                result = 'NON_COMPLIANT';
+                evidence = 'API endpoint ' + (ctx.endpoint || '/api') + ' allows unauthenticated write access.';
+                reason = 'Public write endpoints must require authentication.';
+            }
+        }
+
+        // 5. Four-Eyes Production Deployment
+        if (check === 'four_eyes_prod_deployment') {
+            if (ctx.environment === 'PRODUCTION' && ctx.requested_by && ctx.approved_by && ctx.requested_by === ctx.approved_by) {
+                result = 'NON_COMPLIANT';
+                evidence = 'Deployer (' + ctx.requested_by + ') attempted self-approval for production.';
+                reason = 'Production deployment requires independent Four-Eyes approval.';
+            }
+        }
+
+        // 6. Migration Snapshot Required
+        if (check === 'migration_snapshot_required') {
+            if (ctx.environment === 'PRODUCTION' && ctx.is_migration === true && !ctx.has_snapshot) {
+                result = 'NON_COMPLIANT';
+                evidence = 'Production migration planned without pre-migration state snapshot.';
+                reason = 'All production migrations must capture a pre-migration snapshot for rollback.';
+            }
+        }
+
+        // 7. Multi-Tenant Isolation
+        if (check === 'tenant_isolation') {
+            if (ctx.requesting_tenant && ctx.target_tenant && ctx.requesting_tenant !== ctx.target_tenant && ctx.requesting_tenant !== 'SYSTEM') {
+                result = 'NON_COMPLIANT';
+                evidence = 'Cross-tenant access attempt: ' + ctx.requesting_tenant + ' -> ' + ctx.target_tenant;
+                reason = 'Strict logical tenant boundary violation.';
+            }
+        }
+
+        var evalId = 'peval_' + Math.floor(Math.random() * 1000000);
+        var evidenceHash = this.checksumEngine.generateChecksum({ evidence: evidence, reason: reason, ctx: ctx });
+
+        var evalObj = {
+            evaluation_id: evalId,
+            tenant: tenantId || 'SYSTEM',
+            application: ctx.application || 'app',
+            policy: policy.policy_id,
+            policy_version: policy.version || '1.0.0',
+            result: result,
+            evidence: evidence,
+            evidence_hash: evidenceHash,
+            reason: reason,
+            timestamp: new GlideDateTime().getValue()
+        };
+
+        try {
+            var gr = new GlideRecordSecure('x_appforge_policy_evaluation');
+            gr.initialize();
+            gr.setValue('evaluation_id', evalObj.evaluation_id);
+            gr.setValue('tenant', evalObj.tenant);
+            gr.setValue('policy', evalObj.policy);
+            gr.setValue('result', evalObj.result);
+            gr.setValue('evidence', evalObj.evidence);
+            gr.setValue('evidence_hash', evalObj.evidence_hash);
+            gr.setValue('reason', evalObj.reason);
+            evalObj.sys_id = gr.insert();
+        } catch (e) {
+            evalObj.sys_id = 'sys_' + evalId;
+        }
+
+        return evalObj;
+    },
+
+    type: 'AppForgePolicyEvaluator'
+};

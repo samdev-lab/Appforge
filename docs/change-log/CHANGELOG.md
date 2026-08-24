@@ -5,6 +5,24 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-08-24
+
+### Added — Stage 12: Enterprise Governance, Policy-as-Code & Compliance Factory
+- Created Governance Registry schemas: `x_appforge_policy`, `x_appforge_policy_exception`, `x_appforge_control`, `x_appforge_compliance_assessment`, `x_appforge_policy_evaluation`, `x_appforge_governance_run`.
+- Implemented `AppForgePolicyEngine.js` — declarative Policy-as-Code engine with anti-scripting/eval/SQL syntax guards, policy versioning, and built-in policy packs (`APPFORGE_BASELINE`, `ENTERPRISE_SECURITY`, `AI_SAFETY`).
+- Implemented `AppForgePolicyEvaluator.js` — evaluates declarative policies against target application artifacts producing explainable reasons and structured results (`COMPLIANT`, `NON_COMPLIANT`, `WARNING`, `NOT_APPLICABLE`).
+- Implemented `AppForgeComplianceEvidence.js` — collects, sanitizes (`[REDACTED_SECRET]`), and cryptographically hashes (SHA-256) compliance evidence across platform registries.
+- Implemented `AppForgeComplianceEngine.js` — runs assessments, computes deterministic compliance percentages (e.g. 100%, 92%), logs findings, and recommends remediations.
+- Implemented `AppForgeControlTestEngine.js` — executes deterministic control validation tests against platform state (`PASS`, `FAIL`, `NOT_TESTED`).
+- Implemented `AppForgeGovernanceExceptionManager.js` — manages policy exceptions with Four-Eyes principle (`requested_by != approved_by`), expiry tracking, and risk ratings.
+- Implemented `AppForgeGovernanceRemediationEngine.js` — enforces safety classifications on remediations (`READ_ONLY`, `SAFE_AUTOMATION`, `APPROVAL_REQUIRED`, `FORBIDDEN`), blocking destructive operations (`DROP_TABLE`, `DELETE_DATA`).
+- Implemented `AppForgeAIGovernanceEngine.js` — enforces AI safety guardrails (zero secrets, zero tenant leakage, explainable decisions, human gates).
+- Implemented `AppForgeGovernanceGate.js` — pre-flight governance gate for Production Deployments, Migrations, and Installations.
+- Implemented `AppForgeGovernanceAPI.js` — Scripted REST API for policies, compliance assessments, exceptions, drift, and remediation with strict RBAC.
+- Created `tests/AppForgeGovernanceTestSuite.js` — 74 automated test scenarios covering Policy-as-Code, Security Baselines, Compliance, Exceptions, Drift Remediation, and Multi-Tenant Isolation.
+- Created `scratch/test_governance_artifact_audit.js` — real platform verification of policy evaluation on `Employee Onboarding`, controlled violation detection, automated drift remediation, Four-Eyes exception gating, and multi-tenant isolation.
+- All 600/600 automated test scenarios passed (74 Prompt 015 + 526 regressions).
+
 ## [0.14.0] - 2026-08-23
 
 ### Added — Stage 11: Enterprise Federation & Multi-Tenant Marketplace Foundation

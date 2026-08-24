@@ -1,0 +1,23 @@
+{
+  "name": "x_appforge_policy_evaluation",
+  "label": "AppForge Policy Evaluation Record",
+  "description": "Log of declarative policy evaluations, including evidence and reason explanations",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "evaluation_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "application", "type": "Reference", "reference_table": "x_appforge_application", "indexed": true },
+    { "name": "policy", "type": "Reference", "reference_table": "x_appforge_policy", "mandatory": true, "indexed": true },
+    { "name": "policy_version", "type": "String", "max_length": 30, "default_value": "1.0.0" },
+    { "name": "result", "type": "Choice", "choices": ["COMPLIANT", "NON_COMPLIANT", "WARNING", "NOT_APPLICABLE", "ERROR"], "mandatory": true },
+    { "name": "evidence", "type": "String", "max_length": 4000 },
+    { "name": "evidence_hash", "type": "String", "max_length": 64 },
+    { "name": "reason", "type": "String", "max_length": 4000 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_peval_id", "fields": ["evaluation_id"], "unique": true },
+    { "name": "idx_peval_tenant_app", "fields": ["tenant", "application", "result"] }
+  ]
+}

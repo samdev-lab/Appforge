@@ -1,0 +1,21 @@
+{
+  "name": "x_appforge_governance_run",
+  "label": "AppForge Governance Run Audit Log",
+  "description": "Immutable audit log of governance evaluation runs, drift scans, and remediation actions",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "run_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "run_type", "type": "Choice", "choices": ["POLICY_EVALUATION", "COMPLIANCE_ASSESSMENT", "DRIFT_SCAN", "REMEDIATION", "PREFLIGHT_GATE"], "default_value": "POLICY_EVALUATION" },
+    { "name": "status", "type": "Choice", "choices": ["SUCCESS", "FAILED", "WARNING", "BLOCKED"], "default_value": "SUCCESS" },
+    { "name": "actor", "type": "String", "max_length": 100, "mandatory": true },
+    { "name": "correlation_id", "type": "String", "max_length": 100, "indexed": true },
+    { "name": "summary", "type": "String", "max_length": 4000 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_gov_run_id", "fields": ["run_id"], "unique": true },
+    { "name": "idx_gov_tenant_type", "fields": ["tenant", "run_type"] }
+  ]
+}

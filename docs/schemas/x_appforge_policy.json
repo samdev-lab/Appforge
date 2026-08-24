@@ -1,0 +1,25 @@
+{
+  "name": "x_appforge_policy",
+  "label": "AppForge Policy-as-Code Registry",
+  "description": "Declarative Policy-as-Code definitions for enterprise platform governance",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "policy_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "indexed": true },
+    { "name": "name", "type": "String", "max_length": 150, "mandatory": true },
+    { "name": "description", "type": "String", "max_length": 4000 },
+    { "name": "category", "type": "Choice", "choices": ["SECURITY", "DATA", "ACCESS", "APPLICATION", "INTEGRATION", "DEPLOYMENT", "MIGRATION", "TENANT", "MARKETPLACE", "AI", "OPERATIONAL"], "default_value": "SECURITY" },
+    { "name": "severity", "type": "Choice", "choices": ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"], "default_value": "HIGH" },
+    { "name": "status", "type": "Choice", "choices": ["DRAFT", "ACTIVE", "SUSPENDED", "RETIRED"], "default_value": "ACTIVE" },
+    { "name": "version", "type": "String", "max_length": 30, "default_value": "1.0.0" },
+    { "name": "policy_definition", "type": "String", "max_length": 8000, "description": "Declarative JSON policy condition and effect" },
+    { "name": "effective_from", "type": "GlideDateTime" },
+    { "name": "effective_to", "type": "GlideDateTime" },
+    { "name": "owner", "type": "String", "max_length": 100 }
+  ],
+  "indexes": [
+    { "name": "idx_pol_id", "fields": ["policy_id"], "unique": true },
+    { "name": "idx_pol_tenant_cat", "fields": ["tenant", "category", "status"] }
+  ]
+}

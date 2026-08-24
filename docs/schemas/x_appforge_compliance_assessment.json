@@ -1,0 +1,22 @@
+{
+  "name": "x_appforge_compliance_assessment",
+  "label": "AppForge Compliance Assessment Log",
+  "description": "Historical log of compliance assessments and control validation runs",
+  "scope": "x_appforge",
+  "fields": [
+    { "name": "sys_id", "type": "GUID", "mandatory": true, "primary_key": true },
+    { "name": "assessment_id", "type": "String", "max_length": 100, "mandatory": true, "unique": true, "indexed": true },
+    { "name": "tenant", "type": "Reference", "reference_table": "x_appforge_tenant", "mandatory": true, "indexed": true },
+    { "name": "policy_pack", "type": "String", "max_length": 100, "default_value": "APPFORGE_BASELINE" },
+    { "name": "compliance_percentage", "type": "Decimal", "mandatory": true },
+    { "name": "controls_tested", "type": "Integer", "default_value": 0 },
+    { "name": "controls_passed", "type": "Integer", "default_value": 0 },
+    { "name": "controls_failed", "type": "Integer", "default_value": 0 },
+    { "name": "controls_warning", "type": "Integer", "default_value": 0 },
+    { "name": "timestamp", "type": "GlideDateTime" }
+  ],
+  "indexes": [
+    { "name": "idx_ass_id", "fields": ["assessment_id"], "unique": true },
+    { "name": "idx_ass_tenant", "fields": ["tenant", "timestamp"] }
+  ]
+}
