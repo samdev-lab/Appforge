@@ -1,14 +1,14 @@
 {
-  "release_type": "ENTERPRISE_PRODUCTION_CANDIDATE",
+  "release_type": "MULTI_TENANT_ENTERPRISE_PLATFORM",
   "platform": "AppForge",
-  "version": "0.17.0",
-  "commit": "af897f9",
-  "build_timestamp": "2026-08-24T17:05:00Z",
+  "version": "0.18.0",
+  "commit": "da9833b",
+  "build_timestamp": "2026-08-24T17:13:00Z",
   "instance_target": "dev280961.service-now.com",
   "ServiceNow_release": "WashingtonDC",
-  "schema_version": "1.1.0",
-  "total_automated_tests": 830,
-  "passed_tests": 830,
+  "schema_version": "1.2.0",
+  "total_automated_tests": 900,
+  "passed_tests": 900,
   "failed_tests": 0,
   "skipped_tests": 0,
   "certification_levels": [
@@ -18,12 +18,21 @@
     "Level 4: Security & Isolation",
     "Level 5: Scale & Concurrency",
     "Level 6: Resilience & Disaster Recovery",
-    "Level 7: Asymmetric Trust & Reverse-Engineering"
+    "Level 7: Asymmetric Trust & Reverse-Engineering",
+    "Level 8: Multi-Tenant Control Plane & SaaS Governance"
   ],
   "security_baselines": {
     "policy_pack": "APPFORGE_BASELINE",
     "active_rules": 15,
     "compliance_score": "100%"
+  },
+  "multi_tenancy": {
+    "control_plane": "AppForgeMultiTenantControlPlane",
+    "quota_engine": "AppForgeTenantQuotaEngine",
+    "isolation_validator": "AppForgeTenantIsolationValidator",
+    "tiers_supported": ["COMMUNITY", "ENTERPRISE", "UNLIMITED"],
+    "lifecycle_states": ["PROVISIONED", "ACTIVE", "SUSPENDED", "DECOMMISSIONED"],
+    "cross_tenant_access_default": "DENIED"
   },
   "scale_certification": {
     "tested_record_capacity": "1,000,000 records",

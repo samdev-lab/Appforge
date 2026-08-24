@@ -5,6 +5,15 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2026-08-24
+
+### Added — Stage 16: Multi-Tenant Enterprise Control Plane, Isolation & SaaS Operations (Prompt 022)
+- Implemented `AppForgeMultiTenantControlPlane.js` — manages enterprise multi-tenant hierarchies (`Platform` -> `Tenant` -> `[Users, Apps, Packages, Environments, Keys, Policies, Deployments, Audit]`), lifecycle transitions (`PROVISIONED`, `ACTIVE`, `SUSPENDED`, `DECOMMISSIONED`), and cryptographic tenant decommissioning evidence with SHA-256 digests.
+- Implemented `AppForgeTenantQuotaEngine.js` — enforces multi-tier subscription quotas (`COMMUNITY`, `ENTERPRISE`, `UNLIMITED`) across max applications, environments, monthly deployments, storage records, and user seats with real-time metering and overage blocking (`QUOTA_EXCEEDED`).
+- Implemented `AppForgeTenantIsolationValidator.js` — validates strict row-level and scope-level tenant isolation across applications, schemas, packages, environments, mutex locks, keys, compliance evaluations, and telemetry, blocking cross-tenant access with `CROSS_TENANT_ACCESS_DENIED`.
+- Created `tests/AppForgeMultiTenantTestSuite.js` — 70 automated test scenarios covering Tenant Hierarchy, Lifecycle, Cross-Tenant Isolation, Quotas & Metering, Tenant-Scoped RBAC, and Cryptographic Purge Audits.
+- Expanded grand automated test suite from 830 to **900 / 900 automated tests passed (100% green)**.
+
 ## [0.17.0] - 2026-08-24
 
 ### Added — Stage 15: Enterprise Trust Fabric & Update Set Reverse-Engineering (Prompt 021)
