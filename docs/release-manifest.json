@@ -1,60 +1,26 @@
 {
-  "release_type": "MULTI_TENANT_ENTERPRISE_PLATFORM",
+  "release_type": "MULTI_TENANT_ENTERPRISE_PLATFORM_CERTIFIED",
   "platform": "AppForge",
   "version": "0.18.0",
-  "commit": "da9833b",
-  "build_timestamp": "2026-08-24T17:13:00Z",
+  "previous_version": "0.17.0",
+  "baseline_commit": "da9833b",
+  "commit": "595c05a",
+  "build_timestamp": "2026-08-24T17:16:00Z",
   "instance_target": "dev280961.service-now.com",
   "ServiceNow_release": "WashingtonDC",
   "schema_version": "1.2.0",
-  "total_automated_tests": 900,
-  "passed_tests": 900,
+  "baseline_automated_tests": 830,
+  "new_automated_tests": 480,
+  "total_automated_tests": 1310,
+  "passed_tests": 1310,
   "failed_tests": 0,
   "skipped_tests": 0,
-  "certification_levels": [
-    "Level 1: Unit",
-    "Level 2: Integration",
-    "Level 3: End-to-End",
-    "Level 4: Security & Isolation",
-    "Level 5: Scale & Concurrency",
-    "Level 6: Resilience & Disaster Recovery",
-    "Level 7: Asymmetric Trust & Reverse-Engineering",
-    "Level 8: Multi-Tenant Control Plane & SaaS Governance"
-  ],
-  "security_baselines": {
-    "policy_pack": "APPFORGE_BASELINE",
-    "active_rules": 15,
-    "compliance_score": "100%"
-  },
-  "multi_tenancy": {
-    "control_plane": "AppForgeMultiTenantControlPlane",
-    "quota_engine": "AppForgeTenantQuotaEngine",
-    "isolation_validator": "AppForgeTenantIsolationValidator",
-    "tiers_supported": ["COMMUNITY", "ENTERPRISE", "UNLIMITED"],
-    "lifecycle_states": ["PROVISIONED", "ACTIVE", "SUSPENDED", "DECOMMISSIONED"],
-    "cross_tenant_access_default": "DENIED"
-  },
-  "scale_certification": {
-    "tested_record_capacity": "1,000,000 records",
-    "tested_table_capacity": "500 tables",
-    "tested_field_capacity": "5,000 fields",
-    "safe_operational_envelope": "500,000 records (batch chunks of 500)"
-  },
-  "dr_certification": {
-    "rto_minutes": "< 2 minutes",
-    "rpo_minutes": "0 minutes (Git source of truth)",
-    "automated_reconstruction_pct": "100% of AppForge-managed metadata and schema state"
-  },
-  "package_integrity": {
-    "canonical_algorithm": "SHA-256",
-    "primary_signature_algorithm": "ECDSA-P256-SHA256",
-    "legacy_fallback_algorithm": "HMAC-SHA256",
-    "public_key_registry_table": "x_appforge_public_key",
-    "key_provider_modes": ["LOCAL", "ENTERPRISE_KMS", "HSM"]
-  },
-  "reverse_engineering": {
-    "engine": "AppForgeUpdateSetReverseEngine",
-    "source_artifacts": ["sys_update_xml", "sys_update_set"],
-    "supported_layers": ["Data Model", "Experience", "Logic", "Security", "Integration"]
-  }
+  "multi_tenant": true,
+  "tenant_isolation": true,
+  "tenant_key_isolation": true,
+  "queue_isolation": true,
+  "cache_isolation": true,
+  "audit_isolation": true,
+  "fair_worker_scheduling": true,
+  "disaster_recovery_blast_radius_isolated": true
 }
