@@ -5,6 +5,16 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2026-08-24
+
+### Added — Stage 15: Enterprise Trust Fabric & Update Set Reverse-Engineering (Prompt 021)
+- Implemented `AppForgePublicKeyRegistry.js` — manages `x_appforge_public_key` registry for enterprise asymmetric package signing with SHA-256 fingerprints, lifecycle states (`ACTIVE`, `SUSPENDED`, `REVOKED`, `EXPIRED`), and strict private key storage guards.
+- Implemented `AppForgeKeyProvider.js` — key provider abstraction decoupling signing and key management into `LOCAL`, `ENTERPRISE_KMS` (Cloud KMS), and `HSM` (PKCS#11) enclaves with zero private key exposure in ServiceNow metadata or logs.
+- Implemented `AppForgeAsymmetricSigner.js` — signs package manifests with ECDSA (NIST P-256) / SHA-256 and provides dual-mode verification (validating asymmetric ECDSA packages with registry lookup and legacy HMAC packages seamlessly).
+- Implemented `AppForgeUpdateSetReverseEngine.js` — automated reverse-engineering engine that ingests raw ServiceNow Update Sets (`sys_update_xml`, `sys_update_set`), extracts components across all 5 architectural layers (Data Model, Experience, Logic, Security, Integration), and synthesizes validated canonical AppForge declarative JSON application definitions.
+- Created `tests/AppForgeEnterpriseTrustTestSuite.js` — 75 automated test scenarios covering Public Key Registry, Enclave Key Providers, ECDSA Signing & Dual Verification, Key Rotation/Revocation, and 5-Layer Update Set Reverse Engineering.
+- Expanded grand automated test suite from 755 to **830 / 830 automated tests passed (100% green)**.
+
 ## [0.16.0] - 2026-08-24
 
 ### Added — Stage 13: Enterprise Visual Studio, Compliance Portal & Declarative Template Factory (Prompt 018)

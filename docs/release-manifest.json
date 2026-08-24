@@ -1,14 +1,14 @@
 {
   "release_type": "ENTERPRISE_PRODUCTION_CANDIDATE",
   "platform": "AppForge",
-  "version": "0.16.0",
-  "commit": "026a1a1",
-  "build_timestamp": "2026-08-24T16:52:00Z",
+  "version": "0.17.0",
+  "commit": "af897f9",
+  "build_timestamp": "2026-08-24T17:05:00Z",
   "instance_target": "dev280961.service-now.com",
   "ServiceNow_release": "WashingtonDC",
-  "schema_version": "1.0.0",
-  "total_automated_tests": 755,
-  "passed_tests": 755,
+  "schema_version": "1.1.0",
+  "total_automated_tests": 830,
+  "passed_tests": 830,
   "failed_tests": 0,
   "skipped_tests": 0,
   "certification_levels": [
@@ -17,7 +17,8 @@
     "Level 3: End-to-End",
     "Level 4: Security & Isolation",
     "Level 5: Scale & Concurrency",
-    "Level 6: Resilience & Disaster Recovery"
+    "Level 6: Resilience & Disaster Recovery",
+    "Level 7: Asymmetric Trust & Reverse-Engineering"
   ],
   "security_baselines": {
     "policy_pack": "APPFORGE_BASELINE",
@@ -37,7 +38,14 @@
   },
   "package_integrity": {
     "canonical_algorithm": "SHA-256",
-    "signature_algorithm": "HMAC-SHA256",
-    "asymmetric_migration_target": "ECDSA (NIST P-256) / Ed25519"
+    "primary_signature_algorithm": "ECDSA-P256-SHA256",
+    "legacy_fallback_algorithm": "HMAC-SHA256",
+    "public_key_registry_table": "x_appforge_public_key",
+    "key_provider_modes": ["LOCAL", "ENTERPRISE_KMS", "HSM"]
+  },
+  "reverse_engineering": {
+    "engine": "AppForgeUpdateSetReverseEngine",
+    "source_artifacts": ["sys_update_xml", "sys_update_set"],
+    "supported_layers": ["Data Model", "Experience", "Logic", "Security", "Integration"]
   }
 }
