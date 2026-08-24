@@ -1,12 +1,12 @@
 # AppForge — ServiceNow Application Platform
 
-[![AppForge Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![AppForge Version](https://img.shields.io/badge/version-0.16.0-blue.svg)](CHANGELOG.md)
 [![Platform](https://img.shields.io/badge/platform-ServiceNow-green.svg)](https://developer.servicenow.com)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](#)
 
 AppForge is a long-term **ServiceNow-native application platform** — an Application Factory built inside ServiceNow that allows administrators and developers to create, configure, secure, automate, integrate, and operate completely custom business applications (such as ITSM, CSM, SPM, HR, Vendor Management, Asset Management, Procurement, and custom line-of-business apps) using metadata-driven engines.
 
-> **Phase 015 Status**: AppForge Enterprise Governance, Policy-as-Code & Compliance Factory established (`x_appforge_policy`, `x_appforge_policy_exception`, `x_appforge_control`, `x_appforge_compliance_assessment`, `x_appforge_policy_evaluation`, `x_appforge_governance_run`). Supports declarative Policy-as-Code (ALLOW, DENY, WARN, REQUIRE_APPROVAL), anti-scripting/SQL guards, policy semantic versioning, 15 security baseline policies, policy packs (`APPFORGE_BASELINE`, `ENTERPRISE_SECURITY`, `AI_SAFETY`), compliance assessment percentages, SHA-256 evidence hashing, Four-Eyes exception management (`requested_by != approved_by`), drift governance, safe automated remediation (`READ_ONLY`, `SAFE_AUTOMATION`, `APPROVAL_REQUIRED`, `FORBIDDEN`), pre-flight production/migration gates, AI governance, multi-tenant policy isolation, REST APIs (`/api/x_appforge/governance/*`), and 600/600 automated test scenarios passed (100%).
+> **Phase 018 Status**: AppForge Enterprise Visual Studio, Compliance Portal & Declarative Template Factory established (`AppForgeTemplateFactory.js`, `AppForgeStudioWorkspaceService.js`, `AppForgeDeclarativeDesignerEngine.js`, `AppForgeStudioAPI.js`, `AppForgeWorkspace.html`). Features 6 pre-built enterprise templates (Employee Onboarding, Vendor Management, Asset Request, Case Management, Approval Governance, Blank Application), Visual JSON Designer for Tables/Fields/Forms/Lists/Logic/Security/APIs, Executive Home Dashboard with live metrics (zero fake data), Governed Deployment Pipeline with Four-Eyes modal gating, Compliance Portal, Drift Center, and unified Audit Operations Timeline. Complete 20-stage customer journey verified and 675/675 automated tests passing (100%).
 
 ---
 
@@ -124,4 +124,4 @@ AppForge/
 ## 🏷️ Versioning
 
 AppForge uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
-Current Baseline: `v0.1.0`.
+Current Baseline: `v0.16.0`.

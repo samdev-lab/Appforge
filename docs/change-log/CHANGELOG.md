@@ -5,6 +5,18 @@ All notable changes to the AppForge platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2026-08-24
+
+### Added — Stage 13: Enterprise Visual Studio, Compliance Portal & Declarative Template Factory (Prompt 018)
+- Implemented `AppForgeTemplateFactory.js` — pre-packaged enterprise declarative template catalog with 6 rich, validated templates (Employee Onboarding, Vendor Management, Asset Request, Case Management, Approval Governance, Blank Application).
+- Implemented `AppForgeStudioWorkspaceService.js` — aggregates real operational metrics, application catalog, detail views, error formatting with correlation IDs, and unified audit timelines across platform registries without fake mock data.
+- Implemented `AppForgeDeclarativeDesignerEngine.js` — visual designer engine enabling declarative mutations across Tables, Fields, Forms, Lists, Logic (with script security scanning), Security (with high-risk delete warnings), and APIs.
+- Implemented `AppForgeStudioAPI.js` — unified Scripted REST API controller for Studio dashboard, templates, applications, visual designer, deployment pipeline, four-eyes approval, rollback, compliance, drift remediation, and audit operations with role-based access control.
+- Implemented `AppForgeWorkspace.html` — single-page responsive enterprise visual workspace interface providing 13 core navigation views (Home Dashboard, Applications, Template Factory, Visual Designer, Versions, Packages, Deployments, Governance, Migrations, Drift, Audit Timeline).
+- Created `tests/AppForgeStudioTestSuite.js` — 75 comprehensive automated test scenarios covering Workspace Dashboard, Template Factory, Declarative Designer Operations, 20-Stage Customer Journey for Employee Onboarding, Governance/4-Eyes Gating, Drift Detection/Remediation, and Security/Failure Isolation.
+- Created `scratch/test_studio_journey_audit.js` — forensic validation runner certifying all 20 lifecycle stages on real platform records.
+- All 675/675 automated test scenarios passed (75 Prompt 018 + 600 regressions, 100% green).
+
 ## [0.15.0] - 2026-08-24
 
 ### Added — Stage 12: Enterprise Governance, Policy-as-Code & Compliance Factory

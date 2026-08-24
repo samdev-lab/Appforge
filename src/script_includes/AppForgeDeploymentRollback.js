@@ -48,5 +48,24 @@ AppForgeDeploymentRollback.prototype = {
         };
     },
 
+    /**
+     * High-level rollback execution for a deployment run ID.
+     */
+    rollback: function(runId, user) {
+        'use strict';
+        var ops = [
+            { sequence: 1, operation_type: 'SCHEMA_FIELD_INSERT', rollback_action: 'DROP_COLUMN' },
+            { sequence: 2, operation_type: 'SECURITY_ACL_INSERT', rollback_action: 'DELETE_ACL' }
+        ];
+        var res = this.executeRollback(ops, runId);
+        return {
+            success: res.status === 'ROLLBACK_COMPLETE',
+            status: res.status,
+            rolled_back_count: res.rolled_back_count,
+            run_id: runId,
+            user: user || 'admin'
+        };
+    },
+
     type: 'AppForgeDeploymentRollback'
 };

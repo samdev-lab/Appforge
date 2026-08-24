@@ -1,0 +1,189 @@
+/**
+ * AppForgeDeclarativeDesignerEngine
+ * Visual application designer backend. Allows mutating, customizing, and validating
+ * declarative application JSON definitions across Tables, Fields, Forms, Lists, Logic, Security, and APIs.
+ */
+var AppForgeDeclarativeDesignerEngine = Class.create();
+AppForgeDeclarativeDesignerEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeDeclarativeDesignerEngine] ';
+        this.validator = new AppForgeDefinitionValidator();
+        this.scriptScanner = new AppForgeScriptSecurityScanner();
+        this.SUPPORTED_FIELD_TYPES = ['string', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'reference', 'choice'];
+    },
+
+    /**
+     * Adds or updates a schema table definition within an application definition.
+     * @param {Object} appDef - Master declarative definition.
+     * @param {Object} tableDef - Table specification.
+     * @return {Object} Mutation result with validated definition.
+     */
+    addOrUpdateTable: function(appDef, tableDef) {
+        'use strict';
+        if (!appDef || !tableDef || !tableDef.name) {
+            return { success: false, error: 'Invalid app definition or table specification' };
+        }
+
+        if (!appDef.schemas) appDef.schemas = [];
+
+        var found = false;
+        for (var i = 0; i < appDef.schemas.length; i++) {
+            if (appDef.schemas[i].name === tableDef.name || appDef.schemas[i].schema_id === tableDef.schema_id) {
+                appDef.schemas[i] = tableDef;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            if (!tableDef.schema_id) {
+                tableDef.schema_id = 'sch_' + tableDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            }
+            if (!tableDef.table_name) {
+                var scope = (appDef.application && appDef.application.scope) || 'x_appforge';
+                tableDef.table_name = scope + '_' + tableDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            }
+            if (!tableDef.fields) tableDef.fields = [];
+            appDef.schemas.push(tableDef);
+        }
+
+        var val = this.validator.validate(appDef);
+        return {
+            success: val.valid,
+            errors: val.errors || [],
+            definition: appDef
+        };
+    },
+
+    /**
+     * Adds or updates a field on a schema table.
+     * @param {Object} appDef - Master declarative definition.
+     * @param {string} tableName - Target table name.
+     * @param {Object} fieldDef - Field specification.
+     * @return {Object} Mutation result.
+     */
+    addField: function(appDef, tableName, fieldDef) {
+        'use strict';
+        if (!appDef || !tableName || !fieldDef || !fieldDef.name) {
+            return { success: false, error: 'Invalid arguments for addField' };
+        }
+
+        // Validate field type
+        var fType = (fieldDef.type || 'string').toLowerCase();
+        if (this.SUPPORTED_FIELD_TYPES.indexOf(fType) === -1) {
+            return {
+                success: false,
+                status: 'INVALID_TYPE',
+                error: 'Unsupported field type: ' + fType + '. Supported: ' + this.SUPPORTED_FIELD_TYPES.join(', ')
+            };
+        }
+
+        var table = null;
+        if (appDef.schemas) {
+            for (var i = 0; i < appDef.schemas.length; i++) {
+                if (appDef.schemas[i].name === tableName || appDef.schemas[i].table_name === tableName) {
+                    table = appDef.schemas[i];
+                    break;
+                }
+            }
+        }
+
+        if (!table) {
+            return { success: false, error: 'Target table not found: ' + tableName };
+        }
+
+        if (!table.fields) table.fields = [];
+
+        var fFound = false;
+        for (var f = 0; f < table.fields.length; f++) {
+            if (table.fields[f].name === fieldDef.name) {
+                table.fields[f] = fieldDef;
+                fFound = true;
+                break;
+            }
+        }
+
+        if (!fFound) {
+            table.fields.push(fieldDef);
+        }
+
+        return {
+            success: true,
+            status: 'FIELD_ADDED',
+            field: fieldDef,
+            table: tableName,
+            definition: appDef
+        };
+    },
+
+    /**
+     * Adds a business rule to the application logic layer with security scan check.
+     */
+    addBusinessRule: function(appDef, brDef) {
+        'use strict';
+        if (!appDef || !brDef || !brDef.name || !brDef.table) {
+            return { success: false, error: 'Invalid business rule specification' };
+        }
+
+        if (!appDef.logic) appDef.logic = { business_rules: [], events: [], notifications: [] };
+        if (!appDef.logic.business_rules) appDef.logic.business_rules = [];
+
+        // Run script security analyzer on script body
+        if (brDef.script) {
+            var scan = this.scriptScanner.scan(brDef.script);
+            if (scan.result === 'BLOCK') {
+                return {
+                    success: false,
+                    status: 'SECURITY_BLOCKED',
+                    error: 'Script security violation: ' + (scan.findings && scan.findings[0] && scan.findings[0].label),
+                    findings: scan.findings
+                };
+            }
+        }
+
+        appDef.logic.business_rules.push(brDef);
+
+        return {
+            success: true,
+            status: 'RULE_ADDED',
+            business_rule: brDef,
+            definition: appDef
+        };
+    },
+
+    /**
+     * Adds an ACL rule and warns if it introduces high risk.
+     */
+    addSecurityAcl: function(appDef, aclDef) {
+        'use strict';
+        if (!appDef || !aclDef || !aclDef.table || !aclDef.operation) {
+            return { success: false, error: 'Invalid ACL specification' };
+        }
+
+        if (!appDef.security) appDef.security = { roles: [], acls: [] };
+        if (!appDef.security.acls) appDef.security.acls = [];
+
+        var risk = 'LOW';
+        var warnings = [];
+
+        if (aclDef.operation === 'delete' && (!aclDef.condition || aclDef.condition === 'unrestricted')) {
+            risk = 'HIGH';
+            warnings.push('CRITICAL RISK: Unrestricted delete operation configured for ' + aclDef.table);
+        }
+
+        aclDef.risk = risk;
+        appDef.security.acls.push(aclDef);
+
+        return {
+            success: true,
+            status: 'ACL_ADDED',
+            risk: risk,
+            warnings: warnings,
+            acl: aclDef,
+            definition: appDef
+        };
+    },
+
+    type: 'AppForgeDeclarativeDesignerEngine'
+};
