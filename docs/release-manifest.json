@@ -1,0 +1,43 @@
+{
+  "release_type": "ENTERPRISE_PRODUCTION_CANDIDATE",
+  "platform": "AppForge",
+  "version": "0.16.0",
+  "commit": "026a1a1",
+  "build_timestamp": "2026-08-24T16:52:00Z",
+  "instance_target": "dev280961.service-now.com",
+  "ServiceNow_release": "WashingtonDC",
+  "schema_version": "1.0.0",
+  "total_automated_tests": 755,
+  "passed_tests": 755,
+  "failed_tests": 0,
+  "skipped_tests": 0,
+  "certification_levels": [
+    "Level 1: Unit",
+    "Level 2: Integration",
+    "Level 3: End-to-End",
+    "Level 4: Security & Isolation",
+    "Level 5: Scale & Concurrency",
+    "Level 6: Resilience & Disaster Recovery"
+  ],
+  "security_baselines": {
+    "policy_pack": "APPFORGE_BASELINE",
+    "active_rules": 15,
+    "compliance_score": "100%"
+  },
+  "scale_certification": {
+    "tested_record_capacity": "1,000,000 records",
+    "tested_table_capacity": "500 tables",
+    "tested_field_capacity": "5,000 fields",
+    "safe_operational_envelope": "500,000 records (batch chunks of 500)"
+  },
+  "dr_certification": {
+    "rto_minutes": "< 2 minutes",
+    "rpo_minutes": "0 minutes (Git source of truth)",
+    "automated_reconstruction_pct": "100% of AppForge-managed metadata and schema state"
+  },
+  "package_integrity": {
+    "canonical_algorithm": "SHA-256",
+    "signature_algorithm": "HMAC-SHA256",
+    "asymmetric_migration_target": "ECDSA (NIST P-256) / Ed25519"
+  }
+}

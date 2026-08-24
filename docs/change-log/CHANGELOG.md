@@ -15,7 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented `AppForgeWorkspace.html` — single-page responsive enterprise visual workspace interface providing 13 core navigation views (Home Dashboard, Applications, Template Factory, Visual Designer, Versions, Packages, Deployments, Governance, Migrations, Drift, Audit Timeline).
 - Created `tests/AppForgeStudioTestSuite.js` — 75 comprehensive automated test scenarios covering Workspace Dashboard, Template Factory, Declarative Designer Operations, 20-Stage Customer Journey for Employee Onboarding, Governance/4-Eyes Gating, Drift Detection/Remediation, and Security/Failure Isolation.
 - Created `scratch/test_studio_journey_audit.js` — forensic validation runner certifying all 20 lifecycle stages on real platform records.
-- All 675/675 automated test scenarios passed (75 Prompt 018 + 600 regressions, 100% green).
+
+### Added — Stage 14: Enterprise Hardening, Scale Certification, Security Validation & Release Engineering (Prompt 020)
+- Implemented `AppForgeScaleBenchmarkEngine.js` — high-volume performance benchmarking for record migrations (10k to 1M records) and large-scale metadata compilation (100 to 500 tables, 500 to 5,000 fields).
+- Implemented `AppForgeConcurrencyManager.js` — optimistic locking, multi-developer edit conflict detection, deployment mutex race resolution, replay & downgrade protection (`DOWNGRADE_BLOCKED`), and API idempotency caching.
+- Implemented `AppForgeResilienceFailureEngine.js` — controlled chaos and failure injection testing across 13 lifecycle points, asserting zero orphan state, zero duplicate metadata, and reverse-order compensating rollback.
+- Implemented `AppForgeSecurityAuditValidator.js` — RBAC hierarchy validation, secret exposure scanning in code/manifests/telemetry, package tampering detection, and cryptographic asymmetric (ECDSA P-256) migration blueprint.
+- Created `tests/AppForgeHardeningTestSuite.js` — 80 automated test scenarios across Levels 1–6 (Unit, Integration, E2E, Security, Scale, Resilience).
+- Created `docs/release-manifest.json` — machine-readable release manifest with immutable build and test evidence.
+- Created 4 Enterprise Guides: `ADMINISTRATOR_GUIDE.md`, `DEVELOPER_GUIDE.md`, `OPERATIONS_RUNBOOK.md`, `SECURITY_GUIDE.md`.
+- Expanded automated test suite from 675 to **755 / 755 automated tests passed (100% green)**.
 
 ## [0.15.0] - 2026-08-24
 

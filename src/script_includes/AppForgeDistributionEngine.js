@@ -19,22 +19,20 @@ AppForgeDistributionEngine.prototype = {
      */
     verifyPackageIntegrity: function(packageManifest) {
         'use strict';
-        if (!packageManifest) {
-            return { valid: false, status: 'PACKAGE_INTEGRITY_MISMATCH', reason: 'Missing package manifest' };
+        if (!packageManifest || !packageManifest.checksum) {
+            return { valid: false, status: 'PACKAGE_INTEGRITY_MISMATCH', reason: 'Missing package manifest or checksum' };
         }
 
         // 1. Checksum Verification
         var expectedChecksum = packageManifest.checksum;
-        if (expectedChecksum) {
-            var calculatedChecksum = this.checksumEngine.generateChecksum(packageManifest.inventory || packageManifest.payload || packageManifest);
-            if (expectedChecksum !== calculatedChecksum) {
-                gs.error(this.LOG_PREFIX + 'Package checksum tampering detected! Expected: ' + expectedChecksum + ', got: ' + calculatedChecksum);
-                return {
-                    valid: false,
-                    status: 'PACKAGE_INTEGRITY_MISMATCH',
-                    reason: 'PACKAGE_INTEGRITY_MISMATCH: Calculated checksum (' + calculatedChecksum + ') does not match manifest checksum (' + expectedChecksum + ')'
-                };
-            }
+        var calculatedChecksum = this.checksumEngine.generateChecksum(packageManifest.inventory || packageManifest.payload || packageManifest);
+        if (expectedChecksum !== calculatedChecksum) {
+            gs.error(this.LOG_PREFIX + 'Package checksum tampering detected! Expected: ' + expectedChecksum + ', got: ' + calculatedChecksum);
+            return {
+                valid: false,
+                status: 'PACKAGE_INTEGRITY_MISMATCH',
+                reason: 'PACKAGE_INTEGRITY_MISMATCH: Calculated checksum (' + calculatedChecksum + ') does not match manifest checksum (' + expectedChecksum + ')'
+            };
         }
 
         // 2. Digital Signature Verification
