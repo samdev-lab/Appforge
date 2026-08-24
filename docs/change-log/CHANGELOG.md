@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.18.0] - 2026-08-24
 
+### Added — Stage 17: Enterprise Release Engineering, ServiceNow Deployment Pipeline & Promotion Control (Prompt 024)
+- Implemented `AppForgeReleaseStateMachine.js` — formal 11-stage release state machine (`DRAFT` -> `VALIDATING` -> `CERTIFIED` -> `RELEASE_CANDIDATE` -> `DEV_DEPLOYED` -> `DEV_VALIDATED` -> `TEST_DEPLOYED` -> `TEST_VALIDATED` -> `PRODUCTION_APPROVAL_PENDING` -> `PRODUCTION_APPROVED` -> `PRODUCTION_DEPLOYED` -> `PRODUCTION_VERIFIED`) with failure/rollback branching and cryptographic release immutability sealing once certified.
+- Implemented `AppForgeEnvironmentRegistry.js` — manages enterprise target environments (`DEV`, `TEST`, `PROD`) with URL verification, allowed release channel gating, and active deployment lock tracking.
+- Implemented `AppForgePromotionController.js` — enforces governed promotion gates, Four-Eyes production approval separation (`requester != approver`), checksum consistency verification across environments ($\text{checksum}(\text{DEV}) == \text{checksum}(\text{TEST}) == \text{checksum}(\text{PROD})$), and auditable emergency promotion protocol.
+- Implemented `AppForgeServiceNowDeploymentAdapter.js` — standardized ServiceNow deployment adapter executing governed package installations, preflight validation, mutex locking, post-deployment smoke tests, and correlation ID tracing.
+- Created `tests/AppForgeDeploymentPipelineTestSuite.js` — 60 automated test scenarios covering Release State Machine, Release Immutability, Environment Registry, Four-Eyes Promotion Governance, Mutex Locking, and Emergency Deployments.
+- Created `docs/guides/PRODUCTION_DEPLOYMENT_RUNBOOK.md` — end-to-end production deployment runbook with pre-deployment checklist, emergency hotfix procedures, and incident escalation.
+- Created `docs/releases/v0.18.0/RELEASE_CERTIFICATE.md` — formal cryptographic release certificate with package checksums and sign-off records.
+- Expanded grand automated test suite from 1,310 to **1,370 / 1,370 automated tests passed (100% green)**.
+
 ### Added — Stage 16: Multi-Tenant Enterprise Control Plane, Isolation & SaaS Operations (Prompt 022)
 - Implemented `AppForgeMultiTenantControlPlane.js` — manages enterprise multi-tenant hierarchies (`Platform` -> `Tenant` -> `[Users, Apps, Packages, Environments, Keys, Policies, Deployments, Audit]`), lifecycle transitions (`PROVISIONED`, `ACTIVE`, `SUSPENDED`, `DECOMMISSIONED`), and cryptographic tenant decommissioning evidence with SHA-256 digests.
 - Implemented `AppForgeTenantQuotaEngine.js` — enforces multi-tier subscription quotas (`COMMUNITY`, `ENTERPRISE`, `UNLIMITED`) across max applications, environments, monthly deployments, storage records, and user seats with real-time metering and overage blocking (`QUOTA_EXCEEDED`).
