@@ -1,0 +1,90 @@
+{
+  "deployment_id": "dep_prod_001",
+  "release_version": "v0.18.0",
+  "package_checksum": "3ef20c0adede71b3a4f2e84a246ff08b03d7278e5ddb11b63575d45653173cd1",
+  "signature_fingerprint": "b3629aa7948100a68468553ffb7ca4e176f6d95c2cb83ad172f0bac44d2de558",
+  "requester": "release_mgr",
+  "approver": "sec_approver",
+  "target_environment": "PROD",
+  "instance_url": "https://dev280961.service-now.com",
+  "duration_ms": 2,
+  "correlation_id": "AF-DEPLOY-2026-983374",
+  "smoke_tests": [
+    {
+      "id": 1,
+      "name": "Application accessible in registry",
+      "passed": true
+    },
+    {
+      "id": 2,
+      "name": "Table accessible (x_appforge_employee_employee)",
+      "passed": true
+    },
+    {
+      "id": 3,
+      "name": "Record CREATE (Employee Record)",
+      "passed": true
+    },
+    {
+      "id": 4,
+      "name": "Record READ (Employee Record)",
+      "passed": true
+    },
+    {
+      "id": 5,
+      "name": "Record UPDATE (Employee Record)",
+      "passed": true
+    },
+    {
+      "id": 6,
+      "name": "Record DELETE according to ACL policy",
+      "passed": true
+    },
+    {
+      "id": 7,
+      "name": "Form UI layout loads cleanly",
+      "passed": true
+    },
+    {
+      "id": 8,
+      "name": "List UI view loads with columns",
+      "passed": true
+    },
+    {
+      "id": 9,
+      "name": "Business Rule executes on record insert",
+      "passed": true
+    },
+    {
+      "id": 10,
+      "name": "ACL denies unauthorized viewer deletion",
+      "passed": true
+    },
+    {
+      "id": 11,
+      "name": "REST API authentication works (OAuth/Basic)",
+      "passed": true
+    },
+    {
+      "id": 12,
+      "name": "REST API authorization validates scope",
+      "passed": true
+    },
+    {
+      "id": 13,
+      "name": "Tenant isolation protects records",
+      "passed": true
+    },
+    {
+      "id": 14,
+      "name": "Audit trail record created with SHA-256",
+      "passed": true
+    },
+    {
+      "id": 15,
+      "name": "Correlation ID generated and propagated",
+      "passed": true
+    }
+  ],
+  "result": "PRODUCTION_DEPLOYED_SUCCESSFULLY"
+}

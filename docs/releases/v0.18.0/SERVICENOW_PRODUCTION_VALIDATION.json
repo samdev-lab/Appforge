@@ -1,0 +1,11 @@
+{
+  "instance": "dev280961.service-now.com",
+  "family": "WashingtonDC",
+  "scope": "x_appforge",
+  "tables_count": 32,
+  "script_includes_count": 132,
+  "rest_apis_count": 6,
+  "acls_count": 40,
+  "roles_count": 6,
+  "duplicate_metadata": 0
+}
