@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>x_1805046_app_fo_0_ppm_task</collection>
+        <condition/>
+        <description>AppForge Automated SPM/PPM Business Logic</description>
+        <execute_function>false</execute_function>
+        <filter_condition/>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>PPM Calculate Project Percent Complete</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule(current, previous) {
+    if (!current.u_project) return;
+    var taskGr = new GlideRecord('x_1805046_app_fo_0_ppm_task');
+    taskGr.addQuery('u_project', current.u_project);
+    taskGr.query();
+    var total = 0;
+    var closed = 0;
+    while (taskGr.next()) {
+        total++;
+        if (taskGr.u_state == 'Closed' || taskGr.u_completed == true) closed++;
+    }
+    if (total > 0) {
+        var pct = Math.round((closed / total) * 100);
+        var projGr = new GlideRecord('x_1805046_app_fo_0_ppm_project');
+        if (projGr.get(current.u_project)) {
+            projGr.setValue('u_percent_complete', pct);
+            if (pct == 100) projGr.setValue('u_state', 'Delivered');
+            projGr.update();
+            gs.info('[AppForge PPM Flow] Updated Project % complete to ' + pct + '% for project ' + current.u_project);
+        }
+    }
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>367d6018a1b85924fd6d5db6c04fcece</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>PPM Calculate Project Percent Complete</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_367d6018a1b85924fd6d5db6c04fcece</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <template/>
+        <when>after</when>
+    </sys_script>
+</record_update>
