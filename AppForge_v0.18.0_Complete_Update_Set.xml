@@ -32608,8 +32608,7 @@ AppForgeStudioTestSuite.prototype = {
         <description>AppForge Enterprise Visual Studio Workspace Interface</description>
         <direct>false</direct>
         <endpoint>x_1805046_app_fo_0_workspace.do</endpoint>
-        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
-<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+        <html><![CDATA[<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
 <style>
 :root {
     --af-bg: #0f172a;
@@ -32778,7 +32777,7 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
     </sys_ui_page>
 </record_update>
 ]]></payload>
-        <payload_hash>02889e3a23b56f9780b16d21214146dc</payload_hash>
+        <payload_hash>e925ec3e1d790c59121cf0ad6ac99f52</payload_hash>
         <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
         <replace_on_upgrade>false</replace_on_upgrade>
         <sys_created_by>admin</sys_created_by>

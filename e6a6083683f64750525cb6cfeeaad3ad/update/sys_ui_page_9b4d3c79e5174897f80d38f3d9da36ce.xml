@@ -5,8 +5,7 @@
         <description>AppForge Enterprise Visual Studio Workspace Interface</description>
         <direct>false</direct>
         <endpoint>x_1805046_app_fo_0_workspace.do</endpoint>
-        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
-<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+        <html><![CDATA[<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
 <style>
 :root {
     --af-bg: #0f172a;
