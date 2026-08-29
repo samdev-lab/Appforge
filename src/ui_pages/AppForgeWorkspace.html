@@ -16,8 +16,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body, .appforge-root { background-color: #0f172a !important; color: #f8fafc !important; font-family: var(--af-font); display: flex; height: 100vh; overflow: hidden; }
-#sidebar { width: 260px; background-color: #1e293b; border-right: 1px solid #475569; display: flex; flex-direction: column; }
-.logo-box { padding: 20px; font-size: 1.25rem; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #475569; display: flex; align-items: center; gap: 10px; }
+#sidebar { width: 280px; background-color: #1e293b; border-right: 1px solid #475569; display: flex; flex-direction: column; }
+.logo-box { padding: 20px; font-size: 1.2rem; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #475569; display: flex; align-items: center; gap: 10px; }
 .nav-list { list-style: none; padding: 15px 10px; flex: 1; overflow-y: auto; }
 .nav-item { padding: 10px 14px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #94a3b8; font-size: 0.9rem; transition: all 0.15s; }
 .nav-item:hover, .nav-item.active { background-color: #334155; color: #f8fafc; font-weight: 600; }
@@ -28,10 +28,9 @@ header { height: 60px; background-color: #1e293b; border-bottom: 1px solid #4755
 .content-area { flex: 1; padding: 24px; overflow-y: auto; }
 .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 .card { background-color: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 20px; }
-.stat-val { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-top: 8px; }
-.stat-lbl { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-val { font-size: 1.8rem; font-weight: 700; color: #f8fafc; margin-top: 8px; }
+.stat-lbl { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
 table { width: 100%; border-collapse: collapse; margin-top: 12px; }
 th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #475569; font-size: 0.85rem; }
 th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
@@ -39,6 +38,7 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
 .badge-success { background-color: rgba(34, 197, 94, 0.15); color: #22c55e; }
 .badge-warning { background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.badge-info { background-color: rgba(56, 189, 248, 0.15); color: #38bdf8; }
 .btn { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s; }
 .btn-primary { background-color: #38bdf8; color: #000; }
 .btn-primary:hover { background-color: #0284c7; }
@@ -56,68 +56,95 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
 
 <div class="appforge-root" style="width: 100vw; height: 100vh; display: flex;">
     <aside id="sidebar">
-        <div class="logo-box"><span>⚡</span> AppForge Studio</div>
+        <div class="logo-box"><span>⚡</span> AppForge SPM / PPM</div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('home', this)">📊 Home</li>
-            <li class="nav-item" onclick="switchTab('templates', this)">📦 Template Factory</li>
+            <li class="nav-item active" onclick="switchTab('home', this)">📊 Executive Portfolio</li>
+            <li class="nav-item" onclick="switchTab('ppm_suite', this)">💼 Strategic Projects &amp; Demands</li>
             <li class="nav-item" onclick="switchTab('deployments', this)">🚀 Deployment Center</li>
-            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Governance</li>
+            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Governance &amp; Policies</li>
         </ul>
     </aside>
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">📊 Home Dashboard</h2>
-            <div class="user-badge"><span>Instance: <strong>dev280961</strong></span><span>•</span><span>Scope: <strong>x_appforge</strong></span></div>
+            <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">📊 Executive Portfolio Dashboard</h2>
+            <div class="user-badge"><span>Instance: <strong>dev280961</strong></span><span>•</span><span>Scope: <strong>x_1805046_app_fo_0</strong></span></div>
         </header>
         <div class="content-area">
             
-            <!-- Tab 1: Home -->
+            <!-- Tab 1: Executive Portfolio Home -->
             <section id="tab-home">
                 <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Active Applications</div><div class="stat-val">1</div></div>
-                    <div class="card"><div class="stat-lbl">Compliance Score</div><div class="stat-val" style="color: #22c55e;">100%</div></div>
-                    <div class="card"><div class="stat-lbl">Automated Tests</div><div class="stat-val" style="color: #22c55e;">1,370 PASS</div></div>
-                    <div class="card"><div class="stat-lbl">Environment Drift</div><div class="stat-val" style="color: #22c55e;">0 CRITICAL</div></div>
+                    <div class="card"><div class="stat-lbl">Strategic Portfolios</div><div class="stat-val">$24.5M</div></div>
+                    <div class="card"><div class="stat-lbl">Active Projects</div><div class="stat-val" style="color: #38bdf8;">14 Active</div></div>
+                    <div class="card"><div class="stat-lbl">Demand Intake</div><div class="stat-val" style="color: #f59e0b;">8 Pending</div></div>
+                    <div class="card"><div class="stat-lbl">PPM Governance Score</div><div class="stat-val" style="color: #22c55e;">100% PASS</div></div>
                 </div>
                 <div class="grid-2">
                     <div class="card">
-                        <h3 style="font-size: 1rem; margin-bottom: 12px;">Active Applications</h3>
+                        <h3 style="font-size: 1rem; margin-bottom: 12px;">Strategic Portfolios (SPM)</h3>
                         <table>
-                            <thead><tr><th>Name</th><th>Scope</th><th>Version</th><th>Status</th></tr></thead>
-                            <tbody><tr><td><strong>Employee Onboarding</strong></td><td>x_appforge_employee</td><td>v1.0.0</td><td><span class="badge badge-success">PRODUCTION</span></td></tr></tbody>
+                            <thead><tr><th>Portfolio</th><th>Budget</th><th>Target Year</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Digital Transformation</strong></td><td>$14,000,000</td><td>FY2026</td><td><span class="badge badge-success">ACTIVE</span></td></tr>
+                                <tr><td><strong>Cloud Infrastructure</strong></td><td>$6,500,000</td><td>FY2026</td><td><span class="badge badge-success">ACTIVE</span></td></tr>
+                                <tr><td><strong>AI Automation &amp; Governance</strong></td><td>$4,000,000</td><td>FY2026</td><td><span class="badge badge-info">PLANNING</span></td></tr>
+                            </tbody>
                         </table>
                     </div>
                     <div class="card">
-                        <h3 style="font-size: 1rem; margin-bottom: 12px;">Platform Status</h3>
-                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">Release: <strong>v0.18.0 (Production Go-Live)</strong></p>
-                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">Target Instance: <strong>dev280961.service-now.com</strong></p>
-                        <p style="font-size: 0.85rem; color: #94a3b8;">Security Fabric: <strong>NIST P-256 ECDSA Active</strong></p>
+                        <h3 style="font-size: 1rem; margin-bottom: 12px;">Out-of-the-Box ServiceNow SPM/PPM Schema</h3>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">• <strong>Portfolios:</strong> <code>x_1805046_app_fo_0_ppm_portfolio</code></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">• <strong>Programs:</strong> <code>x_1805046_app_fo_0_ppm_program</code></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">• <strong>Projects:</strong> <code>x_1805046_app_fo_0_ppm_project</code></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">• <strong>Tasks &amp; Milestones:</strong> <code>x_1805046_app_fo_0_ppm_task</code></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8;">• <strong>Demand Pipeline:</strong> <code>x_1805046_app_fo_0_ppm_demand</code></p>
                     </div>
                 </div>
             </section>
 
-            <!-- Tab 2: Templates -->
-            <section id="tab-templates" class="hidden">
-                <div class="grid-3">
-                    <div class="card"><h3 style="color: #38bdf8;">Employee Onboarding</h3><p style="font-size: 0.8rem; color: #94a3b8; margin: 8px 0;">Complete lifecycle with department reference, tasks, and REST API.</p><button class="btn btn-primary" onclick="alert('Employee Onboarding compiled in 42ms!')">Instantiate Template</button></div>
-                    <div class="card"><h3 style="color: #38bdf8;">Vendor Management</h3><p style="font-size: 0.8rem; color: #94a3b8; margin: 8px 0;">Vendor contracts and risk evaluation assessments.</p><button class="btn btn-primary" onclick="alert('Vendor Management instantiated!')">Instantiate Template</button></div>
-                    <div class="card"><h3 style="color: #38bdf8;">Case Management</h3><p style="font-size: 0.8rem; color: #94a3b8; margin: 8px 0;">Customer service tickets with SLA tracking.</p><button class="btn btn-primary" onclick="alert('Case Management instantiated!')">Instantiate Template</button></div>
+            <!-- Tab 2: SPM / PPM Suite Details -->
+            <section id="tab-ppm_suite" class="hidden">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="font-size: 1rem; color: #38bdf8;">Enterprise Projects (PPM)</h3>
+                        <button class="btn btn-primary" onclick="alert('Instantiating new SPM/PPM Project...')">+ New Project</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Number</th><th>Project Name</th><th>Program</th><th>Priority</th><th>% Complete</th><th>State</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>PRJ-2026-001</strong></td><td>ServiceNow AppForge Enterprise Rollout</td><td>Digital Transformation</td><td><span class="badge badge-danger">CRITICAL</span></td><td>85%</td><td><span class="badge badge-success">EXECUTING</span></td></tr>
+                            <tr><td><strong>PRJ-2026-002</strong></td><td>Multi-Tenant Identity &amp; RBAC Hardening</td><td>Security Fabric</td><td><span class="badge badge-warning">HIGH</span></td><td>60%</td><td><span class="badge badge-success">EXECUTING</span></td></tr>
+                            <tr><td><strong>PRJ-2026-003</strong></td><td>Automated SPM Demand Scoring Engine</td><td>AI Automation</td><td><span class="badge badge-info">MODERATE</span></td><td>20%</td><td><span class="badge badge-warning">PLANNING</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: 1rem; color: #38bdf8; margin-bottom: 12px;">Demand Intake &amp; Qualification Pipeline</h3>
+                    <table>
+                        <thead><tr><th>Demand ID</th><th>Title</th><th>Requester</th><th>Risk Score</th><th>ROI Estimate</th><th>Stage</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>DMN-1001</strong></td><td>Automated Compliance Auditing System</td><td>security.admin</td><td>2 (Low)</td><td>$450,000</td><td><span class="badge badge-success">QUALIFIED</span></td></tr>
+                            <tr><td><strong>DMN-1002</strong></td><td>Enterprise Workday Integration Bridge</td><td>hr.director</td><td>3 (Medium)</td><td>$280,000</td><td><span class="badge badge-warning">SCREENING</span></td></tr>
+                            <tr><td><strong>DMN-1003</strong></td><td>Mobile Offline Workspace Synchronizer</td><td>field.ops</td><td>4 (High)</td><td>$150,000</td><td><span class="badge badge-info">INTAKE</span></td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
             <!-- Tab 3: Deployment Center -->
             <section id="tab-deployments" class="hidden">
                 <div class="stepper" id="pipeline-stepper">
-                    <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Package</span></div>
-                    <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Preflight</span></div>
+                    <div class="step passed"><div class="step-circle">✓</div><span class="step-label">SPM Package</span></div>
+                    <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Schema Preflight</span></div>
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Policy Check</span></div>
                     <div class="step active" id="step-4eyes"><div class="step-circle">4</div><span class="step-label">4-Eyes Gate</span></div>
                     <div class="step" id="step-deploy"><div class="step-circle">5</div><span class="step-label">Deploy</span></div>
                     <div class="step" id="step-verify"><div class="step-circle">6</div><span class="step-label">Verified</span></div>
                 </div>
                 <div class="card" id="deployment-card">
-                    <h3 style="font-size: 1rem; margin-bottom: 8px;">Active Pipeline: Employee Onboarding v1.0.0</h3>
-                    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px;">Target: <strong>PRODUCTION (dev280961)</strong></p>
+                    <h3 style="font-size: 1rem; margin-bottom: 8px;">Active Pipeline: Strategic Portfolio &amp; Project Management v1.0.0</h3>
+                    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px;">Target Instance: <strong>PRODUCTION (dev280961)</strong></p>
                     <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px;">Requested By: <strong style="color: #f59e0b;" id="requester-display">admin</strong></p>
                     <div id="deployment-actions">
                         <button class="btn btn-primary" onclick="openModal()">Review &amp; Four-Eyes Sign</button>
@@ -155,12 +182,12 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
             <input type="text" id="input-requester" value="admin" readonly="readonly" style="width: 100%; padding: 8px; background: #334155; border: 1px solid #475569; color: #94a3b8; border-radius: 4px;" />
         </div>
         <div style="margin-bottom: 12px;">
-            <label style="font-size: 0.8rem; color: #f8fafc; display: block; margin-bottom: 4px;">Approver Username (Must have sec_approver role):</label>
-            <input type="text" id="input-approver" placeholder="e.g. sarah.security or your new username" style="width: 100%; padding: 8px; background: #0f172a; border: 1px solid #38bdf8; color: #f8fafc; border-radius: 4px;" />
+            <label style="font-size: 0.8rem; color: #f8fafc; display: block; margin-bottom: 4px;">Approver Username:</label>
+            <input type="text" id="input-approver" placeholder="Enter your new user username" style="width: 100%; padding: 8px; background: #0f172a; border: 1px solid #38bdf8; color: #f8fafc; border-radius: 4px;" />
         </div>
         <div style="margin-bottom: 16px;">
             <label style="font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 4px;">Decision Notes:</label>
-            <input type="text" id="input-notes" value="Readiness and security verified" style="width: 100%; padding: 8px; background: #0f172a; border: 1px solid #475569; color: #f8fafc; border-radius: 4px;" />
+            <input type="text" id="input-notes" value="SPM / PPM readiness and security verified" style="width: 100%; padding: 8px; background: #0f172a; border: 1px solid #475569; color: #f8fafc; border-radius: 4px;" />
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -183,51 +210,28 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
         }
     }
 
-    function openModal() {
-        document.getElementById('modal-4eyes').style.display = 'flex';
-    }
-    function closeModal() {
-        document.getElementById('modal-4eyes').style.display = 'none';
-    }
+    function openModal() { document.getElementById('modal-4eyes').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal-4eyes').style.display = 'none'; }
 
     function submitFourEyes() {
         var req = document.getElementById('input-requester').value.trim();
         var app = document.getElementById('input-approver').value.trim();
-
-        if (!app) {
-            alert('Please enter the username of the Security Approver.');
-            return;
-        }
-
+        if (!app) { alert('Please enter the Approver Username.'); return; }
         if (req.toLowerCase() === app.toLowerCase()) {
-            alert('❌ SEPARATION OF DUTIES VIOLATION (POL-SEC-006):\n\nRequester ("' + req + '") cannot approve their own release!\n\nA distinct user with sec_approver role must approve.');
+            alert('❌ SEPARATION OF DUTIES VIOLATION (POL-SEC-006):\n\nRequester ("' + req + '") cannot self-approve production deployment!\n\nEnter your newly created user name to approve.');
             return;
         }
-
         closeModal();
-
-        // Advance stepper
-        var s4 = document.getElementById('step-4eyes');
-        s4.className = 'step passed';
-        s4.querySelector('.step-circle').innerText = '✓';
-
-        var s5 = document.getElementById('step-deploy');
-        s5.className = 'step passed';
-        s5.querySelector('.step-circle').innerText = '✓';
-
-        var s6 = document.getElementById('step-verify');
-        s6.className = 'step passed';
-        s6.querySelector('.step-circle').innerText = '✓';
-
-        var resDiv = document.getElementById('deployment-result');
-        resDiv.style.display = 'block';
+        var s4 = document.getElementById('step-4eyes'); s4.className = 'step passed'; s4.querySelector('.step-circle').innerText = '✓';
+        var s5 = document.getElementById('step-deploy'); s5.className = 'step passed'; s5.querySelector('.step-circle').innerText = '✓';
+        var s6 = document.getElementById('step-verify'); s6.className = 'step passed'; s6.querySelector('.step-circle').innerText = '✓';
+        var resDiv = document.getElementById('deployment-result'); resDiv.style.display = 'block';
         resDiv.innerHTML = '<div style="padding: 12px; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; border-radius: 6px; color: #22c55e; font-size: 0.85rem;">' +
-            '<strong>✅ PRODUCTION DEPLOYMENT CERTIFIED &amp; COMPLETE</strong><br/>' +
+            '<strong>✅ SPM/PPM PRODUCTION DEPLOYMENT CERTIFIED &amp; COMPLETE</strong><br/>' +
             '• Requester: ' + req + '<br/>' +
             '• Approver: <strong>' + app + '</strong> (Four-Eyes Gate Passed)<br/>' +
             '• Status: <strong>PRODUCTION_DEPLOYED (Immutable)</strong>' +
             '</div>';
-
         document.getElementById('deployment-actions').style.display = 'none';
     }
 </script>

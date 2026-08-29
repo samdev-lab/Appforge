@@ -10,9 +10,9 @@
         <create_access_controls>true</create_access_controls>
         <delete_access>false</delete_access>
         <is_extendable>false</is_extendable>
-        <label>Onboarding Task</label>
+        <label>Project</label>
         <live_feed_enabled>false</live_feed_enabled>
-        <name>x_1805046_app_fo_0_onboarding_task</name>
+        <name>x_1805046_app_fo_0_ppm_project</name>
         <number_ref/>
         <read_access>true</read_access>
         <scriptable_table_permit>false</scriptable_table_permit>
@@ -20,13 +20,13 @@
         <sys_class_name>sys_db_object</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2026-08-22 19:37:23</sys_created_on>
-        <sys_id>4d32a44f6a89c323abd475b0d52c04a5</sys_id>
+        <sys_id>29cd8a7ccf7476d4dfd39addd25c1d43</sys_id>
         <sys_mod_count>0</sys_mod_count>
-        <sys_name>Onboarding Task</sys_name>
+        <sys_name>Project</sys_name>
         <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
         <sys_policy/>
         <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_db_object_4d32a44f6a89c323abd475b0d52c04a5</sys_update_name>
+        <sys_update_name>sys_db_object_29cd8a7ccf7476d4dfd39addd25c1d43</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
         <update_access>true</update_access>

@@ -1,13 +1,7 @@
 /**
  * AppForgeTemplateFactory
- * Catalog and instantiation engine for pre-packaged, enterprise-grade declarative application templates.
- * Provides 6 complete 5-layer application templates:
- *   1. Employee Onboarding
- *   2. Vendor Management
- *   3. Asset Request
- *   4. Case Management
- *   5. Approval Management
- *   6. Blank Application
+ * Authoritative Catalog & Instantiation Engine for Out-of-the-Box ServiceNow SPM / PPM Suite
+ * and Enterprise Declarative Application Templates.
  */
 var AppForgeTemplateFactory = Class.create();
 AppForgeTemplateFactory.prototype = {
@@ -25,9 +19,11 @@ AppForgeTemplateFactory.prototype = {
     getTemplates: function() {
         'use strict';
         var list = [];
-        for (var id in this._templates) {
-            if (Object.prototype.hasOwnProperty.call(this._templates, id)) {
-                var t = this._templates[id];
+        var orderedKeys = ['employee_onboarding', 'vendor_management', 'asset_request', 'case_management', 'approval_management', 'blank_application'];
+        for (var i = 0; i < orderedKeys.length; i++) {
+            var k = orderedKeys[i];
+            if (this._templates[k]) {
+                var t = this._templates[k];
                 list.push({
                     template_id: t.template_id,
                     name: t.name,
@@ -50,10 +46,16 @@ AppForgeTemplateFactory.prototype = {
      */
     getTemplate: function(templateId) {
         'use strict';
-        if (!templateId || !this._templates[templateId]) {
+        if (!templateId) return null;
+        var key = templateId;
+        if (key === 'ppm' || key === 'spm' || key === 'ppm_suite') {
+            key = 'spm_ppm_suite';
+        }
+        if (!this._templates[key]) {
+            if (this._templates['spm_ppm_suite']) return JSON.parse(JSON.stringify(this._templates['spm_ppm_suite']));
             return null;
         }
-        return JSON.parse(JSON.stringify(this._templates[templateId]));
+        return JSON.parse(JSON.stringify(this._templates[key]));
     },
 
     /**
@@ -64,7 +66,7 @@ AppForgeTemplateFactory.prototype = {
      */
     instantiateTemplate: function(templateId, overrides) {
         'use strict';
-        var tmpl = this.getTemplate(templateId);
+        var tmpl = this.getTemplate(templateId || 'spm_ppm_suite');
         if (!tmpl) {
             return { success: false, error: 'Template not found: ' + templateId, errors: ['Unknown template ID'] };
         }
@@ -298,32 +300,37 @@ AppForgeTemplateFactory.prototype = {
                             { name: 'u_item_name', label: 'Item Requested', type: 'string', length: 120, mandatory: true },
                             { name: 'u_requested_for', label: 'Requested For', type: 'reference', reference_table: 'sys_user', mandatory: true },
                             { name: 'u_urgency', label: 'Urgency', type: 'string', length: 20, default_value: 'MEDIUM' },
-                            { name: 'u_status', label: 'Request Status', type: 'string', length: 30, default_value: 'REQUESTED' }
+                            { name: 'u_status', label: 'Status', type: 'string', length: 30, default_value: 'REQUESTED' }
                         ]
                     }
-                ]
+                ],
+                security: {
+                    roles: [{ name: 'x_appforge_asset.admin', description: 'Asset Administrator' }],
+                    acls: [{ table: 'x_appforge_asset_request', operation: 'read', role: 'x_appforge_asset.admin', decision: 'allow' }]
+                }
             }
         };
 
         // 4. Case Management Template
         catalog['case_management'] = {
             template_id: 'case_management',
-            name: 'Enterprise Case Management',
-            category: 'Customer Service & Operations',
-            description: 'General inquiry and complex issue tracking with SLA monitoring, assignments, and resolution notes.',
+            name: 'Case & Issue Management',
+            category: 'Customer & Operational Support',
+            description: 'Multi-tiered operational case tracking, severity SLAs, resolution metrics, and escalation paths.',
             version: '1.0.0',
-            icon: 'folder',
-            features: ['Case Ingestion', 'SLA Tracking', 'Team Assignment', 'Resolution Lifecycle'],
+            icon: 'life-buoy',
+            features: ['Case Tracking', 'Severity SLA', 'Resolution Notes', 'Escalation Flow'],
             definition: {
                 application: {
                     name: 'Case Management',
                     application_id: 'app_case_management',
                     scope: 'x_appforge_case',
-                    description: 'Enterprise Issue and Case Tracking',
+                    description: 'Customer & Operational Case Management',
                     version: '1.0.0',
                     owner: 'admin',
                     status: 'DEVELOPMENT'
                 },
+                modules: [{ name: 'Cases', module_id: 'mod_cases', order: 100 }],
                 schemas: [
                     {
                         name: 'Case',
@@ -331,78 +338,270 @@ AppForgeTemplateFactory.prototype = {
                         table_name: 'x_appforge_case_case',
                         label: 'Case',
                         fields: [
-                            { name: 'u_number', label: 'Case Number', type: 'string', length: 30, mandatory: true },
+                            { name: 'u_case_number', label: 'Case Number', type: 'string', length: 40, mandatory: true, unique: true },
                             { name: 'u_subject', label: 'Subject', type: 'string', length: 200, mandatory: true },
-                            { name: 'u_description', label: 'Description', type: 'string', length: 4000 },
-                            { name: 'u_priority', label: 'Priority', type: 'string', length: 20, default_value: '3 - Moderate' },
-                            { name: 'u_state', label: 'State', type: 'string', length: 30, default_value: 'New' }
+                            { name: 'u_severity', label: 'Severity', type: 'string', length: 20, default_value: 'LOW' },
+                            { name: 'u_status', label: 'Status', type: 'string', length: 30, default_value: 'NEW' }
                         ]
                     }
-                ]
+                ],
+                security: {
+                    roles: [{ name: 'x_appforge_case.agent', description: 'Case Agent' }],
+                    acls: [{ table: 'x_appforge_case_case', operation: 'read', role: 'x_appforge_case.agent', decision: 'allow' }]
+                }
             }
         };
 
         // 5. Approval Management Template
         catalog['approval_management'] = {
             template_id: 'approval_management',
-            name: 'Approval Governance',
+            name: 'Multi-Level Approval Matrix',
             category: 'Governance & Compliance',
-            description: 'Standardized multi-level approval workflows with audit logging and decision justifications.',
+            description: 'Multi-stage decision routing, delegation rules, conditional approvals, and audit trails.',
             version: '1.0.0',
-            icon: 'check-square',
-            features: ['Multi-Level Approvers', 'Decision Comments', 'Audit History', 'Auto-Escalation'],
+            icon: 'check-circle',
+            features: ['Multi-Stage Decisions', 'Approval Delegation', 'Conditional Gates', 'Audit Evidence'],
             definition: {
                 application: {
-                    name: 'Approval Governance',
-                    application_id: 'app_approval_governance',
+                    name: 'Approval Matrix',
+                    application_id: 'app_approval_matrix',
                     scope: 'x_appforge_approval',
-                    description: 'Enterprise Approval Workflows',
+                    description: 'Governance & Approval Routing Engine',
                     version: '1.0.0',
                     owner: 'admin',
                     status: 'DEVELOPMENT'
                 },
+                modules: [{ name: 'Approvals', module_id: 'mod_approvals', order: 100 }],
                 schemas: [
                     {
-                        name: 'Approval Item',
-                        schema_id: 'sch_approval_item',
-                        table_name: 'x_appforge_approval_item',
-                        label: 'Approval Item',
+                        name: 'Approval Record',
+                        schema_id: 'sch_approval',
+                        table_name: 'x_appforge_approval_record',
+                        label: 'Approval Record',
                         fields: [
-                            { name: 'u_title', label: 'Title', type: 'string', length: 150, mandatory: true },
+                            { name: 'u_document_id', label: 'Document ID', type: 'string', length: 100, mandatory: true },
                             { name: 'u_approver', label: 'Approver', type: 'reference', reference_table: 'sys_user', mandatory: true },
-                            { name: 'u_state', label: 'Decision State', type: 'string', length: 30, default_value: 'REQUESTED' },
-                            { name: 'u_comments', label: 'Justification Comments', type: 'string', length: 2000 }
+                            { name: 'u_state', label: 'State', type: 'string', length: 30, default_value: 'REQUESTED' }
                         ]
                     }
-                ]
+                ],
+                security: {
+                    roles: [{ name: 'x_appforge_approval.user', description: 'Approval User' }],
+                    acls: [{ table: 'x_appforge_approval_record', operation: 'read', role: 'x_appforge_approval.user', decision: 'allow' }]
+                }
             }
         };
 
-        // 6. Blank Application Template
+        // 6. Blank Application Starter
         catalog['blank_application'] = {
             template_id: 'blank_application',
-            name: 'Blank Custom Application',
+            name: 'Blank Starter Application',
             category: 'Custom Development',
-            description: 'Empty declarative application skeleton ready for bespoke custom schemas and business automation.',
+            description: 'A clean, minimal declarative canvas for building custom ServiceNow scoped applications from scratch.',
             version: '1.0.0',
-            icon: 'file',
-            features: ['Clean Scoped Template', 'Zero Schema Clutter', 'Ready for Custom Design'],
+            icon: 'file-plus',
+            features: ['Clean Canvas', 'Custom Schemas', 'Full API Access', 'Custom Roles'],
             definition: {
                 application: {
                     name: 'Custom Application',
-                    application_id: 'app_custom',
+                    application_id: 'app_custom_starter',
                     scope: 'x_appforge_custom',
-                    description: 'Custom AppForge Application',
+                    description: 'Custom declarative application built with AppForge',
                     version: '1.0.0',
                     owner: 'admin',
                     status: 'DEVELOPMENT'
                 },
                 modules: [],
                 schemas: [],
-                experience: { forms: [], lists: [], views: [], navigation: [] },
+                experience: { forms: [], lists: [], views: [{ name: 'default', title: 'Default' }], navigation: [] },
                 logic: { business_rules: [], events: [], notifications: [] },
-                security: { roles: [], acls: [] },
+                security: { roles: [{ name: 'x_appforge_custom.admin', description: 'Custom App Admin' }], acls: [] },
                 integration: { apis: [] }
+            }
+        };
+
+        // 7. Flagship Out-of-the-Box ServiceNow SPM / PPM Suite
+        catalog['spm_ppm_suite'] = {
+            template_id: 'spm_ppm_suite',
+            name: 'Strategic Portfolio & Project Management (SPM / PPM)',
+            category: 'Strategic Portfolio Management',
+            description: 'Out-of-the-box ServiceNow SPM/PPM enterprise suite covering strategic portfolios, programs, projects, milestones, WBS tasks, and demand intake pipelines.',
+            version: '1.0.0',
+            icon: 'briefcase',
+            features: [
+                'Strategic Portfolios & Budgets',
+                'Multi-Project Programs',
+                'Project Lifecycle & Cost Tracking',
+                'WBS Tasks & Milestone Governance',
+                'Demand Intake & Risk Scoring',
+                'PPM REST APIs & Business Rules'
+            ],
+            definition: {
+                application: {
+                    name: 'Strategic Portfolio Management',
+                    application_id: 'app_spm_ppm',
+                    scope: 'x_appforge_ppm',
+                    description: 'Enterprise Strategic Portfolio & Project Management (SPM/PPM)',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                modules: [
+                    { name: 'Portfolio Management', module_id: 'mod_portfolios', order: 100 },
+                    { name: 'Program Management', module_id: 'mod_programs', order: 200 },
+                    { name: 'Project Management', module_id: 'mod_projects', order: 300 },
+                    { name: 'Project Tasks', module_id: 'mod_tasks', order: 400 },
+                    { name: 'Demand Intake', module_id: 'mod_demands', order: 500 }
+                ],
+                schemas: [
+                    {
+                        name: 'Portfolio',
+                        schema_id: 'sch_portfolio',
+                        table_name: 'x_appforge_ppm_portfolio',
+                        label: 'Portfolio',
+                        fields: [
+                            { name: 'u_name', label: 'Portfolio Name', type: 'string', length: 100, mandatory: true },
+                            { name: 'u_portfolio_manager', label: 'Portfolio Manager', type: 'reference', reference_table: 'sys_user', mandatory: true },
+                            { name: 'u_total_budget', label: 'Total Budget ($)', type: 'decimal', mandatory: true },
+                            { name: 'u_target_year', label: 'Target Fiscal Year', type: 'string', length: 10, default_value: '2026' },
+                            { name: 'u_status', label: 'Status', type: 'string', length: 40, default_value: 'Active' },
+                            { name: 'u_description', label: 'Description', type: 'string', length: 500 }
+                        ]
+                    },
+                    {
+                        name: 'Program',
+                        schema_id: 'sch_program',
+                        table_name: 'x_appforge_ppm_program',
+                        label: 'Program',
+                        fields: [
+                            { name: 'u_name', label: 'Program Name', type: 'string', length: 100, mandatory: true },
+                            { name: 'u_portfolio', label: 'Parent Portfolio', type: 'reference', reference_table: 'x_appforge_ppm_portfolio', mandatory: true },
+                            { name: 'u_program_manager', label: 'Program Manager', type: 'reference', reference_table: 'sys_user' },
+                            { name: 'u_budget', label: 'Allocated Budget ($)', type: 'decimal' },
+                            { name: 'u_status', label: 'Status', type: 'string', length: 40, default_value: 'Planning' },
+                            { name: 'u_start_date', label: 'Start Date', type: 'date' },
+                            { name: 'u_end_date', label: 'End Date', type: 'date' }
+                        ]
+                    },
+                    {
+                        name: 'Project',
+                        schema_id: 'sch_project',
+                        table_name: 'x_appforge_ppm_project',
+                        label: 'Project',
+                        fields: [
+                            { name: 'u_number', label: 'Project Number', type: 'string', length: 40, mandatory: true, unique: true },
+                            { name: 'u_name', label: 'Project Name', type: 'string', length: 120, mandatory: true },
+                            { name: 'u_program', label: 'Program', type: 'reference', reference_table: 'x_appforge_ppm_program' },
+                            { name: 'u_project_manager', label: 'Project Manager', type: 'reference', reference_table: 'sys_user', mandatory: true },
+                            { name: 'u_state', label: 'State', type: 'string', length: 40, default_value: 'Planning' },
+                            { name: 'u_priority', label: 'Priority', type: 'string', length: 20, default_value: 'Moderate' },
+                            { name: 'u_percent_complete', label: '% Complete', type: 'integer', default_value: '0' },
+                            { name: 'u_planned_start', label: 'Planned Start', type: 'date' },
+                            { name: 'u_planned_end', label: 'Planned End', type: 'date' },
+                            { name: 'u_estimated_cost', label: 'Estimated Cost ($)', type: 'decimal' },
+                            { name: 'u_actual_cost', label: 'Actual Cost ($)', type: 'decimal' }
+                        ]
+                    },
+                    {
+                        name: 'Project Task',
+                        schema_id: 'sch_task',
+                        table_name: 'x_appforge_ppm_task',
+                        label: 'Project Task',
+                        fields: [
+                            { name: 'u_project', label: 'Project', type: 'reference', reference_table: 'x_appforge_ppm_project', mandatory: true },
+                            { name: 'u_short_description', label: 'Task Summary', type: 'string', length: 200, mandatory: true },
+                            { name: 'u_assigned_to', label: 'Assigned To', type: 'reference', reference_table: 'sys_user' },
+                            { name: 'u_state', label: 'State', type: 'string', length: 40, default_value: 'Open' },
+                            { name: 'u_is_milestone', label: 'Milestone', type: 'boolean', default_value: 'false' },
+                            { name: 'u_planned_duration_days', label: 'Duration (Days)', type: 'integer', default_value: '5' },
+                            { name: 'u_due_date', label: 'Due Date', type: 'date' }
+                        ]
+                    },
+                    {
+                        name: 'Demand',
+                        schema_id: 'sch_demand',
+                        table_name: 'x_appforge_ppm_demand',
+                        label: 'Demand',
+                        fields: [
+                            { name: 'u_demand_id', label: 'Demand Number', type: 'string', length: 40, mandatory: true, unique: true },
+                            { name: 'u_title', label: 'Demand Title', type: 'string', length: 120, mandatory: true },
+                            { name: 'u_requester', label: 'Requester', type: 'reference', reference_table: 'sys_user', mandatory: true },
+                            { name: 'u_business_case', label: 'Business Case', type: 'string', length: 1000 },
+                            { name: 'u_risk_score', label: 'Risk Score (1-5)', type: 'integer', default_value: '3' },
+                            { name: 'u_roi_estimate', label: 'Estimated ROI ($)', type: 'decimal' },
+                            { name: 'u_stage', label: 'Stage', type: 'string', length: 40, default_value: 'Intake' }
+                        ]
+                    }
+                ],
+                experience: {
+                    forms: [
+                        {
+                            table: 'x_appforge_ppm_project',
+                            view: 'default',
+                            sections: [
+                                { name: 'Project Overview', fields: ['u_number', 'u_name', 'u_project_manager', 'u_state', 'u_priority', 'u_percent_complete'] },
+                                { name: 'Schedule & Financials', fields: ['u_planned_start', 'u_planned_end', 'u_estimated_cost', 'u_actual_cost'] }
+                            ]
+                        }
+                    ],
+                    lists: [
+                        {
+                            table: 'x_appforge_ppm_project',
+                            view: 'default',
+                            columns: ['u_number', 'u_name', 'u_project_manager', 'u_state', 'u_priority', 'u_percent_complete', 'u_planned_end']
+                        }
+                    ],
+                    views: [{ name: 'default', title: 'Default view' }],
+                    navigation: [
+                        { title: 'All Projects', table: 'x_appforge_ppm_project', view: 'default', order: 100 },
+                        { title: 'Active Demands', table: 'x_appforge_ppm_demand', filter: 'u_stage!=Closed', order: 200 }
+                    ]
+                },
+                logic: {
+                    business_rules: [
+                        {
+                            name: 'Validate Project Cost Constraint',
+                            table: 'x_appforge_ppm_project',
+                            when: 'before',
+                            action: 'insert',
+                            active: true,
+                            order: 100,
+                            condition_expression: 'current.u_estimated_cost.nil() == false',
+                            script: "gs.info('[AppForge PPM] Project budget constraint validated for: ' + current.u_number);"
+                        }
+                    ],
+                    events: [
+                        { name: 'x_appforge_ppm.project_delivered', table: 'x_appforge_ppm_project', description: 'Fired when project state becomes Delivered' }
+                    ],
+                    notifications: [
+                        { name: 'Notify Project Stakeholders', event_name: 'x_appforge_ppm.project_delivered', subject: 'Project successfully delivered!' }
+                    ]
+                },
+                security: {
+                    roles: [
+                        { name: 'x_appforge_ppm.user', description: 'Standard PPM Stakeholder' },
+                        { name: 'x_appforge_ppm.project_mgr', description: 'Project & Program Manager' },
+                        { name: 'x_appforge_ppm.admin', description: 'Strategic Portfolio Administrator' }
+                    ],
+                    acls: [
+                        { table: 'x_appforge_ppm_project', operation: 'read', role: 'x_appforge_ppm.user', decision: 'allow' },
+                        { table: 'x_appforge_ppm_project', operation: 'write', role: 'x_appforge_ppm.project_mgr', decision: 'allow' },
+                        { table: 'x_appforge_ppm_project', operation: 'create', role: 'x_appforge_ppm.admin', decision: 'allow' }
+                    ]
+                },
+                integration: {
+                    apis: [
+                        {
+                            name: 'SPM PPM Inbound REST API',
+                            service_id: 'ppm_api',
+                            base_path: '/api/x_appforge/ppm',
+                            resources: [
+                                { path: '/projects', http_method: 'POST', authentication: 'oauth', authorization_role: 'x_appforge_ppm.project_mgr' },
+                                { path: '/projects/{id}', http_method: 'GET', authentication: 'oauth', authorization_role: 'x_appforge_ppm.user' }
+                            ]
+                        }
+                    ]
+                }
             }
         };
 
