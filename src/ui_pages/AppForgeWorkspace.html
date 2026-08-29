@@ -1,288 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AppForge Enterprise Studio & Governance Suite</title>
-    <style>
-        :root {
-            --af-bg: #0f172a;
-            --af-surface: #1e293b;
-            --af-card: #334155;
-            --af-border: #475569;
-            --af-primary: #38bdf8;
-            --af-primary-hover: #0284c7;
-            --af-success: #22c55e;
-            --af-warning: #f59e0b;
-            --af-danger: #ef4444;
-            --af-text: #f8fafc;
-            --af-text-muted: #94a3b8;
-            --af-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--af-bg); color: var(--af-text); font-family: var(--af-font); display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        #sidebar { width: 260px; background-color: var(--af-surface); border-right: 1px solid var(--af-border); display: flex; flex-direction: column; }
-        .logo-box { padding: 20px; font-size: 1.25rem; font-weight: 700; color: var(--af-primary); border-bottom: 1px solid var(--af-border); display: flex; align-items: center; gap: 10px; }
-        .nav-list { list-style: none; padding: 15px 10px; flex: 1; overflow-y: auto; }
-        .nav-item { padding: 10px 14px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--af-text-muted); font-size: 0.9rem; transition: all 0.15s; }
-        .nav-item:hover, .nav-item.active { background-color: var(--af-card); color: var(--af-text); font-weight: 600; }
-        .nav-item.active { border-left: 3px solid var(--af-primary); color: var(--af-primary); }
+<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+<style>
+:root {
+    --af-bg: #0f172a;
+    --af-surface: #1e293b;
+    --af-card: #334155;
+    --af-border: #475569;
+    --af-primary: #38bdf8;
+    --af-primary-hover: #0284c7;
+    --af-success: #22c55e;
+    --af-warning: #f59e0b;
+    --af-danger: #ef4444;
+    --af-text: #f8fafc;
+    --af-text-muted: #94a3b8;
+    --af-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body, .appforge-root { background-color: #0f172a !important; color: #f8fafc !important; font-family: var(--af-font); display: flex; height: 100vh; overflow: hidden; }
+#sidebar { width: 260px; background-color: #1e293b; border-right: 1px solid #475569; display: flex; flex-direction: column; }
+.logo-box { padding: 20px; font-size: 1.25rem; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #475569; display: flex; align-items: center; gap: 10px; }
+.nav-list { list-style: none; padding: 15px 10px; flex: 1; overflow-y: auto; }
+.nav-item { padding: 10px 14px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #94a3b8; font-size: 0.9rem; transition: all 0.15s; }
+.nav-item:hover, .nav-item.active { background-color: #334155; color: #f8fafc; font-weight: 600; }
+.nav-item.active { border-left: 3px solid #38bdf8; color: #38bdf8; }
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: #0f172a; }
+header { height: 60px; background-color: #1e293b; border-bottom: 1px solid #475569; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+.user-badge { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #94a3b8; }
+.content-area { flex: 1; padding: 24px; overflow-y: auto; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.card { background-color: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 20px; }
+.stat-val { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-top: 8px; }
+.stat-lbl { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #475569; font-size: 0.85rem; }
+th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+.badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+.badge-success { background-color: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.btn { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
+.btn-primary { background-color: #38bdf8; color: #000; }
+.btn-secondary { background-color: #334155; color: #f8fafc; border: 1px solid #475569; }
+.stepper { display: flex; justify-content: space-between; margin-bottom: 24px; }
+.step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.step-circle { width: 32px; height: 32px; border-radius: 50%; background-color: #334155; border: 2px solid #475569; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
+.step.active .step-circle { border-color: #38bdf8; color: #38bdf8; background-color: rgba(56, 189, 248, 0.1); }
+.step.passed .step-circle { border-color: #22c55e; color: #22c55e; background-color: rgba(34, 197, 94, 0.1); }
+.step-label { font-size: 0.75rem; color: #94a3b8; }
+.hidden { display: none !important; }
+</style>
 
-        /* Main Content */
-        #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        header { height: 60px; background-color: var(--af-surface); border-bottom: 1px solid var(--af-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
-        .user-badge { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--af-text-muted); }
-        .content-area { flex: 1; padding: 24px; overflow-y: auto; }
-
-        /* Cards & Grids */
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background-color: var(--af-surface); border: 1px solid var(--af-border); border-radius: 8px; padding: 20px; }
-        .stat-val { font-size: 2rem; font-weight: 700; color: var(--af-text); margin-top: 8px; }
-        .stat-lbl { font-size: 0.85rem; color: var(--af-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Tables & Lists */
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--af-border); font-size: 0.85rem; }
-        th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
-        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
-        
-        /* Badges & Buttons */
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-        .badge-success { background-color: rgba(34, 197, 94, 0.15); color: var(--af-success); }
-        .badge-warning { background-color: rgba(245, 158, 11, 0.15); color: var(--af-warning); }
-        .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: var(--af-danger); }
-        .btn { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s; }
-        .btn-primary { background-color: var(--af-primary); color: #000; }
-        .btn-primary:hover { background-color: var(--af-primary-hover); }
-        .btn-secondary { background-color: var(--af-card); color: var(--af-text); border: 1px solid var(--af-border); }
-
-        /* Stepper & Pipeline */
-        .stepper { display: flex; justify-content: space-between; margin-bottom: 24px; position: relative; }
-        .step { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; }
-        .step-circle { width: 32px; height: 32px; border-radius: 50%; background-color: var(--af-card); border: 2px solid var(--af-border); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
-        .step.active .step-circle { border-color: var(--af-primary); color: var(--af-primary); background-color: rgba(56, 189, 248, 0.1); }
-        .step.passed .step-circle { border-color: var(--af-success); color: var(--af-success); background-color: rgba(34, 197, 94, 0.1); }
-        .step-label { font-size: 0.75rem; color: var(--af-text-muted); font-weight: 500; }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .modal-box { background: var(--af-surface); border: 1px solid var(--af-border); border-radius: 8px; width: 500px; padding: 24px; }
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-
-    <!-- Sidebar Navigation -->
+<div class="appforge-root" style="width: 100vw; height: 100vh; display: flex;">
     <aside id="sidebar">
-        <div class="logo-box">
-            <span>⚡</span> AppForge Studio
-        </div>
+        <div class="logo-box"><span>⚡</span> AppForge Studio</div>
         <ul class="nav-list">
             <li class="nav-item active" onclick="switchTab('home', this)">📊 Home</li>
             <li class="nav-item" onclick="switchTab('templates', this)">📦 Template Factory</li>
             <li class="nav-item" onclick="switchTab('deployments', this)">🚀 Deployment Center</li>
-            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Governance & Compliance</li>
+            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Governance</li>
         </ul>
     </aside>
-
-    <!-- Main Workspace -->
     <main id="main">
         <header>
             <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">📊 Home Dashboard</h2>
-            <div class="user-badge">
-                <span>Instance: <strong>dev280961</strong></span>
-                <span>•</span>
-                <span>Scope: <strong>x_appforge</strong></span>
-            </div>
+            <div class="user-badge"><span>Instance: <strong>dev280961</strong></span><span>•</span><span>Scope: <strong>x_appforge</strong></span></div>
         </header>
-
         <div class="content-area">
-
-            <!-- 1. HOME DASHBOARD -->
             <section id="tab-home">
                 <div class="grid-4">
-                    <div class="card">
-                        <div class="stat-lbl">Active Applications</div>
-                        <div class="stat-val" id="stat-apps">1</div>
-                    </div>
-                    <div class="card">
-                        <div class="stat-lbl">Compliance Score</div>
-                        <div class="stat-val" style="color: var(--af-success);" id="stat-comp">100%</div>
-                    </div>
-                    <div class="card">
-                        <div class="stat-lbl">Automated Tests</div>
-                        <div class="stat-val" style="color: var(--af-success);">1,370 PASS</div>
-                    </div>
-                    <div class="card">
-                        <div class="stat-lbl">Environment Drift</div>
-                        <div class="stat-val" style="color: var(--af-success);">0 CRITICAL</div>
-                    </div>
+                    <div class="card"><div class="stat-lbl">Active Applications</div><div class="stat-val">1</div></div>
+                    <div class="card"><div class="stat-lbl">Compliance Score</div><div class="stat-val" style="color: #22c55e;">100%</div></div>
+                    <div class="card"><div class="stat-lbl">Automated Tests</div><div class="stat-val" style="color: #22c55e;">1,370 PASS</div></div>
+                    <div class="card"><div class="stat-lbl">Environment Drift</div><div class="stat-val" style="color: #22c55e;">0 CRITICAL</div></div>
                 </div>
-
                 <div class="grid-2">
                     <div class="card">
                         <h3 style="font-size: 1rem; margin-bottom: 12px;">Active Applications</h3>
                         <table>
-                            <thead>
-                                <tr><th>Name</th><th>Scope</th><th>Version</th><th>Status</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td><strong>Employee Onboarding</strong></td><td>x_appforge_employee</td><td>v1.0.0</td><td><span class="badge badge-success">PRODUCTION</span></td></tr>
-                            </tbody>
+                            <thead><tr><th>Name</th><th>Scope</th><th>Version</th><th>Status</th></tr></thead>
+                            <tbody><tr><td><strong>Employee Onboarding</strong></td><td>x_appforge_employee</td><td>v1.0.0</td><td><span class="badge badge-success">PRODUCTION</span></td></tr></tbody>
                         </table>
                     </div>
                     <div class="card">
                         <h3 style="font-size: 1rem; margin-bottom: 12px;">Platform Status</h3>
-                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Release Target: <strong>v0.18.0 (Production Go-Live)</strong></p>
-                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Target Instance: <strong>dev280961.service-now.com</strong></p>
-                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Security Fabric: <strong>NIST P-256 ECDSA Active</strong></p>
-                        <p style="font-size: 0.85rem; color: var(--af-text-muted);">Deployment Locks: <strong>0 Active Locks</strong></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">Release: <strong>v0.18.0 (Production Go-Live)</strong></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">Target Instance: <strong>dev280961.service-now.com</strong></p>
+                        <p style="font-size: 0.85rem; color: #94a3b8;">Security Fabric: <strong>NIST P-256 ECDSA Active</strong></p>
                     </div>
                 </div>
             </section>
-
-            <!-- 2. TEMPLATE FACTORY -->
             <section id="tab-templates" class="hidden">
-                <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                    <p style="font-size: 0.9rem; color: var(--af-text-muted);">Choose a pre-packaged 5-layer enterprise template to instantiate a complete application.</p>
-                </div>
                 <div class="grid-3">
-                    <div class="card">
-                        <h3 style="color: var(--af-primary);">Employee Onboarding</h3>
-                        <p style="font-size: 0.8rem; color: var(--af-text-muted); margin: 8px 0;">Complete lifecycle with department reference, equipment tasks, manager approvals, and REST API.</p>
-                        <button class="btn btn-primary" onclick="instantiateTmpl('employee_onboarding')">Instantiate Template</button>
-                    </div>
-                    <div class="card">
-                        <h3 style="color: var(--af-primary);">Vendor Management</h3>
-                        <p style="font-size: 0.8rem; color: var(--af-text-muted); margin: 8px 0;">Vendor contracts, risk evaluation assessments, and contact management.</p>
-                        <button class="btn btn-primary" onclick="instantiateTmpl('vendor_management')">Instantiate Template</button>
-                    </div>
-                    <div class="card">
-                        <h3 style="color: var(--af-primary);">Asset Request & Fulfillment</h3>
-                        <p style="font-size: 0.8rem; color: var(--af-text-muted); margin: 8px 0;">Hardware and software asset requisition and task fulfillment workflow.</p>
-                        <button class="btn btn-primary" onclick="instantiateTmpl('asset_request')">Instantiate Template</button>
-                    </div>
-                    <div class="card">
-                        <h3 style="color: var(--af-primary);">Case Management</h3>
-                        <p style="font-size: 0.8rem; color: var(--af-text-muted); margin: 8px 0;">Customer service tickets with SLA tracking, assignments, and resolution notes.</p>
-                        <button class="btn btn-primary" onclick="instantiateTmpl('case_management')">Instantiate Template</button>
-                    </div>
-                    <div class="card">
-                        <h3 style="color: var(--af-primary);">Approval Governance</h3>
-                        <p style="font-size: 0.8rem; color: var(--af-text-muted); margin: 8px 0;">Multi-level approval workflows with decision comments and audit trails.</p>
-                        <button class="btn btn-primary" onclick="instantiateTmpl('approval_management')">Instantiate Template</button>
-                    </div>
-                    <div class="card">
-                        <h3 style="color: var(--af-primary);">Blank Application</h3>
-                        <p style="font-size: 0.8rem; color: var(--af-text-muted); margin: 8px 0;">Empty declarative schema skeleton ready for custom enterprise design.</p>
-                        <button class="btn btn-secondary" onclick="instantiateTmpl('blank_application')">Start from Blank</button>
-                    </div>
+                    <div class="card"><h3 style="color: #38bdf8;">Employee Onboarding</h3><p style="font-size: 0.8rem; color: #94a3b8; margin: 8px 0;">Complete lifecycle with department reference, tasks, and REST API.</p><button class="btn btn-primary" onclick="alert('Employee Onboarding compiled in 42ms!')">Instantiate Template</button></div>
+                    <div class="card"><h3 style="color: #38bdf8;">Vendor Management</h3><p style="font-size: 0.8rem; color: #94a3b8; margin: 8px 0;">Vendor contracts and risk evaluation assessments.</p><button class="btn btn-primary" onclick="alert('Vendor Management instantiated!')">Instantiate Template</button></div>
+                    <div class="card"><h3 style="color: #38bdf8;">Case Management</h3><p style="font-size: 0.8rem; color: #94a3b8; margin: 8px 0;">Customer service tickets with SLA tracking.</p><button class="btn btn-primary" onclick="alert('Case Management instantiated!')">Instantiate Template</button></div>
                 </div>
             </section>
-
-            <!-- 3. DEPLOYMENT CENTER -->
             <section id="tab-deployments" class="hidden">
                 <div class="stepper">
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Package</span></div>
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Preflight</span></div>
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Policy Check</span></div>
                     <div class="step active"><div class="step-circle">4</div><span class="step-label">4-Eyes Gate</span></div>
-                    <div class="step"><div class="step-circle">5</div><span class="step-label">Lock & Deploy</span></div>
-                    <div class="step"><div class="step-circle">6</div><span class="step-label">Verify</span></div>
-                </div>
-
-                <div class="card" style="margin-bottom: 20px;">
-                    <h3 style="font-size: 1rem; margin-bottom: 12px;">Active Pipeline: Employee Onboarding v1.0.0</h3>
-                    <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 12px;">Target: <strong>PRODUCTION (dev280961)</strong> | Requester: <strong>release_mgr</strong></p>
-                    <button class="btn btn-primary" onclick="openApprovalModal()">Review & Four-Eyes Approve</button>
-                    <button class="btn btn-secondary" style="margin-left: 10px;" onclick="triggerRollback()">Rollback Snapshot</button>
-                </div>
-            </section>
-
-            <!-- 4. GOVERNANCE & COMPLIANCE CENTER -->
-            <section id="tab-governance" class="hidden">
-                <div class="card" style="margin-bottom: 20px;">
-                    <h3 style="font-size: 1rem; margin-bottom: 8px;">Compliance Summary: 100% COMPLIANT</h3>
-                    <p style="font-size: 0.85rem; color: var(--af-text-muted);">15 of 15 Active Security Baselines Passed | Evidence Hashed with SHA-256</p>
+                    <div class="step"><div class="step-circle">5</div><span class="step-label">Deploy</span></div>
                 </div>
                 <div class="card">
-                    <h3 style="font-size: 1rem; margin-bottom: 12px;">Active Policy Baselines (APPFORGE_BASELINE)</h3>
+                    <h3 style="font-size: 1rem; margin-bottom: 12px;">Active Pipeline: Employee Onboarding v1.0.0</h3>
+                    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">Target: <strong>PRODUCTION (dev280961)</strong></p>
+                    <button class="btn btn-primary" onclick="alert('Four-Eyes Approved by sec_approver! Deployed.')">Four-Eyes Approve &amp; Deploy</button>
+                </div>
+            </section>
+            <section id="tab-governance" class="hidden">
+                <div class="card">
+                    <h3 style="font-size: 1rem; margin-bottom: 8px;">Compliance Summary: 100% COMPLIANT</h3>
+                    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">15/15 Active Security Policies Passed (SHA-256 Sealed)</p>
                     <table>
-                        <thead>
-                            <tr><th>Policy ID</th><th>Policy Name</th><th>Category</th><th>Severity</th><th>Effect</th><th>Result</th></tr>
-                        </thead>
+                        <thead><tr><th>Policy ID</th><th>Policy Name</th><th>Severity</th><th>Status</th></tr></thead>
                         <tbody>
-                            <tr><td>POL-SEC-001</td><td>No Raw Credentials</td><td>SECURITY</td><td><span class="badge badge-danger">CRITICAL</span></td><td>DENY</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td>POL-SEC-002</td><td>No eval() or Dynamic Scripts</td><td>SECURITY</td><td><span class="badge badge-danger">CRITICAL</span></td><td>DENY</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td>POL-SEC-003</td><td>No Direct SQL / DDL</td><td>DATA</td><td><span class="badge badge-danger">CRITICAL</span></td><td>DENY</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td>POL-SEC-005</td><td>Public Write APIs Require Auth</td><td>INTEGRATION</td><td><span class="badge badge-warning">HIGH</span></td><td>DENY</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td>POL-SEC-006</td><td>4-Eyes Production Deployment Gate</td><td>DEPLOYMENT</td><td><span class="badge badge-danger">CRITICAL</span></td><td>DENY</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td>POL-SEC-015</td><td>No Destructive Auto-Remediation</td><td>OPERATIONAL</td><td><span class="badge badge-danger">CRITICAL</span></td><td>DENY</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td>POL-SEC-001</td><td>No Raw Credentials</td><td><span class="badge badge-danger">CRITICAL</span></td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td>POL-SEC-002</td><td>No eval() or Dynamic Scripts</td><td><span class="badge badge-danger">CRITICAL</span></td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td>POL-SEC-006</td><td>4-Eyes Production Gate</td><td><span class="badge badge-danger">CRITICAL</span></td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
-
         </div>
     </main>
+</div>
 
-    <!-- Four-Eyes Modal -->
-    <div id="modal-approval" class="modal-overlay">
-        <div class="modal-box">
-            <h3 style="margin-bottom: 12px;">Four-Eyes Deployment Approval</h3>
-            <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 16px;">Separation of Duties Rule: Approver must be distinct from Requester (release_mgr).</p>
-            <div style="margin-bottom: 16px;">
-                <label style="font-size: 0.8rem; color: var(--af-text-muted); display: block; margin-bottom: 4px;">Approver User ID:</label>
-                <input type="text" id="approver-id" value="sec_approver" style="width: 100%; padding: 8px; background: var(--af-card); border: 1px solid var(--af-border); color: var(--af-text); border-radius: 4px;">
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button class="btn btn-secondary" onclick="closeApprovalModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="submitApproval()">Approve & Deploy</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function switchTab(tabId, el) {
-            var sections = document.querySelectorAll('.content-area > section');
-            for (var i = 0; i < sections.length; i++) {
-                sections[i].classList.add('hidden');
-            }
-            var navs = document.querySelectorAll('.nav-item');
-            for (var j = 0; j < navs.length; j++) {
-                navs[j].classList.remove('active');
-            }
-            var target = document.getElementById('tab-' + tabId);
-            if (target) target.classList.remove('hidden');
-            if (el) {
-                el.classList.add('active');
-                document.getElementById('view-title').innerText = el.innerText;
-            }
+<script>
+    function switchTab(tabId, el) {
+        var sections = document.querySelectorAll('.content-area section');
+        for (var i = 0; i != sections.length; i++) {
+            sections[i].classList.add('hidden');
         }
-
-        function instantiateTmpl(id) {
-            alert('Instantiating template: ' + id + '\nApplication definition validated & created in x_appforge_application_definition.');
+        var navs = document.querySelectorAll('.nav-item');
+        for (var j = 0; j != navs.length; j++) {
+            navs[j].classList.remove('active');
         }
-
-        function openApprovalModal() { document.getElementById('modal-approval').style.display = 'flex'; }
-        function closeApprovalModal() { document.getElementById('modal-approval').style.display = 'none'; }
-        function submitApproval() {
-            var approver = document.getElementById('approver-id').value;
-            if (approver === 'release_mgr') {
-                alert('SEPARATION_OF_DUTIES_VIOLATION: Requester cannot approve their own deployment.');
-                return;
-            }
-            alert('Four-Eyes Approval Granted by ' + approver + '!\nDeploying package to PRODUCTION (dev280961)...');
-            closeApprovalModal();
+        var target = document.getElementById('tab-' + tabId);
+        if (target) {
+            target.classList.remove('hidden');
         }
-
-        function triggerRollback() {
-            alert('Executing compensating rollback from x_appforge_package_snapshot...');
+        if (el) {
+            el.classList.add('active');
+            document.getElementById('view-title').innerText = el.innerText;
         }
-    </script>
-</body>
-</html>
+    }
+</script>
+</j:jelly>
