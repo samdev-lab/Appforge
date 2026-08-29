@@ -32795,4 +32795,254 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
         <update_set display_value=""/>
         <view/>
     </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_user_role_a2e8ed3abcd744877e4b3a950d1439f6</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_user_role">
+    <sys_user_role action="INSERT_OR_UPDATE">
+        <assignable_by/>
+        <can_delegate>true</can_delegate>
+        <description>AppForge Platform Administrator with full access to governance, tenancy, and deployments</description>
+        <elevated_privilege>false</elevated_privilege>
+        <grantable>true</grantable>
+        <includes_roles/>
+        <name>x_1805046_app_fo_0.admin</name>
+        <scoped_admin>false</scoped_admin>
+        <suffix>admin</suffix>
+        <sys_class_name>sys_user_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>a2e8ed3abcd744877e4b3a950d1439f6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1805046_app_fo_0.admin</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_a2e8ed3abcd744877e4b3a950d1439f6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_user_role>
+</record_update>
+]]></payload>
+        <payload_hash>2fac5cf01bde0d8072d525db3c9dcea9</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>b9f26578cf8dc5f42a41328c509ec8f5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_user_role_a2e8ed3abcd744877e4b3a950d1439f6</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>b9f26578cf8dc5f42a41328c509ec8f5</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_user_role_bc401443f8d62d389ded5eab8555950b</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_user_role">
+    <sys_user_role action="INSERT_OR_UPDATE">
+        <assignable_by/>
+        <can_delegate>true</can_delegate>
+        <description>AppForge Security Approver for Four-Eyes production authorization and key registry management</description>
+        <elevated_privilege>false</elevated_privilege>
+        <grantable>true</grantable>
+        <includes_roles/>
+        <name>x_1805046_app_fo_0.sec_approver</name>
+        <scoped_admin>false</scoped_admin>
+        <suffix>sec_approver</suffix>
+        <sys_class_name>sys_user_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>bc401443f8d62d389ded5eab8555950b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1805046_app_fo_0.sec_approver</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_bc401443f8d62d389ded5eab8555950b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_user_role>
+</record_update>
+]]></payload>
+        <payload_hash>4fc85ff20eb8aa5a0f035004a58869c0</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>6313a93d8afe41caadba55e2b9c7ac11</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_user_role_bc401443f8d62d389ded5eab8555950b</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>6313a93d8afe41caadba55e2b9c7ac11</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_user_role_4ccdf98fab1454ca52639a86d67b677e</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_user_role">
+    <sys_user_role action="INSERT_OR_UPDATE">
+        <assignable_by/>
+        <can_delegate>true</can_delegate>
+        <description>AppForge Release Manager for lifecycle promotion and deployment package compilation</description>
+        <elevated_privilege>false</elevated_privilege>
+        <grantable>true</grantable>
+        <includes_roles/>
+        <name>x_1805046_app_fo_0.release_mgr</name>
+        <scoped_admin>false</scoped_admin>
+        <suffix>release_mgr</suffix>
+        <sys_class_name>sys_user_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>4ccdf98fab1454ca52639a86d67b677e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1805046_app_fo_0.release_mgr</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_4ccdf98fab1454ca52639a86d67b677e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_user_role>
+</record_update>
+]]></payload>
+        <payload_hash>04cf794c9743775ff1c507e937c928e8</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>6ee87a2585ff407bd17cc8a27385eadb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_user_role_4ccdf98fab1454ca52639a86d67b677e</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>6ee87a2585ff407bd17cc8a27385eadb</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_user_role_e06417321f9d3e9f10bc61a5c36a55a3</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_user_role">
+    <sys_user_role action="INSERT_OR_UPDATE">
+        <assignable_by/>
+        <can_delegate>true</can_delegate>
+        <description>AppForge Developer for building declarative schema definitions, logic, and integrations</description>
+        <elevated_privilege>false</elevated_privilege>
+        <grantable>true</grantable>
+        <includes_roles/>
+        <name>x_1805046_app_fo_0.developer</name>
+        <scoped_admin>false</scoped_admin>
+        <suffix>developer</suffix>
+        <sys_class_name>sys_user_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>e06417321f9d3e9f10bc61a5c36a55a3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1805046_app_fo_0.developer</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_e06417321f9d3e9f10bc61a5c36a55a3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_user_role>
+</record_update>
+]]></payload>
+        <payload_hash>852226f37ef8598bcb538a9afc91dbb2</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>aa56d111db55b987acf3375ab0a0db24</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_user_role_e06417321f9d3e9f10bc61a5c36a55a3</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>aa56d111db55b987acf3375ab0a0db24</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_user_role_baa370a4c404230f0f148bceed8cbc13</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_user_role">
+    <sys_user_role action="INSERT_OR_UPDATE">
+        <assignable_by/>
+        <can_delegate>true</can_delegate>
+        <description>AppForge Standard User with read access to active applications</description>
+        <elevated_privilege>false</elevated_privilege>
+        <grantable>true</grantable>
+        <includes_roles/>
+        <name>x_1805046_app_fo_0.user</name>
+        <scoped_admin>false</scoped_admin>
+        <suffix>user</suffix>
+        <sys_class_name>sys_user_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>baa370a4c404230f0f148bceed8cbc13</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1805046_app_fo_0.user</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_baa370a4c404230f0f148bceed8cbc13</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_user_role>
+</record_update>
+]]></payload>
+        <payload_hash>6ce1cd3df9704701f95f0e6725303129</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>9b3438c231e02900d4540c862e594d66</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_user_role_baa370a4c404230f0f148bceed8cbc13</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>9b3438c231e02900d4540c862e594d66</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
 </unload>
