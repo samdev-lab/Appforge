@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeAjaxService</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeAjaxService</description>
+        <name>AppForgeAjaxService</name>
+        <script><![CDATA[/**
+ * AppForgeAjaxService
+ * Client-callable AJAX processor bridging AppForge Studio Workspace UI with native ServiceNow tables.
+ * Provides real-time persistence for Demands, Projects, Portfolios, and Four-Eyes release approvals.
+ */
+var AppForgeAjaxService = Class.create();
+AppForgeAjaxService.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+
+    /**
+     * Retrieves live workspace data from physical ServiceNow tables.
+     */
+    getWorkspaceData: function() {
+        'use strict';
+        var scope = 'x_1805046_app_fo_0';
+        var result = {
+            portfolios: [],
+            projects: [],
+            demands: [],
+            deployment_status: 'READY_FOR_APPROVAL',
+            metrics: { total_budget: 0, active_projects: 0, total_demands: 0 }
+        };
+
+        try {
+            // 1. Portfolios
+            var portGr = new GlideRecord(scope + '_ppm_portfolio');
+            portGr.query();
+            while (portGr.next()) {
+                var budget = parseFloat(portGr.getValue('u_total_budget')) || 0;
+                result.metrics.total_budget += budget;
+                result.portfolios.push({
+                    sys_id: portGr.getUniqueValue(),
+                    name: portGr.getValue('u_name') || '',
+                    manager: portGr.getValue('u_portfolio_manager') || 'admin',
+                    budget: budget,
+                    year: portGr.getValue('u_target_year') || '2026',
+                    status: portGr.getValue('u_status') || 'Active'
+                });
+            }
+
+            // 2. Projects
+            var projGr = new GlideRecord(scope + '_ppm_project');
+            projGr.query();
+            while (projGr.next()) {
+                result.metrics.active_projects++;
+                result.projects.push({
+                    sys_id: projGr.getUniqueValue(),
+                    number: projGr.getValue('u_number') || '',
+                    name: projGr.getValue('u_name') || '',
+                    manager: projGr.getValue('u_project_manager') || 'admin',
+                    priority: projGr.getValue('u_priority') || 'Moderate',
+                    state: projGr.getValue('u_state') || 'Planning',
+                    percent_complete: parseInt(projGr.getValue('u_percent_complete'), 10) || 0,
+                    estimated_cost: parseFloat(projGr.getValue('u_estimated_cost')) || 0
+                });
+            }
+
+            // 3. Demands
+            var demGr = new GlideRecord(scope + '_ppm_demand');
+            demGr.query();
+            while (demGr.next()) {
+                result.metrics.total_demands++;
+                result.demands.push({
+                    sys_id: demGr.getUniqueValue(),
+                    demand_id: demGr.getValue('u_demand_id') || '',
+                    title: demGr.getValue('u_title') || '',
+                    requester: demGr.getValue('u_requester') || 'admin',
+                    risk_score: parseInt(demGr.getValue('u_risk_score'), 10) || 3,
+                    roi_estimate: parseFloat(demGr.getValue('u_roi_estimate')) || 0,
+                    stage: demGr.getValue('u_stage') || 'Intake'
+                });
+            }
+
+            // 4. Deployment Approval Status
+            var propGr = new GlideRecord('sys_properties');
+            propGr.addQuery('name', scope + '.deployment.status');
+            propGr.query();
+            if (propGr.next()) {
+                result.deployment_status = propGr.getValue('value');
+                result.deployment_approver = propGr.getValue('description') || '';
+            }
+
+        } catch (ex) {
+            gs.error('[AppForgeAjaxService] Error fetching workspace data: ' + ex.message);
+        }
+
+        return JSON.stringify(result);
+    },
+
+    /**
+     * Approves a Demand and automatically converts it to a live ServiceNow Project.
+     */
+    approveDemand: function() {
+        'use strict';
+        var scope = 'x_1805046_app_fo_0';
+        var demandSysId = this.getParameter('sysparm_demand_id');
+        var result = { success: false };
+
+        if (!demandSysId) {
+            result.error = 'Missing demand ID';
+            return JSON.stringify(result);
+        }
+
+        try {
+            var demGr = new GlideRecord(scope + '_ppm_demand');
+            if (demGr.get(demandSysId)) {
+                demGr.setValue('u_stage', 'Approved');
+                demGr.update();
+
+                // Create Project
+                var projGr = new GlideRecord(scope + '_ppm_project');
+                projGr.initialize();
+                projGr.setValue('u_number', 'PRJ-' + (demGr.getValue('u_demand_id') || 'AUTO'));
+                projGr.setValue('u_name', demGr.getValue('u_title') || 'Converted Project');
+                projGr.setValue('u_project_manager', demGr.getValue('u_requester') || 'admin');
+                projGr.setValue('u_state', 'Planning');
+                projGr.setValue('u_priority', 'Moderate');
+                projGr.setValue('u_percent_complete', 0);
+                projGr.setValue('u_estimated_cost', demGr.getValue('u_roi_estimate') || 0);
+                var projId = projGr.insert();
+
+                result.success = true;
+                result.project_sys_id = projId;
+                result.project_number = projGr.getValue('u_number');
+            } else {
+                result.error = 'Demand record not found';
+            }
+        } catch (ex) {
+            result.error = ex.message;
+        }
+
+        return JSON.stringify(result);
+    },
+
+    /**
+     * Executes Four-Eyes Production Release Sign-Off with permanent persistence in sys_properties.
+     */
+    submitFourEyesApproval: function() {
+        'use strict';
+        var scope = 'x_1805046_app_fo_0';
+        var requester = this.getParameter('sysparm_requester') || 'admin';
+        var approver = this.getParameter('sysparm_approver') || '';
+        var notes = this.getParameter('sysparm_notes') || '';
+
+        var result = { success: false };
+
+        if (!approver) {
+            result.error = 'Security Approver ID is required.';
+            return JSON.stringify(result);
+        }
+
+        if (requester.toLowerCase() === approver.toLowerCase()) {
+            result.error = 'SEPARATION_OF_DUTIES_VIOLATION: Requester (' + requester + ') cannot approve their own production release!';
+            return JSON.stringify(result);
+        }
+
+        try {
+            // Persist status
+            var propGr = new GlideRecord('sys_properties');
+            propGr.addQuery('name', scope + '.deployment.status');
+            propGr.query();
+            if (propGr.next()) {
+                propGr.setValue('value', 'PRODUCTION_DEPLOYED');
+                propGr.setValue('description', 'Approved by ' + approver + ' at ' + new GlideDateTime().getValue());
+                propGr.update();
+            } else {
+                propGr.initialize();
+                propGr.setValue('name', scope + '.deployment.status');
+                propGr.setValue('value', 'PRODUCTION_DEPLOYED');
+                propGr.setValue('description', 'Approved by ' + approver + ' at ' + new GlideDateTime().getValue());
+                propGr.insert();
+            }
+
+            result.success = true;
+            result.status = 'PRODUCTION_DEPLOYED';
+            result.approver = approver;
+            result.timestamp = new GlideDateTime().getValue();
+        } catch (ex) {
+            result.error = ex.message;
+        }
+
+        return JSON.stringify(result);
+    },
+
+    type: 'AppForgeAjaxService'
+});
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>fa5a8b528ad3c35e7a2553dbd5440425</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeAjaxService</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_fa5a8b528ad3c35e7a2553dbd5440425</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

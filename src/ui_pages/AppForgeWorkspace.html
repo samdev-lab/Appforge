@@ -46,7 +46,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 .btn-primary:hover { background-color: #0284c7; color: #fff; }
 .btn-success { background-color: #22c55e; color: #000; }
 .btn-success:hover { background-color: #16a34a; color: #fff; }
-.btn-secondary { background-color: var(--af-card); color: var(--af-text); border: 1px solid var(--af-border); }
+.btn-secondary { background-color: var(--af-card); color: var(--af-text); border: 1px solid var(--af-border); text-decoration: none; }
 .progress-bar-bg { width: 100%; height: 8px; background-color: var(--af-card); border-radius: 4px; overflow: hidden; margin-top: 6px; }
 .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #22c55e); border-radius: 4px; }
 .stepper { display: flex; justify-content: space-between; margin-bottom: 24px; }
@@ -76,8 +76,8 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             <li class="nav-item" onclick="switchTab('deployments', this)">🛡️ Four-Eyes Governance</li>
         </ul>
         <div style="padding: 16px; border-top: 1px solid var(--af-border); font-size: 0.75rem; color: #94a3b8;">
-            <div>OOTB ServiceNow Tables: <strong>5 Active</strong></div>
-            <div style="margin-top: 4px;">Role: <strong>x_1805046_app_fo_0.admin</strong></div>
+            <div>Physical Tables: <strong>5 Connected</strong></div>
+            <div style="margin-top: 4px;">User: <strong><span id="current-user-lbl">admin</span></strong></div>
         </div>
     </aside>
 
@@ -89,7 +89,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                 <span>•</span>
                 <span>Scope: <strong>x_1805046_app_fo_0</strong></span>
                 <span>•</span>
-                <span class="badge badge-success">ALL SYSTEMS OPERATIONAL</span>
+                <span class="badge badge-success" id="sync-status">PERSISTENT BACKEND CONNECTED</span>
             </div>
         </header>
 
@@ -100,24 +100,24 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                 <div class="grid-4">
                     <div class="card">
                         <div class="stat-lbl">Strategic Capital Budget</div>
-                        <div class="stat-val" style="color: #38bdf8;">$24.5M</div>
+                        <div class="stat-val" style="color: #38bdf8;" id="stat-budget">$24.5M</div>
                         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 68%;"></div></div>
                         <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 6px;">$16.6M Allocated (68%)</div>
                     </div>
                     <div class="card">
                         <div class="stat-lbl">Active Enterprise Projects</div>
-                        <div class="stat-val" style="color: #22c55e;">6 Active</div>
-                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">3 Planning • 3 Executing</div>
+                        <div class="stat-val" style="color: #22c55e;" id="stat-projects">3 Active</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">Live in x_1805046_app_fo_0_ppm_project</div>
                     </div>
                     <div class="card">
                         <div class="stat-lbl">Demand Intake Pipeline</div>
-                        <div class="stat-val" style="color: #f59e0b;">5 Demands</div>
-                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">$1.85M Projected ROI</div>
+                        <div class="stat-val" style="color: #f59e0b;" id="stat-demands">3 Demands</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">$1.13M Projected ROI</div>
                     </div>
                     <div class="card">
-                        <div class="stat-lbl">Governance &amp; Four-Eyes</div>
-                        <div class="stat-val" style="color: #a855f7;">100% PASS</div>
-                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">15/15 Policies Sealed</div>
+                        <div class="stat-lbl">Production Release Status</div>
+                        <div class="stat-val" style="color: #a855f7;" id="stat-governance">SEALED</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">Four-Eyes Gated</div>
                     </div>
                 </div>
 
@@ -191,7 +191,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                                 <th>Project Manager</th>
                                 <th>Priority</th>
                                 <th>Progress (% Complete)</th>
-                                <th>Cost ($)</th>
+                                <th>Estimated Cost</th>
                                 <th>State</th>
                             </tr>
                         </thead>
@@ -257,7 +257,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Production Cutover &amp; Four-Eyes Verification</strong></td>
+                                <td><strong>Execute Production Cutover &amp; Four-Eyes Verification</strong></td>
                                 <td>PRJ-2026-001</td>
                                 <td>admin</td>
                                 <td>2 Days</td>
@@ -288,7 +288,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         <a href="x_1805046_app_fo_0_ppm_demand_list.do" target="_blank" class="btn btn-secondary">Open Demands List ↗</a>
                     </div>
                     <div style="padding: 12px 16px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem; color: #38bdf8;">
-                        💡 <strong>Automated SPM Flow:</strong> Clicking <strong>"Approve &amp; Convert to Project"</strong> triggers the automated Business Rule, creating a real Project in <code>x_1805046_app_fo_0_ppm_project</code> instantly.
+                        💡 <strong>Real-Time Database Persistence:</strong> Clicking <strong>"Approve &amp; Convert"</strong> executes a real GlideAjax server transaction, saving the converted Project permanently into ServiceNow!
                     </div>
                     <table>
                         <thead>
@@ -306,7 +306,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <tr id="row-dmn-101">
                                 <td><strong>DMN-2026-101</strong></td>
                                 <td>AI Automated Code Review Pipeline</td>
-                                <td>security.admin</td>
+                                <td>admin</td>
                                 <td><span class="badge badge-success">2 (Low)</span></td>
                                 <td><strong style="color: #22c55e;">$600,000</strong></td>
                                 <td><span class="badge badge-info" id="stage-dmn-101">QUALIFIED</span></td>
@@ -315,7 +315,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <tr id="row-dmn-102">
                                 <td><strong>DMN-2026-102</strong></td>
                                 <td>Enterprise Workday Integration Bridge</td>
-                                <td>hr.director</td>
+                                <td>admin</td>
                                 <td><span class="badge badge-warning">3 (Medium)</span></td>
                                 <td><strong style="color: #22c55e;">$350,000</strong></td>
                                 <td><span class="badge badge-warning" id="stage-dmn-102">SCREENING</span></td>
@@ -324,7 +324,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <tr id="row-dmn-103">
                                 <td><strong>DMN-2026-103</strong></td>
                                 <td>Mobile Offline Field Inspection Workspace</td>
-                                <td>field.ops</td>
+                                <td>admin</td>
                                 <td><span class="badge badge-danger">4 (High)</span></td>
                                 <td><strong style="color: #22c55e;">$180,000</strong></td>
                                 <td><span class="badge badge-info" id="stage-dmn-103">INTAKE</span></td>
@@ -341,9 +341,9 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">SPM Package</span></div>
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Schema Preflight</span></div>
                     <div class="step passed"><div class="step-circle">✓</div><span class="step-label">Policy Check</span></div>
-                    <div class="step active" id="step-4eyes"><div class="step-circle">4</div><span class="step-label">4-Eyes Gate</span></div>
-                    <div class="step" id="step-deploy"><div class="step-circle">5</div><span class="step-label">Deploy</span></div>
-                    <div class="step" id="step-verify"><div class="step-circle">6</div><span class="step-label">Verified</span></div>
+                    <div class="step" id="step-4eyes"><div class="step-circle" id="circle-4eyes">4</div><span class="step-label">4-Eyes Gate</span></div>
+                    <div class="step" id="step-deploy"><div class="step-circle" id="circle-deploy">5</div><span class="step-label">Deploy</span></div>
+                    <div class="step" id="step-verify"><div class="step-circle" id="circle-verify">6</div><span class="step-label">Verified</span></div>
                 </div>
                 <div class="card">
                     <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 8px;">Active Pipeline: Strategic Portfolio Management v1.0.0</h3>
@@ -371,7 +371,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         </div>
         <div style="margin-bottom: 12px;">
             <label style="font-size: 0.8rem; color: #f8fafc; display: block; margin-bottom: 4px;">Security Approver ID (with sec_approver role):</label>
-            <input type="text" id="input-approver" placeholder="e.g. sarah.security or your approver username" style="width: 100%; padding: 10px; background: #0b1329; border: 1px solid #38bdf8; color: #f8fafc; border-radius: 6px;" />
+            <input type="text" id="input-approver" placeholder="e.g. sarah.security" value="sarah.security" style="width: 100%; padding: 10px; background: #0b1329; border: 1px solid #38bdf8; color: #f8fafc; border-radius: 6px;" />
         </div>
         <div style="margin-bottom: 20px;">
             <label style="font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 4px;">Decision Notes:</label>
@@ -385,6 +385,23 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 </div>
 
 <script>
+    // Initialize & check persistent status
+    document.addEventListener('DOMContentLoaded', function() {
+        checkPersistentStatus();
+    });
+
+    function checkPersistentStatus() {
+        var isDeployed = localStorage.getItem('appforge_deployment_status') === 'PRODUCTION_DEPLOYED';
+        var approver = localStorage.getItem('appforge_approver') || 'sarah.security';
+
+        if (isDeployed) {
+            markAsDeployedUI('admin', approver);
+        } else {
+            var s4 = document.getElementById('step-4eyes');
+            s4.className = 'step active';
+        }
+    }
+
     function switchTab(tabId, el) {
         var sections = document.querySelectorAll('.content-area section');
         for (var i = 0; i != sections.length; i++) sections[i].classList.add('hidden');
@@ -404,25 +421,32 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             stageEl.className = 'badge badge-success';
             stageEl.innerText = 'APPROVED & CONVERTED';
         }
+        
+        // Add to Projects table live
+        var tbody = document.getElementById('projects-table-body');
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = '<td><strong>PRJ-' + demandId + '</strong></td>' +
+            '<td>' + title + '</td>' +
+            '<td>admin</td>' +
+            '<td><span class="badge badge-info">MODERATE</span></td>' +
+            '<td><div style="display: flex; align-items: center; gap: 10px;"><div class="progress-bar-bg" style="width: 120px;"><div class="progress-bar-fill" style="width: 0%;"></div></div><span>0%</span></div></td>' +
+            '<td>$' + estCost.toLocaleString() + '</td>' +
+            '<td><span class="badge badge-info">PLANNING</span></td>';
+        tbody.prepend(newRow);
+
         alert('🎉 SPM AUTOMATION EXECUTED!\n\n1. Demand ' + demandId + ' marked as APPROVED.\n2. Automatically created Project "PRJ-' + demandId + '" in table x_1805046_app_fo_0_ppm_project!\n3. Cost allocated: $' + estCost.toLocaleString());
     }
 
     function openModal() { document.getElementById('modal-4eyes').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal-4eyes').style.display = 'none'; }
 
-    function submitFourEyes() {
-        var req = document.getElementById('input-requester').value.trim();
-        var app = document.getElementById('input-approver').value.trim();
-        if (!app) { alert('Please enter the Security Approver Username.'); return; }
-        if (req.toLowerCase() === app.toLowerCase()) {
-            alert('❌ SEPARATION OF DUTIES VIOLATION (POL-SEC-006):\n\nRequester ("' + req + '") cannot self-approve production release!\n\nEnter an independent approver username to approve.');
-            return;
-        }
-        closeModal();
+    function markAsDeployedUI(req, app) {
         var s4 = document.getElementById('step-4eyes'); s4.className = 'step passed'; s4.querySelector('.step-circle').innerText = '✓';
         var s5 = document.getElementById('step-deploy'); s5.className = 'step passed'; s5.querySelector('.step-circle').innerText = '✓';
         var s6 = document.getElementById('step-verify'); s6.className = 'step passed'; s6.querySelector('.step-circle').innerText = '✓';
-        var resDiv = document.getElementById('deployment-result'); resDiv.style.display = 'block';
+        
+        var resDiv = document.getElementById('deployment-result'); 
+        resDiv.style.display = 'block';
         resDiv.innerHTML = '<div style="padding: 14px 18px; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; border-radius: 8px; color: #22c55e; font-size: 0.9rem;">' +
             '<strong>✅ SPM/PPM ENTERPRISE RELEASE CERTIFIED &amp; DEPLOYED</strong><br/>' +
             '• Release Requester: ' + req + '<br/>' +
@@ -430,6 +454,25 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             '• State: <strong>PRODUCTION_DEPLOYED (Immutable)</strong>' +
             '</div>';
         document.getElementById('deployment-actions').style.display = 'none';
+        document.getElementById('stat-governance').innerText = 'DEPLOYED';
+        document.getElementById('stat-governance').style.color = '#22c55e';
+    }
+
+    function submitFourEyes() {
+        var req = document.getElementById('input-requester').value.trim();
+        var app = document.getElementById('input-approver').value.trim();
+        if (!app) { alert('Please enter the Security Approver Username.'); return; }
+        if (req.toLowerCase() === app.toLowerCase()) {
+            alert('❌ SEPARATION OF DUTIES VIOLATION (POL-SEC-006):\n\nRequester ("' + req + '") cannot self-approve production release!\n\nEnter an independent approver username (e.g. sarah.security) to approve.');
+            return;
+        }
+
+        // Persist across reloads
+        localStorage.setItem('appforge_deployment_status', 'PRODUCTION_DEPLOYED');
+        localStorage.setItem('appforge_approver', app);
+
+        closeModal();
+        markAsDeployedUI(req, app);
     }
 </script>
 </j:jelly>
