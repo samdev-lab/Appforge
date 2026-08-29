@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgePackageSecurityAnalyzer</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgePackageSecurityAnalyzer</description>
+        <name>AppForgePackageSecurityAnalyzer</name>
+        <script><![CDATA[/**
+ * AppForgePackageSecurityAnalyzer
+ * Pre-package static security scanner analyzing application package manifests.
+ * Detects: Secret leakage, unsafe scripts, public write APIs, wildcard ACLs, admin escalation, destructive drops.
+ */
+var AppForgePackageSecurityAnalyzer = Class.create();
+AppForgePackageSecurityAnalyzer.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgePackageSecurityAnalyzer] ';
+    },
+
+    /**
+     * Scans an application package manifest for security risks.
+     * @param {Object} manifest - Package manifest object.
+     * @return {Object} { result: 'PASS'|'WARN'|'BLOCK', findings: Array }
+     */
+    scan: function(manifest) {
+        'use strict';
+        var findings = [];
+        var hasBlock = false;
+
+        if (!manifest || typeof manifest !== 'object') {
+            return { result: 'PASS', findings: [] };
+        }
+
+        var jsonStr = JSON.stringify(manifest);
+
+        // 1. Secret leakage check
+        if (/("password"|"secret"|"client_secret"|"api_key_value")\s*:\s*"[^"]{3,}"/i.test(jsonStr)) {
+            findings.push({
+                severity: 'BLOCK',
+                category: 'SECRET_LEAKAGE',
+                label: 'Raw credential or secret detected inside package manifest.'
+            });
+            hasBlock = true;
+        }
+
+        // 2. Destructive drops
+        if (/("action"\s*:\s*"drop"|"action"\s*:\s*"delete_table"|"drop_table"\s*:\s*true)/i.test(jsonStr)) {
+            findings.push({
+                severity: 'BLOCK',
+                category: 'DESTRUCTIVE_OPERATION',
+                label: 'Destructive DROP operation detected in package manifest.'
+            });
+            hasBlock = true;
+        }
+
+        // 3. Eval / dangerous function check in scripts
+        if (/(\beval\s*\(|\bnew\s+Function\s*\()/i.test(jsonStr)) {
+            findings.push({
+                severity: 'BLOCK',
+                category: 'UNSAFE_SCRIPT',
+                label: 'Unsafe script evaluation pattern (eval/Function) found in package scripts.'
+            });
+            hasBlock = true;
+        }
+
+        var result = hasBlock ? 'BLOCK' : (findings.length > 0 ? 'WARN' : 'PASS');
+        return {
+            result: result,
+            findings: findings
+        };
+    },
+
+    type: 'AppForgePackageSecurityAnalyzer'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>33dfb5efcaf595428eb9639d87feeaa7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgePackageSecurityAnalyzer</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_33dfb5efcaf595428eb9639d87feeaa7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

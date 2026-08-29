@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeSecurityPlanner</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeSecurityPlanner</description>
+        <name>AppForgeSecurityPlanner</name>
+        <script><![CDATA[/**
+ * AppForgeSecurityPlanner
+ * Dry-run planning engine for Security Factory.
+ * Generates dependency-ordered plans: Roles (ordered by inheritance) → Table ACLs → Field ACLs → Record ACLs → Data Policies.
+ */
+var AppForgeSecurityPlanner = Class.create();
+AppForgeSecurityPlanner.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeSecurityPlanner] ';
+        this.validator = new AppForgeSecurityValidator();
+        this.analyzer = new AppForgeSecurityAnalyzer();
+    },
+
+    /**
+     * Generates a structured dry-run Security execution plan.
+     * @param {Object} secDef - Security definition payload.
+     * @param {string} [appScope] - Application scope prefix.
+     * @return {Object} Structured security execution plan.
+     */
+    generatePlan: function(secDef, appScope) {
+        'use strict';
+        var valResult = this.validator.validate(secDef, appScope);
+        if (!valResult.valid) {
+            var isBlocked = valResult.errors.some(function(e) {
+                return e.indexOf('BLOCKED') !== -1 || e.indexOf('CROSS-SCOPE') !== -1 || e.indexOf('Circular') !== -1;
+            });
+            return {
+                valid: false,
+                status: isBlocked ? 'BLOCKED' : 'FAILED',
+                errors: valResult.errors,
+                warnings: valResult.warnings || [],
+                operations: []
+            };
+        }
+
+        var analysis = this.analyzer.analyze(secDef, appScope);
+        if (analysis.result === 'BLOCK') {
+            return {
+                valid: false,
+                status: 'BLOCKED',
+                errors: analysis.findings.map(function(f) { return '[' + f.severity + '] ' + f.label; }),
+                warnings: valResult.warnings || [],
+                lockout_risk: analysis.lockout_risk,
+                operations: []
+            };
+        }
+
+        var operations = [];
+        var sequence = 1;
+
+        // 1. Plan Roles (parent roles before children)
+        var roles = secDef.roles || [];
+        var orderedRoles = this._orderRolesByInheritance(roles);
+
+        for (var r = 0; r < orderedRoles.length; r++) {
+            var role = orderedRoles[r];
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_ROLE',
+                target_type: 'Role',
+                target_name: role.name,
+                description: role.description || '',
+                inherits_from: role.inherits_from || null,
+                status: 'CREATE'
+            });
+        }
+
+        // 2. Plan ACLs (Table-level before field-level)
+        var acls = secDef.acls || [];
+        for (var a = 0; a < acls.length; a++) {
+            var acl = acls[a];
+            var targetField = acl.field || acl.field_name || '*';
+            var isFieldLevel = targetField !== '*';
+
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_ACL',
+                target_type: isFieldLevel ? 'FieldACL' : 'TableACL',
+                target_name: (acl.table || acl.table_name) + '.' + targetField + ' (' + (acl.operation || 'read') + ')',
+                table: acl.table || acl.table_name,
+                field: targetField,
+                operation: (acl.operation || 'read').toLowerCase(),
+                roles: acl.roles || [],
+                condition: acl.condition || null,
+                status: 'CREATE'
+            });
+        }
+
+        // 3. Plan Data Policies
+        var dps = secDef.data_policies || [];
+        for (var d = 0; d < dps.length; d++) {
+            var dp = dps[d];
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_DATA_POLICY',
+                target_type: 'DataPolicy',
+                target_name: (dp.table || dp.table_name) + '.' + (dp.field || dp.field_name),
+                table: dp.table || dp.table_name,
+                field: dp.field || dp.field_name,
+                mandatory: dp.mandatory || 'ignore',
+                read_only: dp.read_only || 'ignore',
+                status: 'CREATE'
+            });
+        }
+
+        gs.info(this.LOG_PREFIX + 'Security plan generated cleanly (' + operations.length + ' operations)');
+        return {
+            valid: true,
+            status: 'READY',
+            operations: operations,
+            summary: {
+                operations_total: operations.length,
+                roles_count: roles.length,
+                acls_count: acls.length,
+                data_policies_count: dps.length
+            },
+            security_analysis: analysis.result,
+            security_findings: analysis.findings,
+            warnings: valResult.warnings || [],
+            errors: []
+        };
+    },
+
+    /**
+     * Orders roles such that parent roles come before child roles.
+     * @private
+     */
+    _orderRolesByInheritance: function(roles) {
+        'use strict';
+        var ordered = [];
+        var added = {};
+
+        // First add roles with no inheritance
+        for (var i = 0; i < roles.length; i++) {
+            if (!roles[i].inherits_from) {
+                ordered.push(roles[i]);
+                added[roles[i].name] = true;
+            }
+        }
+
+        // Then add roles that inherit
+        var maxPasses = roles.length;
+        while (ordered.length < roles.length && maxPasses-- > 0) {
+            for (var j = 0; j < roles.length; j++) {
+                var r = roles[j];
+                if (!added[r.name] && (!r.inherits_from || added[r.inherits_from])) {
+                    ordered.push(r);
+                    added[r.name] = true;
+                }
+            }
+        }
+
+        // Fallback for remaining
+        for (var k = 0; k < roles.length; k++) {
+            if (!added[roles[k].name]) {
+                ordered.push(roles[k]);
+            }
+        }
+        return ordered;
+    },
+
+    type: 'AppForgeSecurityPlanner'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>1fd76dfe4cabbfdddd578b18474c34fb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeSecurityPlanner</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_1fd76dfe4cabbfdddd578b18474c34fb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

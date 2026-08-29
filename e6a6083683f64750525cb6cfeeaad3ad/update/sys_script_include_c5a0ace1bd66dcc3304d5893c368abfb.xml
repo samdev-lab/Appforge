@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeMigrationCutover</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeMigrationCutover</description>
+        <name>AppForgeMigrationCutover</name>
+        <script><![CDATA[/**
+ * AppForgeMigrationCutover
+ * Zero/minimal-downtime cutover engine coordinating phase progression:
+ * PREPARED -> READY -> APPROVED -> CUTOVER -> VERIFIED.
+ */
+var AppForgeMigrationCutover = Class.create();
+AppForgeMigrationCutover.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeMigrationCutover] ';
+        this.CUTOVER_STATES = ['PREPARED', 'READY', 'APPROVED', 'CUTOVER', 'VERIFIED', 'FAILED'];
+    },
+
+    /**
+     * Advances cutover phase.
+     * @param {string} currentPhase - Current cutover phase.
+     * @param {string} targetPhase - Target phase.
+     * @param {boolean} [isApproved] - Approval flag.
+     * @return {Object} { success: boolean, next_phase: string, error: string }
+     */
+    advanceCutover: function(currentPhase, targetPhase, isApproved) {
+        'use strict';
+        var curr = (currentPhase || 'PREPARED').toUpperCase();
+        var tgt = (targetPhase || 'READY').toUpperCase();
+
+        if (tgt === 'CUTOVER' && !isApproved) {
+            return { success: false, next_phase: curr, error: 'APPROVAL REQUIRED: Production cutover requires formal approval.' };
+        }
+
+        return {
+            success: true,
+            previous_phase: curr,
+            next_phase: tgt
+        };
+    },
+
+    type: 'AppForgeMigrationCutover'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>c5a0ace1bd66dcc3304d5893c368abfb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeMigrationCutover</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_c5a0ace1bd66dcc3304d5893c368abfb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

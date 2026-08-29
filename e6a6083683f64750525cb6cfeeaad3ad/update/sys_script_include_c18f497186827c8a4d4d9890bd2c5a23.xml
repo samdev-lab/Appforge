@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeDistributionEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeDistributionEngine</description>
+        <name>AppForgeDistributionEngine</name>
+        <script><![CDATA[/**
+ * AppForgeDistributionEngine
+ * Manages package distribution, version resolution, canonical SHA-256 checksum verification,
+ * and HMAC-SHA256 signature validation across multi-tenant boundaries.
+ */
+var AppForgeDistributionEngine = Class.create();
+AppForgeDistributionEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeDistributionEngine] ';
+        this.checksumEngine = new AppForgeChecksumEngine();
+        this.packageSigner = new AppForgePackageSigner();
+    },
+
+    /**
+     * Verifies package integrity before distribution or installation.
+     * @param {Object} packageManifest - Application package manifest.
+     * @return {Object} { valid: boolean, status: 'VERIFIED'|'PACKAGE_INTEGRITY_MISMATCH', reason: string }
+     */
+    verifyPackageIntegrity: function(packageManifest) {
+        'use strict';
+        if (!packageManifest || !packageManifest.checksum) {
+            return { valid: false, status: 'PACKAGE_INTEGRITY_MISMATCH', reason: 'Missing package manifest or checksum' };
+        }
+
+        // 1. Checksum Verification
+        var expectedChecksum = packageManifest.checksum;
+        var calculatedChecksum = this.checksumEngine.generateChecksum(packageManifest.inventory || packageManifest.payload || packageManifest);
+        if (expectedChecksum !== calculatedChecksum) {
+            gs.error(this.LOG_PREFIX + 'Package checksum tampering detected! Expected: ' + expectedChecksum + ', got: ' + calculatedChecksum);
+            return {
+                valid: false,
+                status: 'PACKAGE_INTEGRITY_MISMATCH',
+                reason: 'PACKAGE_INTEGRITY_MISMATCH: Calculated checksum (' + calculatedChecksum + ') does not match manifest checksum (' + expectedChecksum + ')'
+            };
+        }
+
+        // 2. Digital Signature Verification
+        if (packageManifest.signature) {
+            var sigValid = this.packageSigner.verifySignature(packageManifest.inventory || packageManifest.payload || packageManifest, packageManifest.signature);
+            if (!sigValid) {
+                return {
+                    valid: false,
+                    status: 'SIGNATURE_INVALID',
+                    reason: 'Cryptographic signature verification failed'
+                };
+            }
+        }
+
+        return {
+            valid: true,
+            status: 'VERIFIED',
+            checksum: expectedChecksum,
+            verified_at: new GlideDateTime().getValue()
+        };
+    },
+
+    type: 'AppForgeDistributionEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>c18f497186827c8a4d4d9890bd2c5a23</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeDistributionEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_c18f497186827c8a4d4d9890bd2c5a23</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

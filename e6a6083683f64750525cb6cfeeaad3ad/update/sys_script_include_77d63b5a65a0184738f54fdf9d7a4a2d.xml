@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeDifferenceDetector</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeDifferenceDetector</description>
+        <name>AppForgeDifferenceDetector</name>
+        <script><![CDATA[/**
+ * AppForgeDifferenceDetector
+ * Server-side metadata comparison service comparing registered metadata vs actual platform/Git state.
+ * Reports MATCH, DIFFERENCE, MISSING, or ERROR without executing unauthorized modifications.
+ */
+var AppForgeDifferenceDetector = Class.create();
+AppForgeDifferenceDetector.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeDifferenceDetector] ';
+    },
+
+    /**
+     * Compares registered metadata against actual platform or Git state.
+     * @param {Object} registered - Registered metadata object.
+     * @param {Object} actual - Actual platform or Git metadata object.
+     * @return {Object} Comparison report containing overallStatus and field-by-field statuses.
+     */
+    compare: function(registered, actual) {
+        'use strict';
+        if (!registered || !actual) {
+            return {
+                overallStatus: 'ERROR',
+                error: 'Registered or actual metadata object is missing',
+                details: {}
+            };
+        }
+
+        var details = {};
+        var hasDifference = false;
+
+        var keys = ['name', 'scope', 'version', 'repository', 'branch', 'latest_commit'];
+
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var regVal = registered[key];
+            var actVal = actual[key];
+
+            if (regVal === undefined || regVal === null) {
+                details[key] = { status: 'MISSING', registered: null, actual: actVal };
+                hasDifference = true;
+            } else if (actVal === undefined || actVal === null) {
+                details[key] = { status: 'MISSING', registered: regVal, actual: null };
+                hasDifference = true;
+            } else if (String(regVal).trim() === String(actVal).trim()) {
+                details[key] = { status: 'MATCH', registered: regVal, actual: actVal };
+            } else {
+                details[key] = { status: 'DIFFERENCE', registered: regVal, actual: actVal };
+                hasDifference = true;
+            }
+        }
+
+        return {
+            overallStatus: hasDifference ? 'DIFFERENCE' : 'MATCH',
+            details: details
+        };
+    },
+
+    type: 'AppForgeDifferenceDetector'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>77d63b5a65a0184738f54fdf9d7a4a2d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeDifferenceDetector</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_77d63b5a65a0184738f54fdf9d7a4a2d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeUpdateSetReverseEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeUpdateSetReverseEngine</description>
+        <name>AppForgeUpdateSetReverseEngine</name>
+        <script><![CDATA[/**
+ * AppForgeUpdateSetReverseEngine
+ * Reverse-engineers ServiceNow Update Sets (sys_update_xml / sys_update_set records)
+ * into canonical AppForge Declarative JSON Application Definitions.
+ * Maps all 5 architectural layers:
+ *   1. Data Model (sys_db_object, sys_dictionary)
+ *   2. Experience (sys_ui_form, sys_ui_element, sys_ui_list)
+ *   3. Logic (sys_script, sysevent_register)
+ *   4. Security (sys_user_role, sys_security_acl)
+ *   5. Integration (sys_ws_definition, sys_ws_operation)
+ */
+var AppForgeUpdateSetReverseEngine = Class.create();
+AppForgeUpdateSetReverseEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeUpdateSetReverseEngine] ';
+        this.validator = new AppForgeDefinitionValidator();
+        this.mapper = new AppForgeFieldTypeMapper();
+    },
+
+    /**
+     * Ingests an update set descriptor or array of update XML payloads and synthesizes a declarative definition.
+     * @param {Object|Array} updateSetPayload - Raw update set record or array of sys_update_xml records.
+     * @param {Object} [appMetadata] - Optional application level overrides.
+     * @return {Object} { success: boolean, application_definition: Object, layer_counts: Object, validation: Object }
+     */
+    reverseEngineer: function(updateSetPayload, appMetadata) {
+        'use strict';
+        if (!updateSetPayload) {
+            return { success: false, error: 'Mandatory parameter missing: updateSetPayload' };
+        }
+
+        var meta = appMetadata || {};
+        var updates = Array.isArray(updateSetPayload) ? updateSetPayload : (updateSetPayload.updates || [updateSetPayload]);
+
+        var appName = meta.name || updateSetPayload.name || 'Reverse Engineered App';
+        var scope = meta.scope || updateSetPayload.scope || 'x_appforge_rev';
+        var appId = meta.application_id || updateSetPayload.application_id || ('app_' + scope.replace(/^x_/, ''));
+        var version = meta.version || '1.0.0';
+
+        var schemasMap = {};
+        var forms = [];
+        var lists = [];
+        var businessRules = [];
+        var events = [];
+        var roles = [];
+        var acls = [];
+        var apis = [];
+
+        for (var i = 0; i < updates.length; i++) {
+            var item = updates[i];
+            var type = item.type || item.target_name || '';
+            var payload = item.payload || item;
+
+            // 1. Data Model Layer (sys_db_object, sys_dictionary)
+            if (type === 'sys_db_object' || payload.schema_id) {
+                var tblName = payload.table_name || payload.name || 'custom_table';
+                if (!schemasMap[tblName]) {
+                    schemasMap[tblName] = {
+                        name: payload.label || payload.name || tblName,
+                        schema_id: payload.schema_id || ('sch_' + tblName.replace(/^x_[a-zA-Z0-9]+_/, '')),
+                        table_name: tblName,
+                        fields: []
+                    };
+                }
+            } else if (type === 'sys_dictionary' || payload.element || payload.internal_type) {
+                var fldName = payload.element || payload.field_name || payload.name;
+                var parentTbl = payload.name || payload.table_name || 'custom_table';
+                if (!schemasMap[parentTbl]) {
+                    schemasMap[parentTbl] = {
+                        name: parentTbl,
+                        schema_id: 'sch_' + parentTbl.replace(/^x_[a-zA-Z0-9]+_/, ''),
+                        table_name: parentTbl,
+                        fields: []
+                    };
+                }
+
+                var declType = this._mapPhysicalToDeclarativeType(payload.internal_type || payload.type || 'string');
+                schemasMap[parentTbl].fields.push({
+                    name: fldName,
+                    label: payload.column_label || payload.label || fldName,
+                    type: declType,
+                    mandatory: !!(payload.mandatory || payload.mandatory_field),
+                    unique: !!payload.unique,
+                    reference_table: payload.reference || payload.reference_table || undefined
+                });
+            } else if (type === 'sys_ui_form' || payload.form_name) {
+                // 2. Experience Layer (sys_ui_form, sys_ui_list)
+                forms.push({
+                    name: payload.view || 'Default Form',
+                    table: payload.name || payload.table || 'custom_table',
+                    fields: payload.fields || ['u_name', 'u_status']
+                });
+            } else if (type === 'sys_ui_list' || payload.list_columns) {
+                lists.push({
+                    name: payload.view || 'Default List',
+                    table: payload.name || payload.table || 'custom_table',
+                    columns: payload.list_columns || payload.columns || ['u_name', 'u_status']
+                });
+            } else if (type === 'sys_script' || payload.rule_name) {
+                // 3. Logic Layer (sys_script, sysevent_register)
+                businessRules.push({
+                    name: payload.name || payload.rule_name || 'Auto BR',
+                    table: payload.collection || payload.table || 'custom_table',
+                    when: payload.when || 'before',
+                    action: payload.action || 'insert',
+                    script: payload.script || 'gs.info("Executed");'
+                });
+            } else if (type === 'sysevent_register' || payload.event_name) {
+                events.push({
+                    name: payload.name || payload.event_name || 'app.event',
+                    table: payload.table || 'custom_table',
+                    description: payload.description || 'Auto generated event'
+                });
+            } else if (type === 'sys_user_role' || payload.role_name) {
+                // 4. Security Layer (sys_user_role, sys_security_acl)
+                roles.push({
+                    name: payload.name || payload.role_name || (scope + '.user'),
+                    description: payload.description || 'Application User Role'
+                });
+            } else if (type === 'sys_security_acl' || payload.operation) {
+                acls.push({
+                    table: payload.name || payload.table || 'custom_table',
+                    operation: payload.operation || 'read',
+                    role: payload.role || (scope + '.user')
+                });
+            } else if (type === 'sys_ws_definition' || payload.api_name || payload.endpoint || payload.base_path) {
+                // 5. Integration Layer (sys_ws_definition, sys_ws_operation)
+                apis.push({
+                    name: payload.name || payload.api_name || 'Custom API',
+                    base_path: payload.base_path || '/api/' + scope,
+                    methods: payload.methods || ['GET', 'POST']
+                });
+            }
+        }
+
+        // Convert schemasMap to schemas array
+        var schemas = [];
+        for (var k in schemasMap) {
+            schemas.push(schemasMap[k]);
+        }
+
+        // Fallback default schema if empty
+        if (schemas.length === 0) {
+            schemas.push({
+                name: 'Default Entity',
+                schema_id: 'sch_default_entity',
+                table_name: scope + '_default_entity',
+                fields: [
+                    { name: 'u_name', label: 'Name', type: 'string', mandatory: true },
+                    { name: 'u_active', label: 'Active', type: 'boolean' }
+                ]
+            });
+        }
+
+        var appDef = {
+            application: {
+                name: appName,
+                application_id: appId,
+                scope: scope,
+                version: version,
+                owner: meta.owner || 'admin'
+            },
+            modules: [
+                { name: 'Management', module_id: 'mod_management', order: 100 }
+            ],
+            schemas: schemas,
+            experience: {
+                forms: forms,
+                lists: lists,
+                views: [],
+                navigation: []
+            },
+            logic: {
+                business_rules: businessRules,
+                events: events,
+                notifications: []
+            },
+            security: {
+                roles: roles.length > 0 ? roles : [{ name: scope + '.user', description: 'User' }],
+                acls: acls.length > 0 ? acls : [{ table: schemas[0].table_name, operation: 'read', role: scope + '.user' }]
+            },
+            integration: {
+                apis: apis
+            }
+        };
+
+        var val = this.validator.validate(appDef);
+
+        return {
+            success: val.valid,
+            application_definition: appDef,
+            layer_counts: {
+                tables: schemas.length,
+                fields: schemas.reduce(function(acc, s) { return acc + (s.fields ? s.fields.length : 0); }, 0),
+                forms: forms.length,
+                lists: lists.length,
+                business_rules: businessRules.length,
+                events: events.length,
+                roles: roles.length,
+                acls: acls.length,
+                apis: apis.length
+            },
+            validation: val
+        };
+    },
+
+    _mapPhysicalToDeclarativeType: function(physType) {
+        'use strict';
+        var t = String(physType).toLowerCase();
+        if (t === 'integer' || t === 'glide_integer') return 'integer';
+        if (t === 'decimal' || t === 'float') return 'decimal';
+        if (t === 'boolean' || t === 'glide_boolean' || t === 'true/false') return 'boolean';
+        if (t === 'date' || t === 'glide_date') return 'date';
+        if (t === 'datetime' || t === 'glide_date_time' || t === 'date/time') return 'datetime';
+        if (t === 'reference' || t === 'glide_reference') return 'reference';
+        if (t === 'choice' || t === 'glide_choice') return 'choice';
+        return 'string';
+    },
+
+    type: 'AppForgeUpdateSetReverseEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>e39ae2b77c3537b9e8be94b35d90e1dc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeUpdateSetReverseEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_e39ae2b77c3537b9e8be94b35d90e1dc</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

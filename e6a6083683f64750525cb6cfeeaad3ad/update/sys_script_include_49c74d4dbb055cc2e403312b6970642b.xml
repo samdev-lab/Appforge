@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeDeploymentPlanner</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeDeploymentPlanner</description>
+        <name>AppForgeDeploymentPlanner</name>
+        <script><![CDATA[/**
+ * AppForgeDeploymentPlanner
+ * Dependency-ordered deployment planning engine producing dry-run execution manifests.
+ */
+var AppForgeDeploymentPlanner = Class.create();
+AppForgeDeploymentPlanner.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeDeploymentPlanner] ';
+        this.preflight = new AppForgeDeploymentPreflight();
+        this.packagePlanner = new AppForgePackagePlanner();
+    },
+
+    /**
+     * Formulates deployment plan.
+     * @param {Object} packageDef - Target package definition.
+     * @param {Object} targetEnv - Target environment.
+     * @param {Object} [approval] - Approval descriptor.
+     * @param {Object} [installedDef] - Existing installed application definition.
+     * @return {Object} Structured dry-run deployment plan.
+     */
+    generatePlan: function(packageDef, targetEnv, approval, installedDef) {
+        'use strict';
+        var preflightResult = this.preflight.runPreflight(packageDef, targetEnv, approval);
+        if (!preflightResult.ready) {
+            return {
+                valid: false,
+                status: 'BLOCKED',
+                errors: preflightResult.errors,
+                preflight: preflightResult,
+                operations: []
+            };
+        }
+
+        var pkgPlan = this.packagePlanner.generatePlan(packageDef, installedDef || null, (targetEnv && targetEnv.type) || 'TEST');
+        return {
+            valid: true,
+            status: 'READY',
+            preflight: preflightResult,
+            operations: pkgPlan.operations,
+            migrations: pkgPlan.migrations,
+            diff: pkgPlan.diff,
+            summary: {
+                total_operations: pkgPlan.operations.length,
+                environment: (targetEnv && targetEnv.type) || 'TEST',
+                target_modifications: 0
+            }
+        };
+    },
+
+    type: 'AppForgeDeploymentPlanner'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>49c74d4dbb055cc2e403312b6970642b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeDeploymentPlanner</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_49c74d4dbb055cc2e403312b6970642b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

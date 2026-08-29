@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeScriptSecurityScanner</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeScriptSecurityScanner</description>
+        <name>AppForgeScriptSecurityScanner</name>
+        <script><![CDATA[/**
+ * AppForgeScriptSecurityScanner
+ * Static security scanner for Script Include code.
+ * Scans for dangerous patterns before provisioning executable scripts.
+ *
+ * IMPORTANT LIMITATIONS:
+ * This scanner performs pattern-based static analysis only.
+ * It is NOT a full sandboxed execution environment.
+ * It cannot detect all obfuscated, encoded, or runtime-generated attacks.
+ * A human security review is recommended for production use.
+ */
+var AppForgeScriptSecurityScanner = Class.create();
+AppForgeScriptSecurityScanner.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeScriptSecurityScanner] ';
+
+        // Patterns that result in BLOCK (hard stop)
+        this.BLOCK_PATTERNS = [
+            { pattern: /\beval\s*\(/, label: 'eval() usage detected' },
+            { pattern: /\bFunction\s*\(/, label: 'Function() constructor detected' },
+            { pattern: /\bnew\s+Function\s*\(/, label: 'new Function() constructor detected' },
+            { pattern: /GlideSession\.get\s*\(\s*['"]sa_password/, label: 'Credential access pattern detected' },
+            { pattern: /GlideRecord\s*\(\s*['"]sys_properties/, label: 'System properties mass access detected' },
+            { pattern: /deleteMultiple\s*\(/, label: 'deleteMultiple() mass delete detected' },
+            { pattern: /GlideSQLStatement/, label: 'Direct SQL statement detected' },
+            { pattern: /JDBC|jdbc/, label: 'Direct JDBC access detected' },
+            { pattern: /\bexecCommand\s*\(/, label: 'System command execution detected' },
+            { pattern: /gs\.setProperty\s*\(\s*['"]glide\.security/, label: 'Security property manipulation detected' },
+            { pattern: /gs\.getSession\s*\(\s*\)\s*\.impersonate/, label: 'Session impersonation detected' }
+        ];
+
+        // Patterns that result in WARN (advisory, not blocking)
+        this.WARN_PATTERNS = [
+            { pattern: /GlideRecord\s*\(\s*['"]sys_user/, label: 'Access to sys_user table - verify scope authorization' },
+            { pattern: /gs\.getProperty\s*\(/, label: 'System property access - verify no secrets are exposed' },
+            { pattern: /XMLDocument|XMLParser/, label: 'XML parsing - validate input sanitization' },
+            { pattern: /JSON\.parse\s*\(/, label: 'JSON.parse - validate untrusted input handling' },
+            { pattern: /\.deleteRecord\s*\(/, label: 'deleteRecord() usage - confirm intentional single deletion' },
+            { pattern: /var\s+\w+\s*=\s*request\./, label: 'Direct request parameter access - validate sanitization' },
+            { pattern: /gs\.eventQueue\s*\(/, label: 'Event queue - confirm event name is not user-supplied' }
+        ];
+    },
+
+    /**
+     * Scans script content for dangerous patterns.
+     * @param {string} script - Script content to scan.
+     * @param {string} [context] - Optional context label for logging.
+     * @return {Object} { result: 'PASS'|'WARN'|'BLOCK', findings: Array }
+     */
+    scan: function(script, context) {
+        'use strict';
+        var ctx = context || 'script';
+        if (!script || typeof script !== 'string') {
+            return { result: 'PASS', findings: [] };
+        }
+
+        var findings = [];
+        var isBlocked = false;
+
+        // Check BLOCK patterns
+        for (var b = 0; b < this.BLOCK_PATTERNS.length; b++) {
+            var bp = this.BLOCK_PATTERNS[b];
+            if (bp.pattern.test(script)) {
+                findings.push({ severity: 'BLOCK', label: bp.label });
+                isBlocked = true;
+                gs.warn(this.LOG_PREFIX + 'BLOCK detected in ' + ctx + ': ' + bp.label);
+            }
+        }
+
+        // Check WARN patterns
+        for (var w = 0; w < this.WARN_PATTERNS.length; w++) {
+            var wp = this.WARN_PATTERNS[w];
+            if (wp.pattern.test(script)) {
+                findings.push({ severity: 'WARN', label: wp.label });
+                gs.info(this.LOG_PREFIX + 'WARN in ' + ctx + ': ' + wp.label);
+            }
+        }
+
+        var result = isBlocked ? 'BLOCK' : (findings.length > 0 ? 'WARN' : 'PASS');
+        return { result: result, findings: findings };
+    },
+
+    /**
+     * Validates script syntax by checking structural integrity (balanced braces/parens).
+     * @param {string} script - Script content.
+     * @return {Object} { valid: boolean, error: string }
+     */
+    validateSyntax: function(script) {
+        'use strict';
+        if (!script || typeof script !== 'string') {
+            return { valid: false, error: 'Script content is required' };
+        }
+        if (script.trim().length === 0) {
+            return { valid: false, error: 'Script content is empty' };
+        }
+
+        // Check balanced braces
+        var braceCount = 0;
+        var parenCount = 0;
+        var inStr = false;
+        var strChar = '';
+
+        for (var i = 0; i < script.length; i++) {
+            var c = script[i];
+            if (inStr) {
+                if (c === strChar && (i === 0 || script[i - 1] !== '\\')) inStr = false;
+                continue;
+            }
+            if (c === '"' || c === "'") { inStr = true; strChar = c; continue; }
+            if (c === '{') braceCount++;
+            if (c === '}') braceCount--;
+            if (c === '(') parenCount++;
+            if (c === ')') parenCount--;
+            if (braceCount < 0) return { valid: false, error: 'Syntax error: unmatched closing brace' };
+            if (parenCount < 0) return { valid: false, error: 'Syntax error: unmatched closing parenthesis' };
+        }
+
+        if (braceCount !== 0) return { valid: false, error: 'Syntax error: unbalanced braces (delta: ' + braceCount + ')' };
+        if (parenCount !== 0) return { valid: false, error: 'Syntax error: unbalanced parentheses (delta: ' + parenCount + ')' };
+
+        return { valid: true };
+    },
+
+    type: 'AppForgeScriptSecurityScanner'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>7d269bc0428bd77c8045a8c29bb6445b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeScriptSecurityScanner</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_7d269bc0428bd77c8045a8c29bb6445b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeIntelligenceContext</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeIntelligenceContext</description>
+        <name>AppForgeIntelligenceContext</name>
+        <script><![CDATA[/**
+ * AppForgeIntelligenceContext
+ * Prepares sanitized, secret-free, deterministic context packages for AI reasoning.
+ * Ensures zero credential leakage, prompt injection guardrails, and scope boundaries.
+ */
+var AppForgeIntelligenceContext = Class.create();
+AppForgeIntelligenceContext.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeIntelligenceContext] ';
+        this.telemetryService = new AppForgeTelemetryService();
+        this.checksumEngine = new AppForgeChecksumEngine();
+    },
+
+    /**
+     * Builds AI context representation for an application.
+     * @param {Object} appMetadata - Application metadata.
+     * @param {Object} diagnosticReport - Output from AppForgeDiagnosticEngine.
+     * @return {Object} Sanitized AI-ready context payload.
+     */
+    buildContext: function(appMetadata, diagnosticReport) {
+        'use strict';
+        var app = appMetadata || { name: 'Employee Onboarding', scope: 'x_appforge_employee', version: '1.2.0' };
+        var diag = diagnosticReport || {};
+
+        var rawContext = {
+            application: {
+                name: app.name,
+                scope: app.scope,
+                version: app.version
+            },
+            health: {
+                status: diag.health_status || 'HEALTHY',
+                score: diag.health_score || 100
+            },
+            anomalies_count: diag.anomalies_count || 0,
+            incidents_count: diag.incidents_count || 0,
+            probable_root_cause: diag.probable_root_cause || 'NONE',
+            confidence: diag.confidence || 1.0,
+            affected_components: diag.affected_components || [],
+            recommendations: (diag.recommendations || []).map(function(r) {
+                return {
+                    action: r.action_type,
+                    priority: r.priority,
+                    safety: r.safety_classification
+                };
+            }),
+            timestamp: new GlideDateTime().getValue()
+        };
+
+        var sanitized = this.telemetryService.sanitizeMetadata(rawContext);
+        var contextHash = this.checksumEngine.generateChecksum(sanitized);
+
+        return {
+            context_hash: contextHash,
+            payload: sanitized,
+            sanitized: true,
+            contains_raw_secrets: false
+        };
+    },
+
+    type: 'AppForgeIntelligenceContext'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>19f324130d82c348fc3b5f39714b4d3f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeIntelligenceContext</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_19f324130d82c348fc3b5f39714b4d3f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

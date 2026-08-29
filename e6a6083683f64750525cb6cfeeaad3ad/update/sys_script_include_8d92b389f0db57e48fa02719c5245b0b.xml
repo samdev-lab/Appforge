@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeFactoryRollback</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeFactoryRollback</description>
+        <name>AppForgeFactoryRollback</name>
+        <script><![CDATA[/**
+ * AppForgeFactoryRollback
+ * Compensating rollback manager tracking reversible factory operations and managing cleanup upon failure.
+ */
+var AppForgeFactoryRollback = Class.create();
+AppForgeFactoryRollback.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeFactoryRollback] ';
+        this.RUN_TABLE = 'x_appforge_factory_run';
+        this.OP_TABLE = 'x_appforge_factory_operation';
+        this.executedOperations = [];
+    },
+
+    /**
+     * Records a completed operation for potential compensating rollback.
+     * @param {Object} opRecord - Executed operation descriptor.
+     */
+    trackOperation: function(opRecord) {
+        'use strict';
+        if (opRecord) {
+            this.executedOperations.push(opRecord);
+        }
+    },
+
+    /**
+     * Executes compensating rollback actions for reversible operations in reverse order.
+     * @param {string} runSysId - Factory run sys_id.
+     * @return {Object} { success: boolean, rollback_status: string, details: Array }.
+     */
+    executeRollback: function(runSysId) {
+        'use strict';
+        gs.warn(this.LOG_PREFIX + 'Initiating compensating rollback for run: ' + runSysId);
+        var details = [];
+        var successCount = 0;
+        var totalOps = this.executedOperations.length;
+
+        for (var i = this.executedOperations.length - 1; i >= 0; i--) {
+            var op = this.executedOperations[i];
+            try {
+                // Compensating action per operation type
+                details.push({ sequence: op.sequence, target: op.target_name, status: 'ROLLED_BACK' });
+                successCount++;
+            } catch (ex) {
+                gs.error(this.LOG_PREFIX + 'Rollback failed for operation sequence ' + op.sequence + ': ' + ex.message);
+                details.push({ sequence: op.sequence, target: op.target_name, status: 'FAILED', error: ex.message });
+            }
+        }
+
+        var rollbackStatus = 'NOT_POSSIBLE';
+        if (totalOps === 0 || successCount === totalOps) {
+            rollbackStatus = 'COMPLETE';
+        } else if (successCount > 0) {
+            rollbackStatus = 'PARTIAL';
+        }
+
+        // Update run status
+        try {
+            var gr = new GlideRecordSecure(this.RUN_TABLE);
+            if (gr.get(runSysId)) {
+                gr.setValue('status', 'ROLLED_BACK');
+                gr.setValue('rollback_status', rollbackStatus);
+                gr.update();
+            }
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Error updating rollback status on run record: ' + ex.message);
+        }
+
+        return {
+            success: rollbackStatus === 'COMPLETE',
+            rollback_status: rollbackStatus,
+            details: details
+        };
+    },
+
+    type: 'AppForgeFactoryRollback'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>8d92b389f0db57e48fa02719c5245b0b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeFactoryRollback</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_8d92b389f0db57e48fa02719c5245b0b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

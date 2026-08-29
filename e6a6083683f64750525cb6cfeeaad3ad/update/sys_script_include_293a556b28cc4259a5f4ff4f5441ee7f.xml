@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeAIGovernanceEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeAIGovernanceEngine</description>
+        <name>AppForgeAIGovernanceEngine</name>
+        <script><![CDATA[/**
+ * AppForgeAIGovernanceEngine
+ * Enforces enterprise AI safety guardrails: zero credential leakage, tenant data boundaries,
+ * explainable evidence, and mandatory human authorization for high-risk actions.
+ */
+var AppForgeAIGovernanceEngine = Class.create();
+AppForgeAIGovernanceEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeAIGovernanceEngine] ';
+    },
+
+    /**
+     * Validates AI diagnostic context for governance compliance.
+     * @param {Object} aiContext - AI context representation.
+     * @param {string} tenantId - Tenant context.
+     * @return {Object} { compliant: boolean, sanitized: boolean, issues: Array }
+     */
+    validateAIContext: function(aiContext, tenantId) {
+        'use strict';
+        var issues = [];
+
+        if (!aiContext) {
+            return { compliant: false, issues: ['Missing AI context payload'] };
+        }
+
+        var jsonStr = JSON.stringify(aiContext);
+
+        // 1. Raw Secrets Detection
+        if (/(?:["']?(?:password|passwd|pwd|secret|api[_-]?key|token|bearer|private[_-]?key)["']?)\s*[:=]\s*["'](?![R\[])[^"',\s]{6,}["']/i.test(jsonStr)) {
+            issues.push('Raw credentials found in AI context payload.');
+        }
+
+        // 2. Cross-Tenant Leakage Check
+        if (aiContext.application && aiContext.application.tenant && tenantId && aiContext.application.tenant !== tenantId && tenantId !== 'SYSTEM') {
+            issues.push('Cross-tenant data leakage detected in AI context.');
+        }
+
+        var isCompliant = issues.length === 0;
+        return {
+            compliant: isCompliant,
+            sanitized: isCompliant,
+            issues: issues,
+            timestamp: new GlideDateTime().getValue()
+        };
+    },
+
+    type: 'AppForgeAIGovernanceEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>293a556b28cc4259a5f4ff4f5441ee7f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeAIGovernanceEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_293a556b28cc4259a5f4ff4f5441ee7f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

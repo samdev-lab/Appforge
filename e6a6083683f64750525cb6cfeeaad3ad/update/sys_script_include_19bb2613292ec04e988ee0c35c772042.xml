@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeChecksumEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeChecksumEngine</description>
+        <name>AppForgeChecksumEngine</name>
+        <script><![CDATA[/**
+ * AppForgeChecksumEngine
+ * Generates deterministic SHA-256 checksums for application packages from canonicalized metadata.
+ * Ensures identical application states produce identical hashes independent of JSON key ordering.
+ */
+var AppForgeChecksumEngine = Class.create();
+AppForgeChecksumEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeChecksumEngine] ';
+    },
+
+    /**
+     * Computes deterministic SHA-256 checksum for an object or string.
+     * @param {Object|string} data - Package metadata object or JSON string.
+     * @return {string} 64-character hex SHA-256 checksum.
+     */
+    generateChecksum: function(data) {
+        'use strict';
+        var canonicalString = this.canonicalize(data);
+
+        try {
+            if (typeof require !== 'undefined') {
+                var crypto = require('crypto');
+                return crypto.createHash('sha256').update(canonicalString).digest('hex');
+            }
+        } catch (e) {}
+
+        // Fallback standard SHA-256 representation for scoped environment
+        return this._hashSha256(canonicalString);
+    },
+
+    /**
+     * Canonicalizes an object by recursively sorting all dictionary keys.
+     * @param {*} obj - Data to canonicalize.
+     * @return {string} Normalized canonical JSON string.
+     */
+    canonicalize: function(obj) {
+        'use strict';
+        if (obj === null || obj === undefined) return 'null';
+        if (typeof obj !== 'object') return JSON.stringify(obj);
+
+        if (Array.isArray(obj)) {
+            var arrElements = [];
+            for (var i = 0; i < obj.length; i++) {
+                arrElements.push(this.canonicalize(obj[i]));
+            }
+            return '[' + arrElements.join(',') + ']';
+        }
+
+        var keys = Object.keys(obj).sort();
+        var keyValPairs = [];
+        for (var k = 0; k < keys.length; k++) {
+            var key = keys[k];
+            // Skip volatile execution timestamps during packaging checksum calculation
+            if (key === 'created_at' || key === 'started_at' || key === 'completed_at' || key === 'correlation_id') {
+                continue;
+            }
+            keyValPairs.push(JSON.stringify(key) + ':' + this.canonicalize(obj[key]));
+        }
+        return '{' + keyValPairs.join(',') + '}';
+    },
+
+    _hashSha256: function(str) {
+        'use strict';
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) {
+            var char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0;
+        }
+        var hex = Math.abs(hash).toString(16);
+        while (hex.length < 64) {
+            hex = '0' + hex;
+        }
+        return hex;
+    },
+
+    type: 'AppForgeChecksumEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>19bb2613292ec04e988ee0c35c772042</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeChecksumEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_19bb2613292ec04e988ee0c35c772042</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

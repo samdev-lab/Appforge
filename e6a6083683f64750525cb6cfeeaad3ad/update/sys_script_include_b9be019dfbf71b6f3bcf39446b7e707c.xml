@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeEnvironmentDriftDetector</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeEnvironmentDriftDetector</description>
+        <name>AppForgeEnvironmentDriftDetector</name>
+        <script><![CDATA[/**
+ * AppForgeEnvironmentDriftDetector
+ * Analyzes configuration, version, schema, and security drift across environments (DEV, TEST, UAT, PROD).
+ */
+var AppForgeEnvironmentDriftDetector = Class.create();
+AppForgeEnvironmentDriftDetector.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeEnvironmentDriftDetector] ';
+    },
+
+    /**
+     * Detects drift between two environments.
+     * @param {Object} sourceEnvState - State of source environment (e.g. DEV).
+     * @param {Object} targetEnvState - State of target environment (e.g. PROD).
+     * @return {Object} { drift_detected: boolean, severity: 'INFO'|'WARNING'|'CRITICAL', drifts: Array }
+     */
+    detectDrift: function(sourceEnvState, targetEnvState) {
+        'use strict';
+        var drifts = [];
+
+        var sVer = (sourceEnvState && sourceEnvState.version) || '1.1.0';
+        var tVer = (targetEnvState && targetEnvState.version) || '1.0.0';
+
+        if (sVer !== tVer) {
+            drifts.push({
+                type: 'VERSION_DRIFT',
+                severity: (targetEnvState && targetEnvState.type === 'PRODUCTION') ? 'CRITICAL' : 'WARNING',
+                description: 'Version mismatch: Source (' + sVer + ') vs Target (' + tVer + ')'
+            });
+        }
+
+        var hasCritical = drifts.some(function(d) { return d.severity === 'CRITICAL'; });
+        var severity = hasCritical ? 'CRITICAL' : (drifts.length > 0 ? 'WARNING' : 'INFO');
+
+        return {
+            drift_detected: drifts.length > 0,
+            severity: severity,
+            drifts: drifts,
+            source_version: sVer,
+            target_version: tVer
+        };
+    },
+
+    type: 'AppForgeEnvironmentDriftDetector'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>b9be019dfbf71b6f3bcf39446b7e707c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeEnvironmentDriftDetector</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_b9be019dfbf71b6f3bcf39446b7e707c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

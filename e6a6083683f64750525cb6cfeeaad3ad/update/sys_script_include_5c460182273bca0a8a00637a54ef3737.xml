@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeIdempotencyManager</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeIdempotencyManager</description>
+        <name>AppForgeIdempotencyManager</name>
+        <script><![CDATA[/**
+ * AppForgeIdempotencyManager
+ * Ensures integration requests with identical idempotency keys (e.g. X-Request-ID, delivery_id)
+ * return identical results without redundant database mutations.
+ */
+var AppForgeIdempotencyManager = Class.create();
+AppForgeIdempotencyManager.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeIdempotencyManager] ';
+        this.cache = {};
+    },
+
+    /**
+     * Checks if a request key has already been processed.
+     * @param {string} key - Idempotency key / delivery ID.
+     * @return {Object|null} Cached response if previously processed, or null.
+     */
+    check: function(key) {
+        'use strict';
+        if (!key) return null;
+        if (this.cache[key]) {
+            gs.info(this.LOG_PREFIX + 'Duplicate request detected for key: ' + key);
+            return {
+                duplicate: true,
+                cached_response: this.cache[key].response,
+                processed_at: this.cache[key].timestamp
+            };
+        }
+        return null;
+    },
+
+    /**
+     * Records a processed request and its result.
+     * @param {string} key - Idempotency key.
+     * @param {Object} response - Processed response data.
+     */
+    record: function(key, response) {
+        'use strict';
+        if (!key) return;
+        this.cache[key] = {
+            response: response,
+            timestamp: new Date().toISOString()
+        };
+    },
+
+    /**
+     * Clears cache (useful for test resets).
+     */
+    clear: function() {
+        'use strict';
+        this.cache = {};
+    },
+
+    type: 'AppForgeIdempotencyManager'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>5c460182273bca0a8a00637a54ef3737</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeIdempotencyManager</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_5c460182273bca0a8a00637a54ef3737</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

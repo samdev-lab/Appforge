@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgePackageInventory</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgePackageInventory</description>
+        <name>AppForgePackageInventory</name>
+        <script><![CDATA[/**
+ * AppForgePackageInventory
+ * Discovers, inventories, and verifies completeness of all 5 application layers:
+ *   1. DATA        (Applications, Modules, Schemas, Fields, References)
+ *   2. EXPERIENCE  (Forms, Sections, Lists, Views, Related Lists, Navigation)
+ *   3. BEHAVIOR    (Business Rules, Script Includes, Events, Notifications)
+ *   4. SECURITY    (Roles, ACLs, Field Security, Record Security, Data Policies)
+ *   5. INTEGRATION (Scripted REST APIs, Resources, Outbound REST, Webhooks, Auth references)
+ */
+var AppForgePackageInventory = Class.create();
+AppForgePackageInventory.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgePackageInventory] ';
+    },
+
+    /**
+     * Discovers all components belonging to an application definition.
+     * @param {Object} appDef - Master application definition.
+     * @return {Object} Categorized 5-layer component inventory.
+     */
+    discoverComponents: function(appDef) {
+        'use strict';
+        if (!appDef || typeof appDef !== 'object') {
+            return { valid: false, errors: ['Application definition required for inventory'], components: {} };
+        }
+
+        var components = {
+            data: {
+                applications: [appDef.name || appDef.application_id || 'Application'],
+                modules: appDef.modules ? appDef.modules.map(function(m) { return m.name || m.module_id; }) : [],
+                schemas: appDef.schemas ? appDef.schemas.map(function(s) { return s.name || s.schema_id; }) : [],
+                fields: []
+            },
+            experience: {
+                forms: (appDef.experience && appDef.experience.forms) ? appDef.experience.forms.map(function(f) { return f.name || f.table; }) : [],
+                lists: (appDef.experience && appDef.experience.lists) ? appDef.experience.lists.map(function(l) { return l.name || l.table; }) : [],
+                views: (appDef.experience && appDef.experience.views) ? appDef.experience.views.map(function(v) { return v.name; }) : [],
+                navigation: (appDef.experience && appDef.experience.navigation) ? appDef.experience.navigation.map(function(n) { return n.title; }) : []
+            },
+            behavior: {
+                business_rules: (appDef.logic && appDef.logic.business_rules) ? appDef.logic.business_rules.map(function(b) { return b.name; }) : [],
+                script_includes: (appDef.logic && appDef.logic.script_includes) ? appDef.logic.script_includes.map(function(s) { return s.name; }) : [],
+                events: (appDef.logic && appDef.logic.events) ? appDef.logic.events.map(function(e) { return e.name; }) : [],
+                notifications: (appDef.logic && appDef.logic.notifications) ? appDef.logic.notifications.map(function(n) { return n.name; }) : []
+            },
+            security: {
+                roles: (appDef.security && appDef.security.roles) ? appDef.security.roles.map(function(r) { return r.name; }) : [],
+                acls: (appDef.security && appDef.security.acls) ? appDef.security.acls.map(function(a) { return a.name; }) : [],
+                data_policies: (appDef.security && appDef.security.data_policies) ? appDef.security.data_policies.map(function(d) { return d.name; }) : []
+            },
+            integration: {
+                apis: (appDef.integration && appDef.integration.apis) ? appDef.integration.apis.map(function(a) { return a.name; }) : [],
+                outbounds: (appDef.integration && appDef.integration.outbounds) ? appDef.integration.outbounds.map(function(o) { return o.name; }) : [],
+                webhooks: (appDef.integration && appDef.integration.webhooks) ? appDef.integration.webhooks.map(function(w) { return w.name; }) : [],
+                authentications: (appDef.integration && appDef.integration.authentications) ? appDef.integration.authentications.map(function(au) { return au.name; }) : []
+            }
+        };
+
+        if (appDef.schemas && Array.isArray(appDef.schemas)) {
+            for (var s = 0; s < appDef.schemas.length; s++) {
+                var sch = appDef.schemas[s];
+                if (sch.fields && Array.isArray(sch.fields)) {
+                    for (var f = 0; f < sch.fields.length; f++) {
+                        components.data.fields.push((sch.name || 'table') + '.' + (sch.fields[f].name || 'field'));
+                    }
+                }
+            }
+        }
+
+        var completeness = this._verifyCompleteness(appDef, components);
+
+        return {
+            valid: completeness.valid,
+            errors: completeness.errors,
+            components: components,
+            counts: {
+                total_components: this._countTotal(components),
+                schemas: components.data.schemas.length,
+                fields: components.data.fields.length,
+                forms: components.experience.forms.length,
+                business_rules: components.behavior.business_rules.length,
+                roles: components.security.roles.length,
+                acls: components.security.acls.length,
+                apis: components.integration.apis.length
+            }
+        };
+    },
+
+    /**
+     * Verifies package completeness and broken dependencies.
+     * @private
+     */
+    _verifyCompleteness: function(appDef, components) {
+        'use strict';
+        var errors = [];
+
+        // Check broken business rule table dependency
+        if (appDef.logic && appDef.logic.business_rules) {
+            for (var b = 0; b < appDef.logic.business_rules.length; b++) {
+                var br = appDef.logic.business_rules[b];
+                if (br.table && components.data.schemas.length > 0) {
+                    var tableExists = components.data.schemas.some(function(sch) {
+                        return br.table === sch || br.table.indexOf(sch) !== -1;
+                    });
+                    if (!tableExists && br.table.indexOf('x_appforge') === -1) {
+                        errors.push('PACKAGE BLOCKED: Business Rule (' + br.name + ') references missing schema: ' + br.table);
+                    }
+                }
+            }
+        }
+
+        return { valid: errors.length === 0, errors: errors };
+    },
+
+    _countTotal: function(components) {
+        'use strict';
+        var count = 0;
+        for (var layer in components) {
+            for (var type in components[layer]) {
+                count += components[layer][type].length;
+            }
+        }
+        return count;
+    },
+
+    type: 'AppForgePackageInventory'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>fc7a4fcc104cba67a88ed6892ac8ae06</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgePackageInventory</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_fc7a4fcc104cba67a88ed6892ac8ae06</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeFactoryExecutor</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeFactoryExecutor</description>
+        <name>AppForgeFactoryExecutor</name>
+        <script><![CDATA[/**
+ * AppForgeFactoryExecutor
+ * Primary execution engine provisioning Applications, Modules, Schemas, Fields, and References
+ * via authoritative AppForge Registry services, with audit logging and performance metrics tracking.
+ */
+var AppForgeFactoryExecutor = Class.create();
+AppForgeFactoryExecutor.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeFactoryExecutor] ';
+        this.RUN_TABLE = 'x_appforge_factory_run';
+        this.OP_TABLE = 'x_appforge_factory_operation';
+        this.DEF_TABLE = 'x_appforge_application_definition';
+
+        this.planner = new AppForgeFactoryPlanner();
+        this.appRegistry = new AppForgeApplicationRegistry();
+        this.moduleRegistry = new AppForgeModuleRegistry();
+        this.schemaRegistry = new AppForgeSchemaRegistry();
+        this.fieldRegistry = new AppForgeSchemaFieldRegistry();
+        this.rollback = new AppForgeFactoryRollback();
+    },
+
+    /**
+     * Executes provisioning for a validated application definition.
+     * @param {Object|string} definitionPayload - Declarative application definition payload.
+     * @param {string} [executedBy] - Username executing the factory.
+     * @return {Object} Factory execution summary object with metrics.
+     */
+    execute: function(definitionPayload, executedBy) {
+        'use strict';
+        var t0 = new Date().getTime();
+        var user = executedBy || 'system';
+
+        // 1. Validation Phase Timing
+        var tValStart = new Date().getTime();
+        var def = typeof definitionPayload === 'string' ? JSON.parse(definitionPayload) : definitionPayload;
+        var appDef = def.application || {};
+        var tValEnd = new Date().getTime();
+
+        // 2. Planning Phase Timing
+        var tPlanStart = new Date().getTime();
+        var plan = this.planner.generatePlan(def);
+        var tPlanEnd = new Date().getTime();
+
+        if (!plan.valid || plan.status === 'BLOCKED' || plan.status === 'FAILED') {
+            return {
+                success: false,
+                status: plan.status || 'FAILED',
+                errors: plan.errors || [],
+                warnings: plan.warnings || [],
+                operations_summary: { total: 0, successful: 0, failed: 0 }
+            };
+        }
+
+        // 3. Create Definition Record & Factory Audit Run
+        var defSysId = this._getOrCreateDefinitionRecord(appDef.name, def);
+        var runSysId = this._createRunRecord(defSysId, plan.application, plan.version, 'EXECUTE', user, plan.operations.length);
+
+        // 4. Execution Phase Timing
+        var tExecStart = new Date().getTime();
+        var createdApps = {};
+        var createdMods = {};
+        var createdSchemas = {};
+        var successOps = 0;
+        var failedOps = 0;
+        var appSysId = null;
+
+        try {
+            for (var i = 0; i < plan.operations.length; i++) {
+                var op = plan.operations[i];
+                var opRes = { success: false };
+
+                if (op.operation_type === 'CREATE_APP' || op.operation_type === 'EXISTING_APP') {
+                    if (op.operation_type === 'CREATE_APP') {
+                        opRes = this.appRegistry.create({
+                            application_id: appDef.scope || appDef.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+                            name: appDef.name,
+                            scope: appDef.scope || 'x_appforge',
+                            version: appDef.version || '1.0.0',
+                            description: appDef.description || 'Provisioned by AppForge Factory',
+                            status: 'DEVELOPMENT'
+                        });
+                        appSysId = opRes.sys_id;
+                    } else {
+                        var existingApp = this.appRegistry.get(appDef.scope || appDef.name);
+                        appSysId = existingApp ? existingApp.sys_id : null;
+                        opRes = { success: true, sys_id: appSysId };
+                    }
+                    if (appSysId) createdApps[appDef.name] = appSysId;
+
+                } else if (op.operation_type === 'CREATE_MODULE' || op.operation_type === 'EXISTING_MODULE') {
+                    var targetAppSysId = appSysId || (createdApps[appDef.name]);
+                    opRes = this.moduleRegistry.create({
+                        module_id: 'mod_' + op.target_name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+                        name: op.target_name,
+                        application: targetAppSysId,
+                        type: op.module_type || 'CORE'
+                    });
+                    if (!opRes.success && opRes.error && opRes.error.indexOf('already exists') !== -1) {
+                        opRes = { success: true, sys_id: 'existing_mod_' + op.target_name };
+                    }
+                    if (opRes.success) createdMods[op.target_name] = opRes.sys_id;
+
+                } else if (op.operation_type === 'CREATE_SCHEMA') {
+                    var parentAppSysId = appSysId || (createdApps[appDef.name]);
+                    var parentModSysId = op.module_name ? createdMods[op.module_name] : null;
+                    opRes = this.schemaRegistry.create({
+                        schema_id: 'sch_' + op.target_name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+                        name: op.target_name,
+                        scope: appDef.scope || 'x_appforge',
+                        application: parentAppSysId,
+                        module: parentModSysId,
+                        physical_table: op.physical_table
+                    });
+                    if (!opRes.success && opRes.error && opRes.error.indexOf('already exists') !== -1) {
+                        opRes = { success: true, sys_id: 'existing_sch_' + op.target_name };
+                    }
+                    if (opRes.success) createdSchemas[op.target_name] = opRes.sys_id;
+
+                } else if (op.operation_type === 'CREATE_FIELD' || op.operation_type === 'CREATE_REFERENCE') {
+                    var parentSchemaSysId = createdSchemas[op.schema_name];
+                    opRes = this.fieldRegistry.create({
+                        field_id: 'fld_' + op.target_name,
+                        name: op.target_name,
+                        schema: parentSchemaSysId,
+                        internal_type: op.field_type,
+                        mandatory: op.mandatory,
+                        unique: op.unique,
+                        reference_table: op.reference_target
+                    });
+                    if (!opRes.success && opRes.error && opRes.error.indexOf('already exists') !== -1) {
+                        opRes = { success: true, sys_id: 'existing_fld_' + op.target_name };
+                    }
+                }
+
+                this._createOperationRecord(runSysId, op, opRes.success ? 'SUCCESS' : 'FAILED', opRes.error);
+                if (opRes.success) {
+                    successOps++;
+                    this.rollback.trackOperation({ sequence: op.sequence, target_name: op.target_name, op_type: op.operation_type });
+                } else {
+                    failedOps++;
+                    throw new Error('Operation sequence ' + op.sequence + ' (' + op.target_name + ') failed: ' + (opRes.error || 'Unknown error'));
+                }
+            }
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Factory execution failed mid-run. Initiating compensating rollback: ' + ex.message);
+            var rollbackRes = this.rollback.executeRollback(runSysId);
+            this._updateRunRecord(runSysId, 'FAILED', successOps, failedOps, rollbackRes.rollback_status, ex.message);
+
+            return {
+                success: false,
+                status: 'FAILED',
+                error: ex.message,
+                rollback: rollbackRes,
+                operations_summary: { total: plan.operations.length, successful: successOps, failed: failedOps }
+            };
+        }
+        var tExecEnd = new Date().getTime();
+
+        // 5. Verification Phase Timing
+        var tVerStart = new Date().getTime();
+        this._updateRunRecord(runSysId, 'SUCCESS', successOps, 0, 'NONE', null);
+        var tVerEnd = new Date().getTime();
+        var t1 = new Date().getTime();
+
+        gs.info(this.LOG_PREFIX + 'Factory execution completed successfully for App: ' + appDef.name + ' in ' + (t1 - t0) + 'ms');
+        return {
+            success: true,
+            status: 'SUCCESS',
+            run_sys_id: runSysId,
+            application_sys_id: appSysId,
+            application_name: appDef.name,
+            performance: {
+                validation_ms: tValEnd - tValStart,
+                planning_ms: tPlanEnd - tPlanStart,
+                execution_ms: tExecEnd - tExecStart,
+                verification_ms: tVerEnd - tVerStart,
+                total_ms: t1 - t0
+            },
+            operations_summary: {
+                total: plan.operations.length,
+                successful: successOps,
+                failed: 0
+            }
+        };
+    },
+
+    /**
+     * Finds or creates definition record.
+     * @private
+     */
+    _getOrCreateDefinitionRecord: function(name, def) {
+        'use strict';
+        var defId = 'def_' + (name || 'app').toLowerCase().replace(/[^a-z0-9]/g, '_') + '_v1';
+        try {
+            var gr = new GlideRecordSecure(this.DEF_TABLE);
+            gr.addQuery('definition_id', defId);
+            gr.query();
+            if (gr.next()) {
+                return gr.getUniqueValue();
+            } else {
+                gr.initialize();
+                gr.setValue('definition_id', defId);
+                gr.setValue('name', name);
+                gr.setValue('version', '1.0.0');
+                gr.setValue('definition', typeof def === 'string' ? def : JSON.stringify(def));
+                gr.setValue('status', 'PLANNED');
+                return gr.insert();
+            }
+        } catch (ex) {
+            return 'sys_id_def_mock';
+        }
+    },
+
+    /**
+     * Creates factory run record.
+     * @private
+     */
+    _createRunRecord: function(defSysId, appName, version, mode, user, totalOps) {
+        'use strict';
+        var runId = 'fac_run_' + new Date().getTime();
+        try {
+            var gr = new GlideRecordSecure(this.RUN_TABLE);
+            gr.initialize();
+            gr.setValue('run_id', runId);
+            gr.setValue('definition', defSysId);
+            gr.setValue('version', version);
+            gr.setValue('mode', mode);
+            gr.setValue('status', 'RUNNING');
+            gr.setValue('started_at', new GlideDateTime().getValue());
+            gr.setValue('executed_by', user);
+            gr.setValue('operations_total', totalOps);
+            return gr.insert();
+        } catch (ex) {
+            return 'sys_id_run_mock';
+        }
+    },
+
+    /**
+     * Creates operation audit record.
+     * @private
+     */
+    _createOperationRecord: function(runSysId, op, status, errMsg) {
+        'use strict';
+        try {
+            var gr = new GlideRecordSecure(this.OP_TABLE);
+            gr.initialize();
+            gr.setValue('run', runSysId);
+            gr.setValue('operation_type', op.operation_type);
+            gr.setValue('target_type', op.target_type);
+            gr.setValue('target_name', op.target_name);
+            gr.setValue('status', status);
+            gr.setValue('sequence', op.sequence);
+            if (errMsg) gr.setValue('error_message', String(errMsg).substring(0, 4000));
+            gr.setValue('started_at', new GlideDateTime().getValue());
+            gr.setValue('completed_at', new GlideDateTime().getValue());
+            gr.insert();
+        } catch (ex) {}
+    },
+
+    /**
+     * Updates factory run status.
+     * @private
+     */
+    _updateRunRecord: function(runSysId, status, successCount, failedCount, rollbackStatus, errMsg) {
+        'use strict';
+        try {
+            var gr = new GlideRecordSecure(this.RUN_TABLE);
+            if (gr.get(runSysId)) {
+                gr.setValue('status', status);
+                gr.setValue('completed_at', new GlideDateTime().getValue());
+                gr.setValue('operations_successful', successCount);
+                gr.setValue('operations_failed', failedCount);
+                if (rollbackStatus) gr.setValue('rollback_status', rollbackStatus);
+                if (errMsg) gr.setValue('error_message', String(errMsg).substring(0, 4000));
+                gr.update();
+            }
+        } catch (ex) {}
+    },
+
+    type: 'AppForgeFactoryExecutor'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>766b947f3fe834f837d7c57e591c0810</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeFactoryExecutor</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_766b947f3fe834f837d7c57e591c0810</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

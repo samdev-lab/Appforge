@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeGovernanceGate</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeGovernanceGate</description>
+        <name>AppForgeGovernanceGate</name>
+        <script><![CDATA[/**
+ * AppForgeGovernanceGate
+ * Unified pre-flight governance gate for Production Deployments, Migrations, and Installations.
+ * Evaluates policies, four-eyes approvals, security scans, and active exceptions.
+ */
+var AppForgeGovernanceGate = Class.create();
+AppForgeGovernanceGate.prototype = {
+    initialize: function(exceptionManager) {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeGovernanceGate] ';
+        this.policyEngine = new AppForgePolicyEngine();
+        this.policyEvaluator = new AppForgePolicyEvaluator();
+        this.exceptionManager = exceptionManager || new AppForgeGovernanceExceptionManager();
+    },
+
+    /**
+     * Evaluates pre-flight governance for an operation.
+     * @param {Object} operationContext - Operation context (environment, actor, approver, etc.).
+     * @param {string} tenantId - Tenant context.
+     * @return {Object} Gate evaluation result.
+     */
+    evaluateGate: function(operationContext, tenantId) {
+        'use strict';
+        var ctx = operationContext || {};
+        var pack = this.policyEngine.getPolicyPack('APPFORGE_BASELINE');
+        var blocked = false;
+        var blockingPolicies = [];
+
+        for (var i = 0; i < pack.length; i++) {
+            var pol = pack[i];
+            var ev = this.policyEvaluator.evaluatePolicy(pol, ctx, tenantId);
+
+            if (ev.result === 'NON_COMPLIANT' && pol.effect === 'DENY') {
+                // Check if active exception exists
+                if (ctx.exception_id && this.exceptionManager.isExceptionActive(ctx.exception_id)) {
+                    gs.info(this.LOG_PREFIX + 'Policy ' + pol.policy_id + ' bypassed by approved exception: ' + ctx.exception_id);
+                } else {
+                    blocked = true;
+                    blockingPolicies.push({ policy_id: pol.policy_id, name: pol.name, reason: ev.reason });
+                }
+            }
+        }
+
+        if (blocked) {
+            gs.warn(this.LOG_PREFIX + 'Preflight gate BLOCKED by ' + blockingPolicies.length + ' policy violation(s).');
+            return {
+                passed: false,
+                status: 'BLOCKED',
+                error: 'GOVERNANCE_GATE_BLOCKED: Mandatory policies violated.',
+                blocking_policies: blockingPolicies
+            };
+        }
+
+        return {
+            passed: true,
+            status: 'PASSED',
+            evaluated_policies: pack.length
+        };
+    },
+
+    type: 'AppForgeGovernanceGate'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>19832aedc4e1c22fbbb2c80515621a0a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeGovernanceGate</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_19832aedc4e1c22fbbb2c80515621a0a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

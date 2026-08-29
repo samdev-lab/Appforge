@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTemplateFactory</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTemplateFactory</description>
+        <name>AppForgeTemplateFactory</name>
+        <script><![CDATA[/**
+ * AppForgeTemplateFactory
+ * Catalog and instantiation engine for pre-packaged, enterprise-grade declarative application templates.
+ * Provides 6 complete 5-layer application templates:
+ *   1. Employee Onboarding
+ *   2. Vendor Management
+ *   3. Asset Request
+ *   4. Case Management
+ *   5. Approval Management
+ *   6. Blank Application
+ */
+var AppForgeTemplateFactory = Class.create();
+AppForgeTemplateFactory.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeTemplateFactory] ';
+        this.validator = new AppForgeDefinitionValidator();
+        this._templates = this._initTemplateCatalog();
+    },
+
+    /**
+     * Retrieves all available application templates.
+     * @return {Array} List of template summary descriptors.
+     */
+    getTemplates: function() {
+        'use strict';
+        var list = [];
+        for (var id in this._templates) {
+            if (Object.prototype.hasOwnProperty.call(this._templates, id)) {
+                var t = this._templates[id];
+                list.push({
+                    template_id: t.template_id,
+                    name: t.name,
+                    category: t.category,
+                    description: t.description,
+                    version: t.version,
+                    table_count: t.definition.schemas ? t.definition.schemas.length : 0,
+                    feature_count: t.features ? t.features.length : 0,
+                    icon: t.icon
+                });
+            }
+        }
+        return list;
+    },
+
+    /**
+     * Retrieves a full template by ID.
+     * @param {string} templateId - Template ID.
+     * @return {Object|null} Template definition object.
+     */
+    getTemplate: function(templateId) {
+        'use strict';
+        if (!templateId || !this._templates[templateId]) {
+            return null;
+        }
+        return JSON.parse(JSON.stringify(this._templates[templateId]));
+    },
+
+    /**
+     * Instantiates an application definition from a template.
+     * @param {string} templateId - Template identifier.
+     * @param {Object} [overrides] - Custom name, scope, or owner overrides.
+     * @return {Object} { success: boolean, application_definition: Object, errors: Array }
+     */
+    instantiateTemplate: function(templateId, overrides) {
+        'use strict';
+        var tmpl = this.getTemplate(templateId);
+        if (!tmpl) {
+            return { success: false, error: 'Template not found: ' + templateId, errors: ['Unknown template ID'] };
+        }
+
+        var def = tmpl.definition;
+        var ov = overrides || {};
+
+        if (ov.name) def.application.name = ov.name;
+        if (ov.application_id) def.application.application_id = ov.application_id;
+        if (ov.scope) def.application.scope = ov.scope;
+        if (ov.description) def.application.description = ov.description;
+        if (ov.owner) def.application.owner = ov.owner;
+        if (ov.version) def.application.version = ov.version;
+
+        var validation = this.validator.validate(def);
+        if (!validation.valid) {
+            return {
+                success: false,
+                status: 'INVALID',
+                errors: validation.errors,
+                application_definition: null
+            };
+        }
+
+        return {
+            success: true,
+            status: 'INSTANTIATED',
+            template_id: templateId,
+            application_definition: def
+        };
+    },
+
+    _initTemplateCatalog: function() {
+        'use strict';
+        var catalog = {};
+
+        // 1. Employee Onboarding Template
+        catalog['employee_onboarding'] = {
+            template_id: 'employee_onboarding',
+            name: 'Employee Onboarding',
+            category: 'Human Resources',
+            description: 'Comprehensive employee onboarding lifecycle management including department allocation, equipment logistics, manager approvals, and REST onboarding APIs.',
+            version: '1.0.0',
+            icon: 'user-plus',
+            features: ['Employee Profiles', 'Department Alignment', 'Manager Approval Flow', 'Logistics Checklist', 'Onboarding REST API'],
+            definition: {
+                application: {
+                    name: 'Employee Onboarding',
+                    application_id: 'app_employee_onboarding',
+                    scope: 'x_appforge_employee',
+                    description: 'Enterprise Employee Onboarding application',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                modules: [
+                    { name: 'Onboarding Management', module_id: 'mod_onboarding', order: 100 },
+                    { name: 'Administration', module_id: 'mod_admin', order: 200 }
+                ],
+                schemas: [
+                    {
+                        name: 'Employee',
+                        schema_id: 'sch_employee',
+                        table_name: 'x_appforge_employee_employee',
+                        label: 'Employee',
+                        fields: [
+                            { name: 'u_first_name', label: 'First Name', type: 'string', length: 100, mandatory: true },
+                            { name: 'u_last_name', label: 'Last Name', type: 'string', length: 100, mandatory: true },
+                            { name: 'u_email', label: 'Work Email', type: 'string', length: 150, mandatory: true, unique: true },
+                            { name: 'u_department', label: 'Department', type: 'reference', reference_table: 'cmn_department' },
+                            { name: 'u_manager', label: 'Manager', type: 'reference', reference_table: 'sys_user' },
+                            { name: 'u_start_date', label: 'Start Date', type: 'date', mandatory: true },
+                            { name: 'u_status', label: 'Status', type: 'string', length: 40, default_value: 'pending' },
+                            { name: 'u_active', label: 'Active', type: 'boolean', default_value: 'true' }
+                        ]
+                    },
+                    {
+                        name: 'Onboarding Task',
+                        schema_id: 'sch_task',
+                        table_name: 'x_appforge_employee_task',
+                        label: 'Onboarding Task',
+                        fields: [
+                            { name: 'u_employee', label: 'Employee', type: 'reference', reference_table: 'x_appforge_employee_employee', mandatory: true },
+                            { name: 'u_task_name', label: 'Task Name', type: 'string', length: 200, mandatory: true },
+                            { name: 'u_category', label: 'Category', type: 'string', length: 50, default_value: 'IT_SETUP' },
+                            { name: 'u_assigned_to', label: 'Assigned To', type: 'reference', reference_table: 'sys_user' },
+                            { name: 'u_completed', label: 'Completed', type: 'boolean', default_value: 'false' },
+                            { name: 'u_due_date', label: 'Due Date', type: 'date' }
+                        ]
+                    }
+                ],
+                experience: {
+                    forms: [
+                        {
+                            table: 'x_appforge_employee_employee',
+                            view: 'default',
+                            sections: [
+                                { name: 'General Information', fields: ['u_first_name', 'u_last_name', 'u_email', 'u_status'] },
+                                { name: 'Organizational Details', fields: ['u_department', 'u_manager', 'u_start_date', 'u_active'] }
+                            ]
+                        }
+                    ],
+                    lists: [
+                        {
+                            table: 'x_appforge_employee_employee',
+                            view: 'default',
+                            columns: ['u_first_name', 'u_last_name', 'u_email', 'u_department', 'u_status', 'u_start_date']
+                        }
+                    ],
+                    views: [{ name: 'default', title: 'Default view' }],
+                    navigation: [
+                        { title: 'All Employees', table: 'x_appforge_employee_employee', view: 'default', order: 100 },
+                        { title: 'Pending Onboarding', table: 'x_appforge_employee_employee', filter: 'u_status=pending', order: 200 }
+                    ]
+                },
+                logic: {
+                    business_rules: [
+                        {
+                            name: 'Validate Start Date On Insert',
+                            table: 'x_appforge_employee_employee',
+                            when: 'before',
+                            action: 'insert',
+                            active: true,
+                            order: 100,
+                            condition_expression: 'current.u_start_date.nil() == false',
+                            script: "gs.info('[AppForge] Employee onboarding validated for: ' + current.u_email);"
+                        }
+                    ],
+                    events: [
+                        { name: 'x_appforge_employee.onboarded', table: 'x_appforge_employee_employee', description: 'Fired when onboarding completes' }
+                    ],
+                    notifications: [
+                        { name: 'Welcome New Employee', event_name: 'x_appforge_employee.onboarded', subject: 'Welcome to the team!' }
+                    ]
+                },
+                security: {
+                    roles: [
+                        { name: 'x_appforge_employee.user', description: 'Standard Employee Onboarding User' },
+                        { name: 'x_appforge_employee.admin', description: 'Employee Onboarding Administrator' }
+                    ],
+                    acls: [
+                        { table: 'x_appforge_employee_employee', operation: 'read', role: 'x_appforge_employee.user', decision: 'allow' },
+                        { table: 'x_appforge_employee_employee', operation: 'write', role: 'x_appforge_employee.admin', decision: 'allow' },
+                        { table: 'x_appforge_employee_employee', operation: 'create', role: 'x_appforge_employee.admin', decision: 'allow' }
+                    ]
+                },
+                integration: {
+                    apis: [
+                        {
+                            name: 'Employee Onboarding Inbound API',
+                            service_id: 'employee_api',
+                            base_path: '/api/x_appforge/employee',
+                            resources: [
+                                { path: '/onboard', http_method: 'POST', authentication: 'oauth', authorization_role: 'x_appforge_employee.admin' },
+                                { path: '/status/{id}', http_method: 'GET', authentication: 'oauth', authorization_role: 'x_appforge_employee.user' }
+                            ]
+                        }
+                    ]
+                }
+            }
+        };
+
+        // 2. Vendor Management Template
+        catalog['vendor_management'] = {
+            template_id: 'vendor_management',
+            name: 'Vendor Management',
+            category: 'Procurement & Vendor Operations',
+            description: 'Vendor relationship, risk evaluation, contract tracking, and vendor contact governance application.',
+            version: '1.0.0',
+            icon: 'briefcase',
+            features: ['Vendor Profile', 'Risk Assessment', 'Contract Tracking', 'Vendor Contacts', 'Approval Workflow'],
+            definition: {
+                application: {
+                    name: 'Vendor Management',
+                    application_id: 'app_vendor_management',
+                    scope: 'x_appforge_vendor',
+                    description: 'Enterprise Vendor Management System',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                modules: [{ name: 'Vendors', module_id: 'mod_vendors', order: 100 }],
+                schemas: [
+                    {
+                        name: 'Vendor',
+                        schema_id: 'sch_vendor',
+                        table_name: 'x_appforge_vendor_vendor',
+                        label: 'Vendor',
+                        fields: [
+                            { name: 'u_vendor_name', label: 'Vendor Name', type: 'string', length: 150, mandatory: true },
+                            { name: 'u_tax_id', label: 'Tax Identification Number', type: 'string', length: 50, mandatory: true },
+                            { name: 'u_risk_rating', label: 'Risk Rating', type: 'string', length: 20, default_value: 'LOW' },
+                            { name: 'u_active', label: 'Active', type: 'boolean', default_value: 'true' }
+                        ]
+                    }
+                ],
+                security: {
+                    roles: [{ name: 'x_appforge_vendor.admin', description: 'Vendor Administrator' }],
+                    acls: [{ table: 'x_appforge_vendor_vendor', operation: 'read', role: 'x_appforge_vendor.admin', decision: 'allow' }]
+                }
+            }
+        };
+
+        // 3. Asset Request Template
+        catalog['asset_request'] = {
+            template_id: 'asset_request',
+            name: 'Asset Request & Fulfillment',
+            category: 'IT Asset Management',
+            description: 'Hardware and software asset requisition, manager approval, and fulfillment task tracking.',
+            version: '1.0.0',
+            icon: 'laptop',
+            features: ['Hardware Requisition', 'Software Licensing', 'Manager Approvals', 'Fulfillment Queue'],
+            definition: {
+                application: {
+                    name: 'Asset Request',
+                    application_id: 'app_asset_request',
+                    scope: 'x_appforge_asset',
+                    description: 'IT Asset Request Management',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                modules: [{ name: 'Asset Requests', module_id: 'mod_asset_requests', order: 100 }],
+                schemas: [
+                    {
+                        name: 'Asset Request',
+                        schema_id: 'sch_asset_req',
+                        table_name: 'x_appforge_asset_request',
+                        label: 'Asset Request',
+                        fields: [
+                            { name: 'u_item_name', label: 'Item Requested', type: 'string', length: 120, mandatory: true },
+                            { name: 'u_requested_for', label: 'Requested For', type: 'reference', reference_table: 'sys_user', mandatory: true },
+                            { name: 'u_urgency', label: 'Urgency', type: 'string', length: 20, default_value: 'MEDIUM' },
+                            { name: 'u_status', label: 'Request Status', type: 'string', length: 30, default_value: 'REQUESTED' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // 4. Case Management Template
+        catalog['case_management'] = {
+            template_id: 'case_management',
+            name: 'Enterprise Case Management',
+            category: 'Customer Service & Operations',
+            description: 'General inquiry and complex issue tracking with SLA monitoring, assignments, and resolution notes.',
+            version: '1.0.0',
+            icon: 'folder',
+            features: ['Case Ingestion', 'SLA Tracking', 'Team Assignment', 'Resolution Lifecycle'],
+            definition: {
+                application: {
+                    name: 'Case Management',
+                    application_id: 'app_case_management',
+                    scope: 'x_appforge_case',
+                    description: 'Enterprise Issue and Case Tracking',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                schemas: [
+                    {
+                        name: 'Case',
+                        schema_id: 'sch_case',
+                        table_name: 'x_appforge_case_case',
+                        label: 'Case',
+                        fields: [
+                            { name: 'u_number', label: 'Case Number', type: 'string', length: 30, mandatory: true },
+                            { name: 'u_subject', label: 'Subject', type: 'string', length: 200, mandatory: true },
+                            { name: 'u_description', label: 'Description', type: 'string', length: 4000 },
+                            { name: 'u_priority', label: 'Priority', type: 'string', length: 20, default_value: '3 - Moderate' },
+                            { name: 'u_state', label: 'State', type: 'string', length: 30, default_value: 'New' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // 5. Approval Management Template
+        catalog['approval_management'] = {
+            template_id: 'approval_management',
+            name: 'Approval Governance',
+            category: 'Governance & Compliance',
+            description: 'Standardized multi-level approval workflows with audit logging and decision justifications.',
+            version: '1.0.0',
+            icon: 'check-square',
+            features: ['Multi-Level Approvers', 'Decision Comments', 'Audit History', 'Auto-Escalation'],
+            definition: {
+                application: {
+                    name: 'Approval Governance',
+                    application_id: 'app_approval_governance',
+                    scope: 'x_appforge_approval',
+                    description: 'Enterprise Approval Workflows',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                schemas: [
+                    {
+                        name: 'Approval Item',
+                        schema_id: 'sch_approval_item',
+                        table_name: 'x_appforge_approval_item',
+                        label: 'Approval Item',
+                        fields: [
+                            { name: 'u_title', label: 'Title', type: 'string', length: 150, mandatory: true },
+                            { name: 'u_approver', label: 'Approver', type: 'reference', reference_table: 'sys_user', mandatory: true },
+                            { name: 'u_state', label: 'Decision State', type: 'string', length: 30, default_value: 'REQUESTED' },
+                            { name: 'u_comments', label: 'Justification Comments', type: 'string', length: 2000 }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // 6. Blank Application Template
+        catalog['blank_application'] = {
+            template_id: 'blank_application',
+            name: 'Blank Custom Application',
+            category: 'Custom Development',
+            description: 'Empty declarative application skeleton ready for bespoke custom schemas and business automation.',
+            version: '1.0.0',
+            icon: 'file',
+            features: ['Clean Scoped Template', 'Zero Schema Clutter', 'Ready for Custom Design'],
+            definition: {
+                application: {
+                    name: 'Custom Application',
+                    application_id: 'app_custom',
+                    scope: 'x_appforge_custom',
+                    description: 'Custom AppForge Application',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                modules: [],
+                schemas: [],
+                experience: { forms: [], lists: [], views: [], navigation: [] },
+                logic: { business_rules: [], events: [], notifications: [] },
+                security: { roles: [], acls: [] },
+                integration: { apis: [] }
+            }
+        };
+
+        return catalog;
+    },
+
+    type: 'AppForgeTemplateFactory'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>9337db51f9929f9e5df75212322073e7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTemplateFactory</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_9337db51f9929f9e5df75212322073e7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

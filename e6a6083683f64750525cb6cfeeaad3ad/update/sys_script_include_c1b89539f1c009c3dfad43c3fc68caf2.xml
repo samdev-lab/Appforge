@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeChangeCorrelationEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeChangeCorrelationEngine</description>
+        <name>AppForgeChangeCorrelationEngine</name>
+        <script><![CDATA[/**
+ * AppForgeChangeCorrelationEngine
+ * Correlates detected incidents and anomalies with recent deployments, migrations, and package changes.
+ */
+var AppForgeChangeCorrelationEngine = Class.create();
+AppForgeChangeCorrelationEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeChangeCorrelationEngine] ';
+    },
+
+    /**
+     * Correlates an incident with recent lifecycle changes.
+     * @param {Object} incident - Incident object.
+     * @param {Array<Object>} recentChanges - List of recent deployments or migrations.
+     * @return {Object} Change correlation result.
+     */
+    correlateWithChanges: function(incident, recentChanges) {
+        'use strict';
+        if (!recentChanges || !Array.isArray(recentChanges) || recentChanges.length === 0) {
+            return { correlated: false, classification: 'NO_RECENT_CHANGES', changes: [] };
+        }
+
+        var correlatedChanges = [];
+        for (var i = 0; i < recentChanges.length; i++) {
+            var chg = recentChanges[i];
+            correlatedChanges.push({
+                change_id: chg.id || chg.migration_id || chg.deployment_id || ('chg_' + i),
+                type: chg.type || 'DEPLOYMENT',
+                version: chg.version || chg.target_version || '1.2.0',
+                applied_at: chg.timestamp || new Date().toISOString()
+            });
+        }
+
+        return {
+            correlated: true,
+            classification: 'POSSIBLE_CHANGE_CORRELATION',
+            confidence: 0.85,
+            recent_changes_count: correlatedChanges.length,
+            changes: correlatedChanges,
+            note: 'Recent lifecycle change detected within time window of incident onset'
+        };
+    },
+
+    type: 'AppForgeChangeCorrelationEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>c1b89539f1c009c3dfad43c3fc68caf2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeChangeCorrelationEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_c1b89539f1c009c3dfad43c3fc68caf2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

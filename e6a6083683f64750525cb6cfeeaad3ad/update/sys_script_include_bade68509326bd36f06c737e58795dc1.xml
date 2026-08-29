@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeWorkflowProcessor</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeWorkflowProcessor</description>
+        <name>AppForgeWorkflowProcessor</name>
+        <script><![CDATA[/**
+ * AppForgeWorkflowProcessor
+ * Dedicated processor for GitHub 'workflow_run' webhook events.
+ * Prepares workflow run status tracking without executing automated deployments.
+ */
+var AppForgeWorkflowProcessor = Class.create();
+AppForgeWorkflowProcessor.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeWorkflowProcessor] ';
+    },
+
+    /**
+     * Processes workflow_run event payload.
+     * @param {Object} eventRecordGr - GlideRecord of x_appforge_git_event.
+     * @param {Object} payload - Parsed JSON webhook payload.
+     * @return {Object} Processing status result.
+     */
+    process: function(eventRecordGr, payload) {
+        'use strict';
+        if (!eventRecordGr || !payload) {
+            return { success: false, error: 'Invalid record or payload for workflow processing' };
+        }
+
+        try {
+            var workflowRun = payload.workflow_run || {};
+            var action = payload.action || '';
+            var name = workflowRun.name || '';
+            var status = workflowRun.status || '';
+            var conclusion = workflowRun.conclusion || '';
+            var branch = workflowRun.head_branch || '';
+            var commitSha = workflowRun.head_sha || '';
+            var actor = workflowRun.actor ? workflowRun.actor.login : '';
+
+            eventRecordGr.setValue('action', action + ' (' + status + '/' + conclusion + ')');
+            eventRecordGr.setValue('branch', branch);
+            eventRecordGr.setValue('commit_sha', commitSha);
+            eventRecordGr.setValue('author', actor);
+            eventRecordGr.setValue('github_username', actor);
+            eventRecordGr.setValue('commit_message', 'Workflow Run: ' + name + ' [' + status + ' - ' + conclusion + ']');
+
+            gs.info(this.LOG_PREFIX + 'Processed workflow_run event. Workflow: ' + name + ', Status: ' + status + ', Conclusion: ' + conclusion + '. Deployment NOT triggered (Scope Rule).');
+            return { success: true, workflowName: name, status: status, conclusion: conclusion };
+        } catch (ex) {
+            gs.error(this.LOG_PREFIX + 'Error processing workflow_run event: ' + ex.message);
+            return { success: false, error: ex.message };
+        }
+    },
+
+    type: 'AppForgeWorkflowProcessor'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>bade68509326bd36f06c737e58795dc1</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeWorkflowProcessor</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_bade68509326bd36f06c737e58795dc1</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

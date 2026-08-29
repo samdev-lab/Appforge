@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTenantIsolationValidator</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTenantIsolationValidator</description>
+        <name>AppForgeTenantIsolationValidator</name>
+        <script><![CDATA[/**
+ * AppForgeTenantIsolationValidator
+ * Validates tenant boundary separation and prevents cross-tenant data leakage.
+ * Verifies isolation across Applications, Packages, Environments, Locks, Keys, Policies, and Audits.
+ */
+var AppForgeTenantIsolationValidator = Class.create();
+AppForgeTenantIsolationValidator.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeTenantIsolationValidator] ';
+        this.tenantManager = new AppForgeTenantManager();
+    },
+
+    /**
+     * Asserts tenant boundary isolation between actor tenant and target resource tenant.
+     * @param {string} actorTenantId - Tenant ID of requesting user/process.
+     * @param {string} resourceTenantId - Tenant ID owning the target resource.
+     * @param {string} resourceType - 'application' | 'package' | 'environment' | 'key' | 'policy' | 'audit'.
+     * @param {boolean} [isGlobalAdmin=false] - Whether actor has global platform admin role.
+     * @return {Object} { allowed: boolean, status: string, reason?: string }
+     */
+    validateIsolation: function(actorTenantId, resourceTenantId, resourceType, isGlobalAdmin) {
+        'use strict';
+        if (isGlobalAdmin === true) {
+            return {
+                allowed: true,
+                status: 'GLOBAL_ADMIN_ACCESS',
+                actor_tenant: actorTenantId,
+                resource_tenant: resourceTenantId,
+                resource_type: resourceType
+            };
+        }
+
+        if (!actorTenantId || !resourceTenantId) {
+            return {
+                allowed: false,
+                status: 'TENANT_CONTEXT_MISSING',
+                reason: 'Missing tenant context: actorTenantId or resourceTenantId undefined.'
+            };
+        }
+
+        if (actorTenantId === resourceTenantId) {
+            return {
+                allowed: true,
+                status: 'TENANT_ISOLATION_VERIFIED',
+                actor_tenant: actorTenantId,
+                resource_tenant: resourceTenantId,
+                resource_type: resourceType
+            };
+        }
+
+        // Cross-tenant access attempt
+        gs.error(this.LOG_PREFIX + 'SECURITY VIOLATION: Cross-tenant access blocked. Tenant ' + actorTenantId + ' attempted to access ' + resourceType + ' of Tenant ' + resourceTenantId);
+
+        return {
+            allowed: false,
+            status: 'CROSS_TENANT_ACCESS_DENIED',
+            actor_tenant: actorTenantId,
+            resource_tenant: resourceTenantId,
+            resource_type: resourceType,
+            reason: 'Access Denied: Tenant boundary violation. ' + actorTenantId + ' cannot access ' + resourceType + ' belonging to ' + resourceTenantId + '.'
+        };
+    },
+
+    type: 'AppForgeTenantIsolationValidator'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>0b54a98dd52b06bf42ac22ae6f2a5f8e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTenantIsolationValidator</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_0b54a98dd52b06bf42ac22ae6f2a5f8e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

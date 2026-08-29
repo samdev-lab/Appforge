@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTransformationEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTransformationEngine</description>
+        <name>AppForgeTransformationEngine</name>
+        <script><![CDATA[/**
+ * AppForgeTransformationEngine
+ * Declarative transformation service for data mapping.
+ * Supported transformations: STRING, INTEGER, DECIMAL, BOOLEAN, DATE, DATETIME, UPPERCASE, LOWERCASE, TRIM.
+ * Strictly avoids arbitrary code execution.
+ */
+var AppForgeTransformationEngine = Class.create();
+AppForgeTransformationEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeTransformationEngine] ';
+        this.SUPPORTED_TRANSFORMS = [
+            'STRING', 'INTEGER', 'DECIMAL', 'BOOLEAN',
+            'DATE', 'DATETIME', 'UPPERCASE', 'LOWERCASE', 'TRIM'
+        ];
+    },
+
+    /**
+     * Transforms an input value according to specified transformation type.
+     * @param {*} value - Raw input value.
+     * @param {string} transformType - Transformation identifier.
+     * @return {*} Transformed value.
+     */
+    transform: function(value, transformType) {
+        'use strict';
+        if (value === undefined || value === null) return value;
+        if (!transformType) return value;
+
+        var type = String(transformType).toUpperCase();
+
+        switch (type) {
+            case 'STRING':
+                return String(value);
+
+            case 'INTEGER':
+                var intVal = parseInt(value, 10);
+                return isNaN(intVal) ? 0 : intVal;
+
+            case 'DECIMAL':
+                var decVal = parseFloat(value);
+                return isNaN(decVal) ? 0.0 : decVal;
+
+            case 'BOOLEAN':
+                if (typeof value === 'boolean') return value;
+                var strVal = String(value).toLowerCase().trim();
+                return strVal === 'true' || strVal === '1' || strVal === 'yes';
+
+            case 'UPPERCASE':
+                return String(value).toUpperCase();
+
+            case 'LOWERCASE':
+                return String(value).toLowerCase();
+
+            case 'TRIM':
+                return String(value).trim();
+
+            case 'DATE':
+                try {
+                    var d = new Date(value);
+                    return isNaN(d.getTime()) ? String(value) : d.toISOString().split('T')[0];
+                } catch (e) {
+                    return String(value);
+                }
+
+            case 'DATETIME':
+                try {
+                    var dt = new Date(value);
+                    return isNaN(dt.getTime()) ? String(value) : dt.toISOString();
+                } catch (e) {
+                    return String(value);
+                }
+
+            default:
+                gs.warn(this.LOG_PREFIX + 'Unsupported transformation: ' + type);
+                return value;
+        }
+    },
+
+    type: 'AppForgeTransformationEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>0a34964ded920b083b7ac2f7639094b4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTransformationEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_0a34964ded920b083b7ac2f7639094b4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

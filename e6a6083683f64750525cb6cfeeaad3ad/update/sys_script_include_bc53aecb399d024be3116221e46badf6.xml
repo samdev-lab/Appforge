@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeRetryEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeRetryEngine</description>
+        <name>AppForgeRetryEngine</name>
+        <script><![CDATA[/**
+ * AppForgeRetryEngine
+ * Manages retry calculations and policies for outbound integration executions.
+ * Policies: NONE, FIXED, EXPONENTIAL.
+ * Enforces non-retry rules for authentication (401/403) and validation (400/422) failures.
+ */
+var AppForgeRetryEngine = Class.create();
+AppForgeRetryEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeRetryEngine] ';
+        this.NON_RETRYABLE_STATUSES = [400, 401, 403, 404, 405, 422];
+    },
+
+    /**
+     * Determines whether a failed request should be retried based on status and attempt count.
+     * @param {number} statusCode - HTTP response status code (or 0 for network timeout).
+     * @param {number} currentAttempt - Current 1-based attempt index.
+     * @param {Object} policy - Retry policy configuration { type, max_retries, initial_delay_ms }.
+     * @return {boolean} True if request should be retried.
+     */
+    shouldRetry: function(statusCode, currentAttempt, policy) {
+        'use strict';
+        if (!policy || policy.type === 'NONE') return false;
+
+        var maxRetries = policy.max_retries !== undefined ? policy.max_retries : 3;
+        if (currentAttempt > maxRetries) return false;
+
+        // Non-retryable permanent client errors
+        if (this.NON_RETRYABLE_STATUSES.indexOf(statusCode) !== -1) {
+            return false;
+        }
+
+        return true;
+    },
+
+    /**
+     * Calculates delay in milliseconds before next retry attempt.
+     * @param {number} attempt - Attempt index (1, 2, 3...).
+     * @param {Object} policy - Retry policy configuration.
+     * @return {number} Delay in milliseconds.
+     */
+    calculateDelayMs: function(attempt, policy) {
+        'use strict';
+        if (!policy || policy.type === 'NONE') return 0;
+
+        var baseDelay = policy.initial_delay_ms || 1000;
+        var maxDelay = policy.max_delay_ms || 30000;
+
+        if (policy.type === 'FIXED') {
+            return Math.min(baseDelay, maxDelay);
+        }
+
+        if (policy.type === 'EXPONENTIAL') {
+            var delay = baseDelay * Math.pow(2, attempt - 1);
+            return Math.min(delay, maxDelay);
+        }
+
+        return baseDelay;
+    },
+
+    type: 'AppForgeRetryEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>bc53aecb399d024be3116221e46badf6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeRetryEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_bc53aecb399d024be3116221e46badf6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

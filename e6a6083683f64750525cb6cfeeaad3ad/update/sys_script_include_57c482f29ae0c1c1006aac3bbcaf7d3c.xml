@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeEnvironmentRegistry</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeEnvironmentRegistry</description>
+        <name>AppForgeEnvironmentRegistry</name>
+        <script><![CDATA[/**
+ * AppForgeEnvironmentRegistry
+ * Formalizes and manages enterprise deployment targets across DEV, TEST, and PROD.
+ * Enforces environment channels, instance verification, and active deployment lock tracking.
+ */
+var AppForgeEnvironmentRegistry = Class.create();
+AppForgeEnvironmentRegistry.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeEnvironmentRegistry] ';
+        this._environments = this._initDefaultEnvironments();
+    },
+
+    _initDefaultEnvironments: function() {
+        'use strict';
+        return {
+            'DEV': {
+                environment_id: 'DEV',
+                name: 'Development Environment',
+                instance_url: 'https://dev280961.service-now.com',
+                ServiceNow_release: 'WashingtonDC',
+                tenant: 'PLATFORM_DEFAULT',
+                status: 'ONLINE',
+                allowed_release_channel: ['DRAFT', 'VALIDATING', 'CERTIFIED', 'RELEASE_CANDIDATE'],
+                deployment_lock: null,
+                last_deployment: null,
+                last_verified_release: 'v0.18.0'
+            },
+            'TEST': {
+                environment_id: 'TEST',
+                name: 'Quality Assurance & Staging Environment',
+                instance_url: 'https://test-dev280961.service-now.com',
+                ServiceNow_release: 'WashingtonDC',
+                tenant: 'PLATFORM_DEFAULT',
+                status: 'ONLINE',
+                allowed_release_channel: ['CERTIFIED', 'RELEASE_CANDIDATE', 'DEV_VALIDATED'],
+                deployment_lock: null,
+                last_deployment: null,
+                last_verified_release: 'v0.18.0'
+            },
+            'PROD': {
+                environment_id: 'PROD',
+                name: 'Production Enterprise Runtime',
+                instance_url: 'https://prod-dev280961.service-now.com',
+                ServiceNow_release: 'WashingtonDC',
+                tenant: 'PLATFORM_DEFAULT',
+                status: 'ONLINE',
+                allowed_release_channel: ['PRODUCTION_APPROVED', 'EMERGENCY_APPROVED'],
+                deployment_lock: null,
+                last_deployment: null,
+                last_verified_release: 'v0.18.0'
+            }
+        };
+    },
+
+    /**
+     * Retrieves an environment descriptor.
+     */
+    getEnvironment: function(envId) {
+        'use strict';
+        var id = (envId || '').toUpperCase();
+        return this._environments[id] || null;
+    },
+
+    /**
+     * Validates whether a release state is permitted to deploy to target environment.
+     */
+    validateDeploymentTarget: function(envId, releaseState) {
+        'use strict';
+        var env = this.getEnvironment(envId);
+        if (!env) {
+            return { allowed: false, status: 'ENVIRONMENT_NOT_FOUND', error: 'Target environment ' + envId + ' does not exist in registry.' };
+        }
+
+        if (env.status !== 'ONLINE') {
+            return { allowed: false, status: 'ENVIRONMENT_UNAVAILABLE', error: 'Target environment ' + envId + ' is ' + env.status + '.' };
+        }
+
+        var allowedChannels = env.allowed_release_channel || [];
+        if (allowedChannels.indexOf(releaseState) === -1) {
+            gs.error(this.LOG_PREFIX + 'PROMOTION_BLOCKED: Release in state ' + releaseState + ' is not permitted on ' + envId);
+            return {
+                allowed: false,
+                status: 'WRONG_ENVIRONMENT_CHANNEL',
+                error: 'Promotion blocked: Environment ' + envId + ' requires release state in [' + allowedChannels.join(', ') + '], but got ' + releaseState + '.'
+            };
+        }
+
+        return { allowed: true, status: 'TARGET_VERIFIED', environment: env };
+    },
+
+    /**
+     * Updates environment runtime state after deployment.
+     */
+    recordDeployment: function(envId, releaseVersion, runId, status) {
+        'use strict';
+        var env = this.getEnvironment(envId);
+        if (env) {
+            env.last_deployment = {
+                version: releaseVersion,
+                run_id: runId,
+                status: status,
+                timestamp: new GlideDateTime().getValue()
+            };
+            if (status === 'SUCCESS') env.last_verified_release = releaseVersion;
+        }
+    },
+
+    type: 'AppForgeEnvironmentRegistry'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>57c482f29ae0c1c1006aac3bbcaf7d3c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeEnvironmentRegistry</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_57c482f29ae0c1c1006aac3bbcaf7d3c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

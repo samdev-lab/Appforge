@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeMultiTenantControlPlane</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeMultiTenantControlPlane</description>
+        <name>AppForgeMultiTenantControlPlane</name>
+        <script><![CDATA[/**
+ * AppForgeMultiTenantControlPlane
+ * Multi-Tenant Enterprise Control Plane managing tenant hierarchies, lifecycle transitions,
+ * resource quotas, isolation boundaries, and cryptographic decommissioning audits.
+ *
+ * Tenant Hierarchy:
+ * Platform -> Tenant -> [Users, Applications, Packages, Environments, Keys, Policies, Deployments, Audit]
+ */
+var AppForgeMultiTenantControlPlane = Class.create();
+AppForgeMultiTenantControlPlane.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeMultiTenantControlPlane] ';
+        this.quotaEngine = new AppForgeTenantQuotaEngine();
+        this.isolationValidator = new AppForgeTenantIsolationValidator();
+        this.checksumEngine = new AppForgeChecksumEngine();
+        this._tenants = {};
+        this._tenantResources = {};
+    },
+
+    /**
+     * Provisions a new enterprise tenant.
+     * @param {Object} tenantDef - { tenant_id, name, tier, organization, contact_email }
+     * @param {string} actor - Provisioning administrator.
+     * @return {Object} Provisioned tenant record.
+     */
+    provisionTenant: function(tenantDef, actor) {
+        'use strict';
+        if (!tenantDef || !tenantDef.tenant_id) {
+            return { success: false, error: 'Mandatory parameter missing: tenant_id' };
+        }
+
+        var tId = tenantDef.tenant_id;
+        if (this._tenants[tId]) {
+            return { success: false, error: 'Tenant ' + tId + ' is already provisioned.' };
+        }
+
+        var tier = tenantDef.tier || 'ENTERPRISE';
+        this.quotaEngine.setTenantTier(tId, tier);
+
+        var tenantRecord = {
+            tenant_id: tId,
+            name: tenantDef.name || ('Tenant ' + tId),
+            organization: tenantDef.organization || 'Acme Corp',
+            tier: tier,
+            status: 'ACTIVE',
+            contact_email: tenantDef.contact_email || 'admin@tenant.local',
+            created_by: actor || 'platform_admin',
+            created_at: new GlideDateTime().getValue(),
+            updated_at: new GlideDateTime().getValue()
+        };
+
+        this._tenants[tId] = tenantRecord;
+        this._tenantResources[tId] = {
+            users: [],
+            applications: [],
+            packages: [],
+            environments: ['DEV', 'TEST', 'PRODUCTION'],
+            keys: [],
+            policies: ['APPFORGE_BASELINE'],
+            deployments: [],
+            audit_events: []
+        };
+
+        gs.info(this.LOG_PREFIX + 'Tenant provisioned successfully: ' + tId + ' (' + tier + ' tier)');
+
+        return {
+            success: true,
+            status: 'ACTIVE',
+            tenant: tenantRecord,
+            hierarchy: this._tenantResources[tId]
+        };
+    },
+
+    /**
+     * Retrieves tenant descriptor by ID.
+     */
+    getTenant: function(tenantId) {
+        'use strict';
+        return this._tenants[tenantId] || null;
+    },
+
+    /**
+     * Suspends a tenant, immediately blocking application mutation and deployments.
+     */
+    suspendTenant: function(tenantId, actor, reason) {
+        'use strict';
+        if (!this._tenants[tenantId]) {
+            return { success: false, error: 'Tenant ' + tenantId + ' not found.' };
+        }
+
+        this._tenants[tenantId].status = 'SUSPENDED';
+        this._tenants[tenantId].suspended_by = actor || 'platform_admin';
+        this._tenants[tenantId].suspension_reason = reason || 'Administrative suspension';
+        this._tenants[tenantId].updated_at = new GlideDateTime().getValue();
+
+        gs.warn(this.LOG_PREFIX + 'Tenant suspended: ' + tenantId + ' (Reason: ' + reason + ')');
+
+        return {
+            success: true,
+            status: 'SUSPENDED',
+            tenant_id: tenantId,
+            reason: reason
+        };
+    },
+
+    /**
+     * Reactivates a suspended tenant.
+     */
+    activateTenant: function(tenantId, actor) {
+        'use strict';
+        if (!this._tenants[tenantId]) {
+            return { success: false, error: 'Tenant ' + tenantId + ' not found.' };
+        }
+
+        this._tenants[tenantId].status = 'ACTIVE';
+        this._tenants[tenantId].updated_at = new GlideDateTime().getValue();
+
+        return { success: true, status: 'ACTIVE', tenant_id: tenantId };
+    },
+
+    /**
+     * Decommissions a tenant and generates an immutable cryptographic purge evidence certificate.
+     */
+    decommissionTenant: function(tenantId, actor, reason) {
+        'use strict';
+        if (!this._tenants[tenantId]) {
+            return { success: false, error: 'Tenant ' + tenantId + ' not found.' };
+        }
+
+        var t = this._tenants[tenantId];
+        var resources = this._tenantResources[tenantId] || {};
+
+        var evidencePayload = {
+            tenant_id: tenantId,
+            tenant_name: t.name,
+            decommissioned_by: actor || 'platform_admin',
+            decommissioned_at: new GlideDateTime().getValue(),
+            reason: reason || 'Customer Offboarding',
+            purged_resources: {
+                applications_count: resources.applications.length,
+                packages_count: resources.packages.length,
+                keys_count: resources.keys.length
+            }
+        };
+
+        var evidenceHash = this.checksumEngine.generateChecksum(evidencePayload);
+
+        t.status = 'DECOMMISSIONED';
+        t.decommissioned_at = evidencePayload.decommissioned_at;
+        t.decommissioned_by = evidencePayload.decommissioned_by;
+        t.evidence_hash = evidenceHash;
+
+        // Clear active resources
+        this._tenantResources[tenantId] = {
+            users: [],
+            applications: [],
+            packages: [],
+            environments: [],
+            keys: [],
+            policies: [],
+            deployments: [],
+            audit_events: ['TENANT_DECOMMISSIONED_EVIDENCE_' + evidenceHash]
+        };
+
+        gs.warn(this.LOG_PREFIX + 'Tenant decommissioned and purged: ' + tenantId + ' (Evidence SHA-256: ' + evidenceHash.substring(0, 16) + '...)');
+
+        return {
+            success: true,
+            status: 'DECOMMISSIONED',
+            tenant_id: tenantId,
+            evidence_hash: evidenceHash,
+            certificate: evidencePayload
+        };
+    },
+
+    /**
+     * Registers a resource under a tenant hierarchy and checks quotas.
+     */
+    registerTenantResource: function(tenantId, resourceType, resourceId) {
+        'use strict';
+        var tenant = this.getTenant(tenantId);
+        if (!tenant) {
+            return { success: false, status: 'TENANT_NOT_FOUND', error: 'Tenant ' + tenantId + ' does not exist.' };
+        }
+
+        if (tenant.status !== 'ACTIVE') {
+            return { success: false, status: 'TENANT_' + tenant.status, error: 'Tenant ' + tenantId + ' is ' + tenant.status + '. Operation blocked.' };
+        }
+
+        // Quota check
+        var qCheck = this.quotaEngine.checkQuota(tenantId, resourceType, 1);
+        if (!qCheck.allowed) {
+            return qCheck;
+        }
+
+        if (this._tenantResources[tenantId] && this._tenantResources[tenantId][resourceType]) {
+            this._tenantResources[tenantId][resourceType].push(resourceId);
+            this.quotaEngine.recordUsage(tenantId, resourceType, 1);
+        }
+
+        return {
+            success: true,
+            status: 'RESOURCE_REGISTERED',
+            tenant_id: tenantId,
+            resource_type: resourceType,
+            resource_id: resourceId
+        };
+    },
+
+    /**
+     * Retrieves full tenant hierarchy tree.
+     */
+    getTenantHierarchy: function(tenantId) {
+        'use strict';
+        var t = this.getTenant(tenantId);
+        if (!t) return null;
+
+        return {
+            tenant: t,
+            hierarchy: this._tenantResources[tenantId] || {},
+            quotas: this.quotaEngine.getUsage(tenantId)
+        };
+    },
+
+    /**
+     * Validates tenant isolation for a proposed operation.
+     */
+    validateOperation: function(actorTenantId, targetTenantId, resourceType, isGlobalAdmin) {
+        'use strict';
+        return this.isolationValidator.validateIsolation(actorTenantId, targetTenantId, resourceType, isGlobalAdmin);
+    },
+
+    type: 'AppForgeMultiTenantControlPlane'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>f734f60724094ed42a8e2fae6c8106b5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeMultiTenantControlPlane</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_f734f60724094ed42a8e2fae6c8106b5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

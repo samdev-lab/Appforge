@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeComplianceEvidence</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeComplianceEvidence</description>
+        <name>AppForgeComplianceEvidence</name>
+        <script><![CDATA[/**
+ * AppForgeComplianceEvidence
+ * Collects, sanitizes, and hashes compliance evidence across platform registries and runtime events.
+ */
+var AppForgeComplianceEvidence = Class.create();
+AppForgeComplianceEvidence.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeComplianceEvidence] ';
+        this.checksumEngine = new AppForgeChecksumEngine();
+    },
+
+    /**
+     * Collects and sanitizes compliance evidence.
+     * @param {Object} rawEvidence - Raw evidence object.
+     * @return {Object} Sanitized and hashed evidence record.
+     */
+    collectEvidence: function(rawEvidence) {
+        'use strict';
+        if (!rawEvidence) return null;
+
+        var sanitized = this._sanitize(rawEvidence);
+        var evidenceHash = this.checksumEngine.generateChecksum(sanitized);
+
+        return {
+            tenant: sanitized.tenant || 'SYSTEM',
+            application: sanitized.application || 'app',
+            policy: sanitized.policy || 'GENERAL',
+            source: sanitized.source || 'PLATFORM_REGISTRY',
+            result: sanitized.result || 'PASS',
+            evidence: sanitized.evidence || {},
+            evidence_hash: evidenceHash,
+            timestamp: new GlideDateTime().getValue()
+        };
+    },
+
+    /**
+     * Recursively masks sensitive credentials in evidence records.
+     */
+    _sanitize: function(obj) {
+        'use strict';
+        if (!obj || typeof obj !== 'object') return obj;
+        var copy = Array.isArray(obj) ? [] : {};
+        for (var k in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, k)) {
+                if (/(?:password|passwd|pwd|secret|api[_-]?key|token|bearer|private[_-]?key)/i.test(k)) {
+                    copy[k] = '[REDACTED_SECRET]';
+                } else if (typeof obj[k] === 'object' && obj[k] !== null) {
+                    copy[k] = this._sanitize(obj[k]);
+                } else {
+                    copy[k] = obj[k];
+                }
+            }
+        }
+        return copy;
+    },
+
+    type: 'AppForgeComplianceEvidence'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>35b0ae54d21441d58e3e943b1f432445</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeComplianceEvidence</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_35b0ae54d21441d58e3e943b1f432445</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

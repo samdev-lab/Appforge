@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeRateLimiter</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeRateLimiter</description>
+        <name>AppForgeRateLimiter</name>
+        <script><![CDATA[/**
+ * AppForgeRateLimiter
+ * In-memory / rolling window rate limiter enforcing integration and webhook request thresholds.
+ */
+var AppForgeRateLimiter = Class.create();
+AppForgeRateLimiter.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeRateLimiter] ';
+        this.requestWindows = {};
+    },
+
+    /**
+     * Checks if a client/integration identifier exceeds rate limit.
+     * @param {string} identifier - Client ID or Integration ID.
+     * @param {number} limitPerMinute - Maximum requests per 60 seconds.
+     * @return {Object} { allowed: boolean, current_count: number, limit: number, retry_after: number }
+     */
+    checkRateLimit: function(identifier, limitPerMinute) {
+        'use strict';
+        var limit = limitPerMinute || 60;
+        var now = new Date().getTime();
+        var windowStart = now - 60000;
+
+        if (!this.requestWindows[identifier]) {
+            this.requestWindows[identifier] = [];
+        }
+
+        // Evict timestamps older than 60 seconds
+        this.requestWindows[identifier] = this.requestWindows[identifier].filter(function(ts) {
+            return ts > windowStart;
+        });
+
+        var count = this.requestWindows[identifier].length;
+
+        if (count >= limit) {
+            gs.warn(this.LOG_PREFIX + 'Rate limit exceeded for ' + identifier + ' (' + count + '/' + limit + ' req/min)');
+            return {
+                allowed: false,
+                current_count: count,
+                limit: limit,
+                status_code: 429,
+                error: 'Too Many Requests',
+                retry_after: 60
+            };
+        }
+
+        this.requestWindows[identifier].push(now);
+        return {
+            allowed: true,
+            current_count: count + 1,
+            limit: limit,
+            remaining: limit - (count + 1)
+        };
+    },
+
+    /**
+     * Resets rate limiter tracking.
+     */
+    reset: function() {
+        'use strict';
+        this.requestWindows = {};
+    },
+
+    type: 'AppForgeRateLimiter'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>aa8f31351555be53fe3fa3810dea9cc0</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeRateLimiter</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_aa8f31351555be53fe3fa3810dea9cc0</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgePackageDiffEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgePackageDiffEngine</description>
+        <name>AppForgePackageDiffEngine</name>
+        <script><![CDATA[/**
+ * AppForgePackageDiffEngine
+ * Compares two application versions (v1 vs v2) and identifies:
+ *   - ADDED components
+ *   - MODIFIED components
+ *   - UNCHANGED components
+ *   - REMOVED components
+ *   - BREAKING changes (e.g. deleted fields, type changes, removed APIs/roles)
+ */
+var AppForgePackageDiffEngine = Class.create();
+AppForgePackageDiffEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgePackageDiffEngine] ';
+    },
+
+    /**
+     * Calculates deep difference between two application package definitions.
+     * @param {Object} v1Def - Baseline version definition (e.g. 1.0.0).
+     * @param {Object} v2Def - Target version definition (e.g. 1.1.0).
+     * @return {Object} Categorized diff report.
+     */
+    calculateDiff: function(v1Def, v2Def) {
+        'use strict';
+        var added = [];
+        var modified = [];
+        var unchanged = [];
+        var removed = [];
+        var breaking = [];
+
+        var v1Schemas = (v1Def && v1Def.schemas) || [];
+        var v2Schemas = (v2Def && v2Def.schemas) || [];
+
+        // 1. Compare Schemas & Fields
+        var v1FieldMap = {};
+        for (var s1 = 0; s1 < v1Schemas.length; s1++) {
+            var sch1 = v1Schemas[s1];
+            var flds1 = sch1.fields || [];
+            for (var f1 = 0; f1 < flds1.length; f1++) {
+                v1FieldMap[sch1.name + '.' + flds1[f1].name] = flds1[f1];
+            }
+        }
+
+        var v2FieldMap = {};
+        for (var s2 = 0; s2 < v2Schemas.length; s2++) {
+            var sch2 = v2Schemas[s2];
+            var flds2 = sch2.fields || [];
+            for (var f2 = 0; f2 < flds2.length; f2++) {
+                var fieldKey = sch2.name + '.' + flds2[f2].name;
+                v2FieldMap[fieldKey] = flds2[f2];
+
+                if (!v1FieldMap[fieldKey]) {
+                    added.push({ type: 'Field', name: fieldKey, detail: 'New field added' });
+                } else {
+                    var oldField = v1FieldMap[fieldKey];
+                    var newField = flds2[f2];
+                    if (oldField.type !== newField.type) {
+                        breaking.push({
+                            type: 'FieldTypeChange',
+                            name: fieldKey,
+                            detail: 'Field type changed from ' + oldField.type + ' to ' + newField.type
+                        });
+                        modified.push({ type: 'Field', name: fieldKey, detail: 'Type changed' });
+                    } else {
+                        unchanged.push({ type: 'Field', name: fieldKey });
+                    }
+                }
+            }
+        }
+
+        // Detect removed fields (Breaking change)
+        for (var oldKey in v1FieldMap) {
+            if (!v2FieldMap[oldKey]) {
+                removed.push({ type: 'Field', name: oldKey });
+                breaking.push({ type: 'FieldDeletion', name: oldKey, detail: 'Field removed from schema' });
+            }
+        }
+
+        // 2. Compare Business Rules
+        var v1Rules = (v1Def && v1Def.logic && v1Def.logic.business_rules) || [];
+        var v2Rules = (v2Def && v2Def.logic && v2Def.logic.business_rules) || [];
+        var v1RuleNames = v1Rules.map(function(r) { return r.name; });
+        var v2RuleNames = v2Rules.map(function(r) { return r.name; });
+
+        for (var r2 = 0; r2 < v2Rules.length; r2++) {
+            var rName = v2Rules[r2].name;
+            if (v1RuleNames.indexOf(rName) === -1) {
+                added.push({ type: 'BusinessRule', name: rName });
+            } else {
+                unchanged.push({ type: 'BusinessRule', name: rName });
+            }
+        }
+        for (var r1 = 0; r1 < v1Rules.length; r1++) {
+            if (v2RuleNames.indexOf(v1Rules[r1].name) === -1) {
+                removed.push({ type: 'BusinessRule', name: v1Rules[r1].name });
+            }
+        }
+
+        return {
+            has_changes: added.length > 0 || modified.length > 0 || removed.length > 0,
+            has_breaking_changes: breaking.length > 0,
+            summary: {
+                added_count: added.length,
+                modified_count: modified.length,
+                unchanged_count: unchanged.length,
+                removed_count: removed.length,
+                breaking_count: breaking.length
+            },
+            added: added,
+            modified: modified,
+            unchanged: unchanged,
+            removed: removed,
+            breaking: breaking
+        };
+    },
+
+    type: 'AppForgePackageDiffEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>b1fab8bdade8a8cfcc22a6f791f95695</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgePackageDiffEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_b1fab8bdade8a8cfcc22a6f791f95695</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

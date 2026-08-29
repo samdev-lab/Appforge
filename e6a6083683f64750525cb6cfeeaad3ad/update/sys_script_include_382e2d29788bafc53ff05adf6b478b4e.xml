@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTenantContext</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTenantContext</description>
+        <name>AppForgeTenantContext</name>
+        <script><![CDATA[/**
+ * AppForgeTenantContext
+ * Establishes, validates, and scopes execution context for multi-tenant requests.
+ * Derives tenant context from verified user membership rather than trusting client headers.
+ * Emits TENANT_CONTEXT_REQUIRED or TENANT_CONTEXT_INVALID on violation.
+ */
+var AppForgeTenantContext = Class.create();
+AppForgeTenantContext.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeTenantContext] ';
+        this._currentContext = null;
+    },
+
+    /**
+     * Establishes validated tenant execution context.
+     * @param {Object} user - Authenticated user descriptor { user_id, name, roles, tenant_id }.
+     * @param {Object} [requestMeta] - Request metadata { request_id, correlation_id, headers }.
+     * @param {string} [environment='DEV'] - Execution environment.
+     * @return {Object} Validated context descriptor or error.
+     */
+    establishContext: function(user, requestMeta, environment) {
+        'use strict';
+        if (!user || !user.user_id) {
+            return {
+                valid: false,
+                status: 'TENANT_CONTEXT_REQUIRED',
+                error: 'Authentication required: Unable to establish tenant context for anonymous request.'
+            };
+        }
+
+        var tenantId = user.tenant_id;
+        var meta = requestMeta || {};
+        var headerTenant = (meta.headers && meta.headers['x-tenant-id']) ? meta.headers['x-tenant-id'] : null;
+
+        // Security check: Client-provided header must not override authenticated membership unless global admin
+        var isGlobalAdmin = (user.roles && user.roles.indexOf('PLATFORM_ADMIN') !== -1);
+        if (headerTenant && headerTenant !== tenantId && !isGlobalAdmin) {
+            gs.error(this.LOG_PREFIX + 'SECURITY_VIOLATION: User ' + user.user_id + ' (tenant: ' + tenantId + ') attempted to spoof header tenant: ' + headerTenant);
+            return {
+                valid: false,
+                status: 'TENANT_CONTEXT_INVALID',
+                error: 'Security violation: Authenticated user cannot override tenant context via x-tenant-id header.'
+            };
+        }
+
+        var effectiveTenant = (isGlobalAdmin && headerTenant) ? headerTenant : (tenantId || 'global');
+        var reqId = meta.request_id || ('req_' + new Date().getTime() + '_' + Math.floor(Math.random() * 10000));
+        var corrId = meta.correlation_id || ('AF-CTX-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000));
+
+        this._currentContext = {
+            tenant_id: effectiveTenant,
+            user_id: user.user_id,
+            user_name: user.name || user.user_id,
+            roles: user.roles || ['TENANT_VIEWER'],
+            environment: environment || 'DEV',
+            organization: user.organization || effectiveTenant,
+            is_global_admin: isGlobalAdmin,
+            request_id: reqId,
+            correlation_id: corrId,
+            established_at: new GlideDateTime().getValue()
+        };
+
+        return {
+            valid: true,
+            status: 'TENANT_CONTEXT_ESTABLISHED',
+            context: this._currentContext
+        };
+    },
+
+    /**
+     * Returns current active context or null.
+     */
+    getContext: function() {
+        'use strict';
+        return this._currentContext;
+    },
+
+    /**
+     * Asserts that a valid tenant context is active.
+     */
+    validateContext: function() {
+        'use strict';
+        if (!this._currentContext || !this._currentContext.tenant_id) {
+            return { valid: false, status: 'TENANT_CONTEXT_REQUIRED', error: 'No active tenant context established.' };
+        }
+        return { valid: true, status: 'VALID', context: this._currentContext };
+    },
+
+    /**
+     * Clears active tenant context at end of worker/request lifecycle.
+     */
+    clearContext: function() {
+        'use strict';
+        this._currentContext = null;
+    },
+
+    type: 'AppForgeTenantContext'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>382e2d29788bafc53ff05adf6b478b4e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTenantContext</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_382e2d29788bafc53ff05adf6b478b4e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

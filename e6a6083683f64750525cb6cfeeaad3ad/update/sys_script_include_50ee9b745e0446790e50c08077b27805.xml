@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeLogicValidator</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeLogicValidator</description>
+        <name>AppForgeLogicValidator</name>
+        <script><![CDATA[/**
+ * AppForgeLogicValidator
+ * Validates complete Logic Definition payloads (Business Rules, Script Includes, Events, Notifications).
+ * Enforces cross-scope protection, destructive operation guards, and structural integrity.
+ */
+var AppForgeLogicValidator = Class.create();
+AppForgeLogicValidator.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeLogicValidator] ';
+        this.conditionEngine = new AppForgeConditionEngine();
+        this.actionEngine = new AppForgeActionEngine();
+        this.VALID_WHENS = ['BEFORE', 'AFTER', 'ASYNC', 'DISPLAY'];
+        this.VALID_RECIPIENT_TYPES = ['FIELD', 'USER', 'GROUP', 'ROLE', 'STATIC_EMAIL', 'EVENT_PARAMETER'];
+        this.ALLOWED_SCOPE_PREFIXES = ['x_appforge'];
+    },
+
+    /**
+     * Validates a complete Logic Definition block.
+     * @param {Object} logicDef - Full logic definition (business_rules, script_includes, events, notifications).
+     * @param {string} [appScope] - Expected application scope prefix for cross-scope validation.
+     * @return {Object} { valid: boolean, errors: Array, warnings: Array }
+     */
+    validate: function(logicDef, appScope) {
+        'use strict';
+        var errors = [];
+        var warnings = [];
+
+        if (!logicDef || typeof logicDef !== 'object') {
+            return { valid: false, errors: ['Logic definition must be an object'], warnings: [] };
+        }
+
+        // 1. Validate Business Rules
+        var brs = logicDef.business_rules || [];
+        var brNames = [];
+        for (var b = 0; b < brs.length; b++) {
+            var br = brs[b];
+            if (!br.name) errors.push('Business rule at index ' + b + ' missing name');
+            if (!br.table) errors.push('Business rule (' + (br.name || b) + ') missing table');
+            if (br.when && this.VALID_WHENS.indexOf(br.when) === -1) {
+                errors.push('Business rule (' + br.name + ') invalid when: ' + br.when + '. Supported: ' + this.VALID_WHENS.join(', '));
+            }
+
+            // Cross-scope protection: table must belong to AppForge scope
+            if (br.table && appScope && br.table.indexOf(appScope) === -1 && br.table.indexOf('x_appforge') === -1) {
+                errors.push('CROSS-SCOPE VIOLATION: Business rule (' + br.name + ') targets table outside application scope: ' + br.table);
+            }
+
+            // Validate condition
+            if (br.condition) {
+                var condRes = this.conditionEngine.validate(br.condition);
+                if (!condRes.valid) errors.push('Business rule (' + br.name + ') invalid condition: ' + condRes.error);
+            }
+
+            // Validate actions
+            if (br.actions) {
+                var actRes = this.actionEngine.validate(br.actions);
+                if (!actRes.valid) {
+                    for (var ae = 0; ae < actRes.errors.length; ae++) {
+                        var isDestructive = actRes.errors[ae].indexOf('BLOCKED') !== -1;
+                        if (isDestructive) {
+                            errors.push('DESTRUCTIVE ACTION BLOCKED in rule (' + br.name + '): ' + actRes.errors[ae]);
+                        } else {
+                            errors.push('Business rule (' + br.name + ') invalid action: ' + actRes.errors[ae]);
+                        }
+                    }
+                }
+            }
+
+            if (br.name) {
+                if (brNames.indexOf(br.name) !== -1) {
+                    errors.push('Duplicate business rule name: ' + br.name);
+                } else {
+                    brNames.push(br.name);
+                }
+            }
+        }
+
+        // 2. Validate Script Includes
+        var sis = logicDef.script_includes || [];
+        for (var s = 0; s < sis.length; s++) {
+            var si = sis[s];
+            if (!si.name) errors.push('Script Include at index ' + s + ' missing name');
+            if (!si.api_name) errors.push('Script Include (' + (si.name || s) + ') missing api_name');
+            if (!si.script) errors.push('Script Include (' + (si.name || s) + ') missing script content');
+            if (si.accessible_from === 'GLOBAL') {
+                errors.push('Script Include (' + (si.name || s) + ') cannot be globally accessible from AppForge factory. Set accessible_from to THIS_APP_ONLY or ANY_SCOPE.');
+            }
+        }
+
+        // 3. Validate Events
+        var events = logicDef.events || [];
+        var eventNames = [];
+        for (var e = 0; e < events.length; e++) {
+            var evt = events[e];
+            if (!evt.name) errors.push('Event at index ' + e + ' missing name');
+            if (evt.name) {
+                if (eventNames.indexOf(evt.name) !== -1) {
+                    errors.push('Duplicate event name: ' + evt.name);
+                } else {
+                    eventNames.push(evt.name);
+                }
+            }
+            if (evt.payload) {
+                var payloadRes = this._validatePayload(evt.payload, evt.name);
+                if (!payloadRes.valid) errors.push(payloadRes.error);
+            }
+        }
+
+        // 4. Validate Notifications
+        var notifs = logicDef.notifications || [];
+        for (var n = 0; n < notifs.length; n++) {
+            var notif = notifs[n];
+            if (!notif.name) errors.push('Notification at index ' + n + ' missing name');
+            if (!notif.subject) errors.push('Notification (' + (notif.name || n) + ') missing subject');
+            if (notif.recipients) {
+                var rcptRes = this._validateRecipients(notif.recipients, notif.name);
+                if (!rcptRes.valid) errors.push(rcptRes.error);
+            }
+        }
+
+        return { valid: errors.length === 0, errors: errors, warnings: warnings };
+    },
+
+    /**
+     * Validates event payload definition.
+     * @private
+     */
+    _validatePayload: function(payload, eventName) {
+        'use strict';
+        if (typeof payload !== 'object') {
+            return { valid: false, error: 'Event (' + eventName + ') payload must be an object' };
+        }
+        // Check for dangerous expressions
+        var payloadStr = JSON.stringify(payload);
+        if (/eval\s*\(|Function\s*\(|GlideSystem\.exec/.test(payloadStr)) {
+            return { valid: false, error: 'Event (' + eventName + ') payload contains blocked expression (eval/Function/exec)' };
+        }
+        return { valid: true };
+    },
+
+    /**
+     * Validates notification recipients.
+     * @private
+     */
+    _validateRecipients: function(recipients, notifName) {
+        'use strict';
+        if (!Array.isArray(recipients) || recipients.length === 0) {
+            return { valid: false, error: 'Notification (' + notifName + ') requires at least one recipient' };
+        }
+        for (var r = 0; r < recipients.length; r++) {
+            var rcpt = recipients[r];
+            if (!rcpt.type) return { valid: false, error: 'Notification (' + notifName + ') recipient at index ' + r + ' missing type' };
+            if (this.VALID_RECIPIENT_TYPES.indexOf(rcpt.type) === -1) {
+                return { valid: false, error: 'Notification (' + notifName + ') invalid recipient type: ' + rcpt.type };
+            }
+            if (rcpt.type === 'FIELD' && !rcpt.field) {
+                return { valid: false, error: 'Notification (' + notifName + ') FIELD recipient missing field name' };
+            }
+            if (rcpt.type === 'STATIC_EMAIL' && !rcpt.email) {
+                return { valid: false, error: 'Notification (' + notifName + ') STATIC_EMAIL recipient missing email address' };
+            }
+        }
+        return { valid: true };
+    },
+
+    type: 'AppForgeLogicValidator'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>50ee9b745e0446790e50c08077b27805</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeLogicValidator</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_50ee9b745e0446790e50c08077b27805</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

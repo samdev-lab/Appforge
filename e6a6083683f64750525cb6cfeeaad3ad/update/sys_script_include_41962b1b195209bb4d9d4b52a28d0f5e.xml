@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeBranchPatternParser</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeBranchPatternParser</description>
+        <name>AppForgeBranchPatternParser</name>
+        <script><![CDATA[/**
+ * AppForgeBranchPatternParser
+ * Script Include responsible for parsing Git branch names and extracting branch classification types and instance identifiers.
+ */
+var AppForgeBranchPatternParser = Class.create();
+AppForgeBranchPatternParser.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeBranchPatternParser] ';
+    },
+
+    /**
+     * Parses a branch name string into its type and instance metadata.
+     * @param {string} branchName - Git branch name (e.g. sn_instances/dev280961, main).
+     * @return {Object} Parsed result { branch_name, branch_type, instance_identifier }.
+     */
+    parse: function(branchName) {
+        'use strict';
+        if (!branchName) {
+            return {
+                branch_name: '',
+                branch_type: 'OTHER',
+                instance_identifier: null
+            };
+        }
+
+        var cleanName = branchName.trim();
+
+        // 1. Instance Branch Pattern (e.g. sn_instances/dev280961)
+        var instanceMatch = cleanName.match(/^sn_instances\/(.+)$/i);
+        if (instanceMatch && instanceMatch[1]) {
+            return {
+                branch_name: cleanName,
+                branch_type: 'INSTANCE',
+                instance_identifier: instanceMatch[1]
+            };
+        }
+
+        // 2. Main / Production Baseline Branch Pattern
+        if (/^(main|master)$/i.test(cleanName)) {
+            return {
+                branch_name: cleanName,
+                branch_type: 'MAIN',
+                instance_identifier: null
+            };
+        }
+
+        // 3. Development Branch Pattern
+        if (/^(dev|development)$/i.test(cleanName)) {
+            return {
+                branch_name: cleanName,
+                branch_type: 'DEVELOPMENT',
+                instance_identifier: null
+            };
+        }
+
+        // 4. Feature Branch Pattern (e.g. feature/module-ui)
+        if (/^feature\//i.test(cleanName)) {
+            return {
+                branch_name: cleanName,
+                branch_type: 'FEATURE',
+                instance_identifier: null
+            };
+        }
+
+        // 5. Release Branch Pattern (e.g. release/v1.0.0)
+        if (/^release\//i.test(cleanName)) {
+            return {
+                branch_name: cleanName,
+                branch_type: 'RELEASE',
+                instance_identifier: null
+            };
+        }
+
+        // 6. Hotfix Branch Pattern (e.g. hotfix/patch-security)
+        if (/^hotfix\//i.test(cleanName)) {
+            return {
+                branch_name: cleanName,
+                branch_type: 'HOTFIX',
+                instance_identifier: null
+            };
+        }
+
+        return {
+            branch_name: cleanName,
+            branch_type: 'OTHER',
+            instance_identifier: null
+        };
+    },
+
+    type: 'AppForgeBranchPatternParser'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>41962b1b195209bb4d9d4b52a28d0f5e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeBranchPatternParser</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_41962b1b195209bb4d9d4b52a28d0f5e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

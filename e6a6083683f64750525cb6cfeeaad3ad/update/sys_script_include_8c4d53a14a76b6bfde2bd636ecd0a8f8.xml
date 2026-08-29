@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeMigrationBatchProcessor</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeMigrationBatchProcessor</description>
+        <name>AppForgeMigrationBatchProcessor</name>
+        <script><![CDATA[/**
+ * AppForgeMigrationBatchProcessor
+ * Executes high-volume data transformations in chunked batches with per-batch checkpointing,
+ * pause/resume controls, before/after SHA-256 checksumming, and idempotency markers.
+ */
+var AppForgeMigrationBatchProcessor = Class.create();
+AppForgeMigrationBatchProcessor.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeMigrationBatchProcessor] ';
+        this.checksumEngine = new AppForgeChecksumEngine();
+        this.transformEngine = new AppForgeTransformationEngine();
+        this._stateMap = {};
+    },
+
+    /**
+     * Executes a batch migration over an in-memory or database record set.
+     * @param {string} migrationId - Unique migration ID.
+     * @param {Array<Object>} records - Array of records to process.
+     * @param {Object} transformationRule - Transformation descriptor ({ source_field, target_field, transformation }).
+     * @param {number} [batchSize=100] - Batch size.
+     * @param {number} [maxBatches] - Optional max batches to process before pausing.
+     * @return {Object} Batch execution result with progress metrics.
+     */
+    processBatches: function(migrationId, records, transformationRule, batchSize, maxBatches) {
+        'use strict';
+        var bSize = batchSize || 100;
+        var totalRecords = (records && records.length) || 0;
+        var totalBatches = Math.ceil(totalRecords / bSize) || 1;
+
+        if (!this._stateMap[migrationId]) {
+            this._stateMap[migrationId] = {
+                current_batch: 1,
+                processed: 0,
+                successful: 0,
+                failed: 0,
+                status: 'EXECUTING',
+                checkpoints: []
+            };
+        }
+
+        var state = this._stateMap[migrationId];
+        var batchesExecutedThisRun = 0;
+
+        while (state.current_batch <= totalBatches && state.status !== 'PAUSED' && state.status !== 'CANCELLED') {
+            if (maxBatches && batchesExecutedThisRun >= maxBatches) {
+                state.status = 'PAUSED';
+                gs.info(this.LOG_PREFIX + 'Migration ' + migrationId + ' paused at batch ' + state.current_batch);
+                break;
+            }
+
+            var startIdx = (state.current_batch - 1) * bSize;
+            var endIdx = Math.min(startIdx + bSize, totalRecords);
+            var batchRecords = records.slice(startIdx, endIdx);
+
+            for (var i = 0; i < batchRecords.length; i++) {
+                var rec = batchRecords[i];
+                var srcVal = rec[transformationRule.source_field];
+                var beforeChecksum = this.checksumEngine.generateChecksum(rec);
+
+                // Apply transformation
+                var newVal = this._applyTransformation(srcVal, transformationRule.transformation);
+                rec[transformationRule.target_field] = newVal;
+                var afterChecksum = this.checksumEngine.generateChecksum(rec);
+
+                // Record execution marker
+                rec._migration_marker = {
+                    migration_id: migrationId,
+                    checksum_before: beforeChecksum,
+                    checksum_after: afterChecksum,
+                    before_value: String(srcVal),
+                    after_value: String(newVal),
+                    status: 'MIGRATED'
+                };
+
+                state.processed++;
+                state.successful++;
+            }
+
+            state.checkpoints.push({
+                batch_number: state.current_batch,
+                records_processed: batchRecords.length,
+                timestamp: new Date().toISOString()
+            });
+
+            state.current_batch++;
+            batchesExecutedThisRun++;
+        }
+
+        if (state.processed >= totalRecords) {
+            state.status = 'COMPLETED';
+        }
+
+        return {
+            migration_id: migrationId,
+            status: state.status,
+            total_records: totalRecords,
+            processed: state.processed,
+            successful: state.successful,
+            failed: state.failed,
+            remaining: totalRecords - state.processed,
+            current_batch: state.current_batch - 1,
+            total_batches: totalBatches,
+            checkpoints: state.checkpoints
+        };
+    },
+
+    /**
+     * Pauses an active migration.
+     */
+    pause: function(migrationId) {
+        'use strict';
+        if (this._stateMap[migrationId]) {
+            this._stateMap[migrationId].status = 'PAUSED';
+            return { status: 'PAUSED', migration_id: migrationId };
+        }
+        return { status: 'NOT_FOUND' };
+    },
+
+    /**
+     * Resumes a paused migration.
+     */
+    resume: function(migrationId, records, transformationRule, batchSize) {
+        'use strict';
+        if (this._stateMap[migrationId]) {
+            this._stateMap[migrationId].status = 'EXECUTING';
+            return this.processBatches(migrationId, records, transformationRule, batchSize);
+        }
+        return { status: 'NOT_FOUND' };
+    },
+
+    /**
+     * Cancels an active migration.
+     */
+    cancel: function(migrationId) {
+        'use strict';
+        if (this._stateMap[migrationId]) {
+            this._stateMap[migrationId].status = 'CANCELLED';
+            return { status: 'CANCELLED', migration_id: migrationId };
+        }
+        return { status: 'NOT_FOUND' };
+    },
+
+    /**
+     * Gets live progress status.
+     */
+    getStatus: function(migrationId) {
+        'use strict';
+        return this._stateMap[migrationId] || { status: 'NOT_FOUND' };
+    },
+
+    _applyTransformation: function(value, type) {
+        'use strict';
+        if (value === null || value === undefined) return '';
+        var t = (type || 'UPPERCASE').toUpperCase();
+        var str = String(value);
+
+        switch (t) {
+            case 'UPPERCASE': return str.toUpperCase();
+            case 'LOWERCASE': return str.toLowerCase();
+            case 'TRIM': return str.trim();
+            case 'INTEGER_CONVERT': return parseInt(str, 10) || 0;
+            case 'DECIMAL_CONVERT': return parseFloat(str) || 0.0;
+            case 'BOOLEAN_CONVERT': return str.toLowerCase() === 'true' || str === '1';
+            case 'NULL_TO_DEFAULT': return str || 'DEFAULT';
+            default: return str;
+        }
+    },
+
+    type: 'AppForgeMigrationBatchProcessor'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>8c4d53a14a76b6bfde2bd636ecd0a8f8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeMigrationBatchProcessor</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_8c4d53a14a76b6bfde2bd636ecd0a8f8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeMigrationRiskEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeMigrationRiskEngine</description>
+        <name>AppForgeMigrationRiskEngine</name>
+        <script><![CDATA[/**
+ * AppForgeMigrationRiskEngine
+ * Calculates risk classifications (LOW, MEDIUM, HIGH, CRITICAL) for schema evolutions and data migrations.
+ */
+var AppForgeMigrationRiskEngine = Class.create();
+AppForgeMigrationRiskEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeMigrationRiskEngine] ';
+    },
+
+    /**
+     * Assesses risk for a planned migration.
+     * @param {Object} migrationDef - Migration definition.
+     * @param {number} estimatedRecords - Estimated record count.
+     * @param {string} targetEnvironment - Target environment name.
+     * @return {Object} { risk_level: 'LOW'|'MEDIUM'|'HIGH'|'CRITICAL', score: number, factors: Array }
+     */
+    calculateRisk: function(migrationDef, estimatedRecords, targetEnvironment) {
+        'use strict';
+        var score = 0;
+        var factors = [];
+        var count = estimatedRecords || 0;
+        var isProd = (targetEnvironment || '').toUpperCase() === 'PRODUCTION';
+
+        if (isProd) {
+            score += 30;
+            factors.push('Production target environment (+30)');
+        }
+
+        if (count > 1000000) {
+            score += 50;
+            factors.push('Ultra high volume (>1M records) (+50)');
+        } else if (count > 50000) {
+            score += 30;
+            factors.push('High volume (>50k records) (+30)');
+        } else if (count > 1000) {
+            score += 15;
+            factors.push('Moderate volume (>1k records) (+15)');
+        } else {
+            score += 5;
+            factors.push('Low volume (<=1k records) (+5)');
+        }
+
+        if (migrationDef && migrationDef.operations) {
+            for (var i = 0; i < migrationDef.operations.length; i++) {
+                var op = migrationDef.operations[i];
+                var opType = (op.operation_type || op.type || '').toUpperCase();
+                if (opType === 'DROP_FIELD' || opType === 'DROP_TABLE' || opType === 'MASS_DELETE') {
+                    score += 100;
+                    factors.push('Destructive schema operation: ' + opType + ' (+100)');
+                } else if (opType === 'MAP_REFERENCE' || opType === 'ADD_REFERENCE') {
+                    score += 20;
+                    factors.push('Reference data migration (+20)');
+                } else if (op.rollback_strategy === 'NON_REVERSIBLE') {
+                    score += 40;
+                    factors.push('Non-reversible operation detected (+40)');
+                }
+            }
+        }
+
+        var riskLevel = 'LOW';
+        if (score >= 80) {
+            riskLevel = 'CRITICAL';
+        } else if (score >= 50) {
+            riskLevel = 'HIGH';
+        } else if (score >= 25) {
+            riskLevel = 'MEDIUM';
+        }
+
+        return {
+            risk_level: riskLevel,
+            score: score,
+            factors: factors
+        };
+    },
+
+    type: 'AppForgeMigrationRiskEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>beec2c902dcd4fbeb423d6ee5b26cfd3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeMigrationRiskEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_beec2c902dcd4fbeb423d6ee5b26cfd3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

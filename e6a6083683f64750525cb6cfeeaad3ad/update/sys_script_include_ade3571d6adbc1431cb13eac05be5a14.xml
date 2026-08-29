@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.MockIntelligenceProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: MockIntelligenceProvider</description>
+        <name>MockIntelligenceProvider</name>
+        <script><![CDATA[/**
+ * MockIntelligenceProvider
+ * Provider-neutral AI interface implementation providing deterministic diagnostic analysis and summarization.
+ * Does not hard-code any specific commercial LLM provider.
+ */
+var MockIntelligenceProvider = Class.create();
+MockIntelligenceProvider.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[MockIntelligenceProvider] ';
+        this.provider_name = 'MockDeterministicAI';
+    },
+
+    analyze: function(context) {
+        'use strict';
+        return {
+            provider: this.provider_name,
+            summary: 'Application analyzed deterministically from telemetry state.',
+            confidence: 0.95
+        };
+    },
+
+    diagnose: function(context) {
+        'use strict';
+        var pl = (context && context.payload) || {};
+        return {
+            provider: this.provider_name,
+            diagnosis: pl.probable_root_cause ? ('Root cause determined as ' + pl.probable_root_cause) : 'Application operational within parameters',
+            confidence: pl.confidence || 0.90
+        };
+    },
+
+    summarize: function(context) {
+        'use strict';
+        var pl = (context && context.payload) || {};
+        return {
+            provider: this.provider_name,
+            summary: 'Application: ' + (pl.application && pl.application.name) + ' (Health: ' + (pl.health && pl.health.status) + ', Score: ' + (pl.health && pl.health.score) + '/100)'
+        };
+    },
+
+    recommend: function(context) {
+        'use strict';
+        var pl = (context && context.payload) || {};
+        return {
+            provider: this.provider_name,
+            recommended_actions: pl.recommendations || []
+        };
+    },
+
+    type: 'MockIntelligenceProvider'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>ade3571d6adbc1431cb13eac05be5a14</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>MockIntelligenceProvider</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_ade3571d6adbc1431cb13eac05be5a14</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

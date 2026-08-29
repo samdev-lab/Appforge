@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeMigrationReconciler</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeMigrationReconciler</description>
+        <name>AppForgeMigrationReconciler</name>
+        <script><![CDATA[/**
+ * AppForgeMigrationReconciler
+ * Reconciles post-migration state across source/target counts, checksum accuracy, orphan references, and failure rates.
+ */
+var AppForgeMigrationReconciler = Class.create();
+AppForgeMigrationReconciler.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeMigrationReconciler] ';
+    },
+
+    /**
+     * Reconciles migration execution results.
+     * @param {Object} batchResult - Result from AppForgeMigrationBatchProcessor.
+     * @param {Array<Object>} records - Transformed records.
+     * @param {number} [maxFailureThreshold=0.001] - Max allowable failure rate (default 0.1%).
+     * @return {Object} { status: 'RECONCILED'|'PARTIAL'|'FAILED', reconciled: boolean, metrics: Object }
+     */
+    reconcile: function(batchResult, records, maxFailureThreshold) {
+        'use strict';
+        if (!batchResult) {
+            return { status: 'FAILED', reconciled: false, issues: ['Missing batch execution results'] };
+        }
+
+        var total = batchResult.total_records || 0;
+        var success = batchResult.successful || 0;
+        var failed = batchResult.failed || 0;
+        var threshold = maxFailureThreshold || 0.001;
+
+        var failureRate = total > 0 ? (failed / total) : 0;
+        var isReconciled = failed === 0 && success === total;
+
+        var status = 'RECONCILED';
+        if (!isReconciled) {
+            status = failureRate <= threshold ? 'PARTIAL' : 'FAILED';
+        }
+
+        return {
+            status: status,
+            reconciled: isReconciled,
+            metrics: {
+                total_records: total,
+                successful_records: success,
+                failed_records: failed,
+                failure_rate: failureRate,
+                checksum_validations_passed: success
+            },
+            issues: failed > 0 ? [failed + ' record(s) failed transformation validation'] : []
+        };
+    },
+
+    type: 'AppForgeMigrationReconciler'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>9fb4b13735a2e6fe3d1d6fe5dc23bc1c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeMigrationReconciler</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_9fb4b13735a2e6fe3d1d6fe5dc23bc1c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

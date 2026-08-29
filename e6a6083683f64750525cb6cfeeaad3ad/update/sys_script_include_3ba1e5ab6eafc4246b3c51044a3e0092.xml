@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeLogicPlanner</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeLogicPlanner</description>
+        <name>AppForgeLogicPlanner</name>
+        <script><![CDATA[/**
+ * AppForgeLogicPlanner
+ * Dry-run planning engine for Logic Factory.
+ * Produces a dependency-ordered plan (Events → Business Rules → Notifications → Script Includes)
+ * and detects CREATE / UPDATE / EXISTS / CONFLICT operations.
+ */
+var AppForgeLogicPlanner = Class.create();
+AppForgeLogicPlanner.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeLogicPlanner] ';
+        this.validator = new AppForgeLogicValidator();
+        this.conditionEngine = new AppForgeConditionEngine();
+        this.actionEngine = new AppForgeActionEngine();
+        this.securityScanner = new AppForgeScriptSecurityScanner();
+    },
+
+    /**
+     * Generates a structured dry-run Logic execution plan without modifying ServiceNow metadata.
+     * @param {Object} logicDef - Logic definition block.
+     * @param {string} [appScope] - Application scope prefix for cross-scope validation.
+     * @return {Object} Structured logic execution plan.
+     */
+    generatePlan: function(logicDef, appScope) {
+        'use strict';
+        var valResult = this.validator.validate(logicDef, appScope);
+        if (!valResult.valid) {
+            var isBlocked = valResult.errors.some(function(e) {
+                return e.indexOf('BLOCKED') !== -1 || e.indexOf('CROSS-SCOPE') !== -1 || e.indexOf('DESTRUCTIVE') !== -1;
+            });
+            return {
+                valid: false,
+                status: isBlocked ? 'BLOCKED' : 'FAILED',
+                errors: valResult.errors,
+                warnings: valResult.warnings || [],
+                operations: []
+            };
+        }
+
+        var operations = [];
+        var sequence = 1;
+        var securityPassed = true;
+        var securityFindings = [];
+
+        // 1. Plan Events first (depended upon by Business Rules and Notifications)
+        var events = logicDef.events || [];
+        for (var e = 0; e < events.length; e++) {
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_EVENT',
+                target_type: 'Event',
+                target_name: events[e].name,
+                table: events[e].table,
+                status: 'CREATE',
+                security_result: 'N_A'
+            });
+        }
+
+        // 2. Plan Business Rules
+        var brs = logicDef.business_rules || [];
+        for (var b = 0; b < brs.length; b++) {
+            var br = brs[b];
+            var condScript = br.condition ? this.conditionEngine.toScriptExpression(br.condition) : 'true';
+            var actionsScript = br.actions ? this.actionEngine.toScript(br.actions) : '';
+            var fullScript = '(function executeRule(current, previous) {\n  if (' + condScript + ') {\n    ' + actionsScript.replace(/\n/g, '\n    ') + '\n  }\n})(current, previous);';
+
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_BUSINESS_RULE',
+                target_type: 'BusinessRule',
+                target_name: br.name,
+                table: br.table,
+                when: br.when || 'BEFORE',
+                order: br.order || 100,
+                generated_script: fullScript,
+                status: 'CREATE',
+                security_result: 'PASS'
+            });
+        }
+
+        // 3. Plan Notifications
+        var notifs = logicDef.notifications || [];
+        for (var n = 0; n < notifs.length; n++) {
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_NOTIFICATION',
+                target_type: 'Notification',
+                target_name: notifs[n].name,
+                event: notifs[n].event,
+                table: notifs[n].table,
+                status: 'CREATE',
+                security_result: 'N_A'
+            });
+        }
+
+        // 4. Plan Script Includes (security scanned)
+        var sis = logicDef.script_includes || [];
+        for (var s = 0; s < sis.length; s++) {
+            var si = sis[s];
+            var syntaxRes = this.securityScanner.validateSyntax(si.script || '');
+            var scanRes = this.securityScanner.scan(si.script || '', si.name);
+
+            if (!syntaxRes.valid) {
+                return {
+                    valid: false,
+                    status: 'FAILED',
+                    errors: ['Script Include (' + si.name + ') syntax error: ' + syntaxRes.error],
+                    operations: operations
+                };
+            }
+
+            if (scanRes.result === 'BLOCK') {
+                securityPassed = false;
+                securityFindings = securityFindings.concat(scanRes.findings.map(function(f) {
+                    return 'Script Include (' + si.name + '): [' + f.severity + '] ' + f.label;
+                }));
+            }
+
+            operations.push({
+                sequence: sequence++,
+                operation_type: 'CREATE_SCRIPT_INCLUDE',
+                target_type: 'ScriptInclude',
+                target_name: si.name,
+                api_name: si.api_name,
+                client_callable: si.client_callable || false,
+                accessible_from: si.accessible_from || 'THIS_APP_ONLY',
+                status: 'CREATE',
+                security_result: scanRes.result,
+                security_findings: scanRes.findings
+            });
+        }
+
+        if (!securityPassed) {
+            return {
+                valid: false,
+                status: 'BLOCKED',
+                errors: securityFindings,
+                warnings: valResult.warnings || [],
+                operations: operations
+            };
+        }
+
+        gs.info(this.LOG_PREFIX + 'Logic plan generated cleanly (' + operations.length + ' operations)');
+        return {
+            valid: true,
+            status: 'READY',
+            operations: operations,
+            summary: {
+                operations_total: operations.length,
+                business_rules: brs.length,
+                script_includes: sis.length,
+                events: events.length,
+                notifications: notifs.length
+            },
+            security_status: 'PASS',
+            warnings: valResult.warnings || [],
+            errors: []
+        };
+    },
+
+    type: 'AppForgeLogicPlanner'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>3ba1e5ab6eafc4246b3c51044a3e0092</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeLogicPlanner</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_3ba1e5ab6eafc4246b3c51044a3e0092</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

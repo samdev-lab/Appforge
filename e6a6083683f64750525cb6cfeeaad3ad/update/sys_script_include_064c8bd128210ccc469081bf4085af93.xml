@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeMigrationRollback</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeMigrationRollback</description>
+        <name>AppForgeMigrationRollback</name>
+        <script><![CDATA[/**
+ * AppForgeMigrationRollback
+ * Compensating rollback manager for data migrations and schema alterations.
+ * Reverts transformed records to before-values and reconciles restored state.
+ */
+var AppForgeMigrationRollback = Class.create();
+AppForgeMigrationRollback.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeMigrationRollback] ';
+    },
+
+    /**
+     * Executes compensating rollback for an array of migrated records.
+     * @param {Array<Object>} records - Migrated records with _migration_marker.
+     * @param {string} fieldName - Target field name.
+     * @param {string} migrationId - Migration ID.
+     * @return {Object} { status: 'ROLLBACK_RECONCILED'|'ROLLBACK_PARTIAL'|'ROLLBACK_NOT_POSSIBLE', restored_count: number }
+     */
+    rollbackRecords: function(records, fieldName, migrationId) {
+        'use strict';
+        if (!records || !Array.isArray(records) || records.length === 0) {
+            return { status: 'ROLLBACK_RECONCILED', restored_count: 0, details: 'No records to revert.' };
+        }
+
+        var restored = 0;
+        var failed = 0;
+
+        for (var i = 0; i < records.length; i++) {
+            var rec = records[i];
+            if (rec._migration_marker && rec._migration_marker.before_value !== undefined) {
+                rec[fieldName] = rec._migration_marker.before_value;
+                rec._migration_marker.status = 'REVERTED';
+                restored++;
+            } else {
+                failed++;
+            }
+        }
+
+        var status = 'ROLLBACK_RECONCILED';
+        if (failed > 0) {
+            status = restored > 0 ? 'ROLLBACK_PARTIAL' : 'ROLLBACK_NOT_POSSIBLE';
+        }
+
+        gs.info(this.LOG_PREFIX + 'Rollback complete for migration ' + migrationId + ' (' + restored + ' records restored)');
+
+        return {
+            status: status,
+            migration_id: migrationId,
+            restored_count: restored,
+            failed_count: failed,
+            verified: status === 'ROLLBACK_RECONCILED'
+        };
+    },
+
+    type: 'AppForgeMigrationRollback'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>064c8bd128210ccc469081bf4085af93</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeMigrationRollback</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_064c8bd128210ccc469081bf4085af93</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTenantQuotaEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTenantQuotaEngine</description>
+        <name>AppForgeTenantQuotaEngine</name>
+        <script><![CDATA[/**
+ * AppForgeTenantQuotaEngine
+ * Manages resource quotas, subscription tiers, and metering for multi-tenant SaaS operations.
+ * Enforces limits on applications, environments, monthly deployments, storage, and user seats.
+ */
+var AppForgeTenantQuotaEngine = Class.create();
+AppForgeTenantQuotaEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeTenantQuotaEngine] ';
+        this.TIERS = {
+            'COMMUNITY': {
+                max_applications: 5,
+                max_environments: 2,
+                max_deployments_per_month: 20,
+                max_deployments_this_month: 20,
+                max_records_storage: 10000,
+                max_user_seats: 10
+            },
+            'ENTERPRISE': {
+                max_applications: 50,
+                max_environments: 10,
+                max_deployments_per_month: 500,
+                max_deployments_this_month: 500,
+                max_records_storage: 1000000,
+                max_user_seats: 250
+            },
+            'UNLIMITED': {
+                max_applications: 999999,
+                max_environments: 999999,
+                max_deployments_per_month: 999999,
+                max_deployments_this_month: 999999,
+                max_records_storage: 999999999,
+                max_user_seats: 999999
+            }
+        };
+        this._tenantTiers = {};
+        this._tenantUsage = {};
+    },
+
+    /**
+     * Sets or updates a tenant's subscription tier.
+     */
+    setTenantTier: function(tenantId, tier) {
+        'use strict';
+        var t = (tier || 'ENTERPRISE').toUpperCase();
+        if (!this.TIERS[t]) t = 'ENTERPRISE';
+        this._tenantTiers[tenantId] = t;
+        if (!this._tenantUsage[tenantId]) {
+            this._tenantUsage[tenantId] = {
+                applications: 0,
+                environments: 0,
+                deployments_this_month: 0,
+                records_storage: 0,
+                user_seats: 0
+            };
+        }
+        return { success: true, tenant_id: tenantId, tier: t, limits: this.TIERS[t] };
+    },
+
+    /**
+     * Checks if a tenant has remaining quota for an operation.
+     * @param {string} tenantId - Tenant identifier.
+     * @param {string} resourceType - 'applications', 'environments', 'deployments_this_month', 'records_storage', 'user_seats'.
+     * @param {number} [quantity=1] - Quantity requested.
+     * @return {Object} { allowed: boolean, status: string, limit: number, current: number, remaining: number, error?: string }
+     */
+    checkQuota: function(tenantId, resourceType, quantity) {
+        'use strict';
+        var tierName = this._tenantTiers[tenantId] || 'ENTERPRISE';
+        var limits = this.TIERS[tierName] || this.TIERS['ENTERPRISE'];
+        var usage = this._tenantUsage[tenantId] || {
+            applications: 0,
+            environments: 0,
+            deployments_this_month: 0,
+            records_storage: 0,
+            user_seats: 0
+        };
+
+        var reqQty = quantity || 1;
+        var limitKey = 'max_' + resourceType;
+        var maxAllowed = limits[limitKey] !== undefined ? limits[limitKey] : 999999;
+        var currentUsed = usage[resourceType] || 0;
+
+        if (currentUsed + reqQty > maxAllowed) {
+            gs.warn(this.LOG_PREFIX + 'Quota exceeded for tenant ' + tenantId + ' on ' + resourceType + ' (Used: ' + currentUsed + ', Limit: ' + maxAllowed + ')');
+            return {
+                allowed: false,
+                status: 'QUOTA_EXCEEDED',
+                tenant_id: tenantId,
+                resource_type: resourceType,
+                limit: maxAllowed,
+                current: currentUsed,
+                requested: reqQty,
+                remaining: Math.max(maxAllowed - currentUsed, 0),
+                error: 'Operation rejected: Tenant quota exceeded for ' + resourceType + '. Current: ' + currentUsed + '/' + maxAllowed + '.'
+            };
+        }
+
+        return {
+            allowed: true,
+            status: 'QUOTA_AVAILABLE',
+            tenant_id: tenantId,
+            resource_type: resourceType,
+            limit: maxAllowed,
+            current: currentUsed,
+            remaining: maxAllowed - (currentUsed + reqQty)
+        };
+    },
+
+    /**
+     * Increments or decrements tenant usage.
+     */
+    recordUsage: function(tenantId, resourceType, delta) {
+        'use strict';
+        if (!this._tenantUsage[tenantId]) {
+            this.setTenantTier(tenantId, 'ENTERPRISE');
+        }
+        var d = delta !== undefined ? delta : 1;
+        this._tenantUsage[tenantId][resourceType] = Math.max((this._tenantUsage[tenantId][resourceType] || 0) + d, 0);
+        return {
+            tenant_id: tenantId,
+            resource_type: resourceType,
+            new_usage: this._tenantUsage[tenantId][resourceType]
+        };
+    },
+
+    /**
+     * Retrieves current tenant usage metrics.
+     */
+    getUsage: function(tenantId) {
+        'use strict';
+        var tier = this._tenantTiers[tenantId] || 'ENTERPRISE';
+        return {
+            tenant_id: tenantId,
+            tier: tier,
+            limits: this.TIERS[tier],
+            usage: this._tenantUsage[tenantId] || {
+                applications: 0,
+                environments: 0,
+                deployments_this_month: 0,
+                records_storage: 0,
+                user_seats: 0
+            }
+        };
+    },
+
+    type: 'AppForgeTenantQuotaEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>be5f5f2a877b8c446baea8b9390143cc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTenantQuotaEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_be5f5f2a877b8c446baea8b9390143cc</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>
