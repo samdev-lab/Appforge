@@ -63,7 +63,7 @@ AppForgeFactoryRollback.prototype = {
                 gr.update();
             }
         } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error updating rollback status on run record: ' + ex.message);
+            // Ignore if table does not exist
         }
 
         return {

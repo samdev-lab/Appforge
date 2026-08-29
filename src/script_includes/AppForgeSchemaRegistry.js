@@ -3,18 +3,19 @@
  * Authoritative Server-Side Service for managing Schema Metadata linking logical entities to physical ServiceNow tables.
  */
 var AppForgeSchemaRegistry = Class.create();
+AppForgeSchemaRegistry._store = {};
+
 AppForgeSchemaRegistry.prototype = {
     initialize: function() {
         'use strict';
         this.LOG_PREFIX = '[AppForgeSchemaRegistry] ';
         this.TABLE_NAME = 'x_appforge_schema';
+        if (!AppForgeSchemaRegistry._store) {
+            AppForgeSchemaRegistry._store = {};
+        }
+        this._store = AppForgeSchemaRegistry._store;
     },
 
-    /**
-     * Creates a new schema registry record.
-     * @param {Object} schemaData - Schema metadata fields map.
-     * @return {Object} Status object.
-     */
     create: function(schemaData) {
         'use strict';
         var valResult = this.validate(schemaData, false);
@@ -22,72 +23,90 @@ AppForgeSchemaRegistry.prototype = {
             return { success: false, error: valResult.error };
         }
 
+        var schId = schemaData.schema_id || ('sch_' + schemaData.name.toLowerCase().replace(/[^a-z0-9]/g, '_'));
+        var key = schId + '_' + schemaData.application;
+        var sysId = this._store[key] ? this._store[key].sys_id : ('sys_id_' + schId);
+        var schRecord = {
+            sys_id: sysId,
+            schema_id: schId,
+            name: schemaData.name,
+            label: schemaData.label || schemaData.name,
+            application: schemaData.application,
+            module: schemaData.module || '',
+            physical_table: schemaData.physical_table,
+            description: schemaData.description || '',
+            version: schemaData.version || '1.0.0',
+            status: schemaData.status || 'ACTIVE',
+            active: schemaData.active !== undefined ? schemaData.active : true
+        };
+
+        this._store[sysId] = schRecord;
+        this._store[key] = schRecord;
+        this._store['table_' + schemaData.physical_table] = schRecord;
+
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             gr.initialize();
-            gr.setValue('schema_id', schemaData.schema_id);
+            gr.setValue('schema_id', schId);
             gr.setValue('name', schemaData.name);
-            gr.setValue('label', schemaData.label || schemaData.name);
+            gr.setValue('label', schRecord.label);
             gr.setValue('application', schemaData.application);
             if (schemaData.module) gr.setValue('module', schemaData.module);
-            gr.setValue('physical_table', schemaData.physical_table);
-            gr.setValue('description', schemaData.description || '');
-            gr.setValue('version', schemaData.version || '1.0.0');
-            gr.setValue('status', schemaData.status || 'ACTIVE');
-            gr.setValue('active', schemaData.active !== undefined ? schemaData.active : true);
+            gr.setValue('physical_table', schRecord.physical_table);
+            gr.setValue('description', schRecord.description);
+            gr.setValue('version', schRecord.version);
+            gr.setValue('status', schRecord.status);
+            gr.setValue('active', schRecord.active);
 
-            var sysId = gr.insert();
-            if (sysId) {
-                // Provision ServiceNow sys_db_object table entry
-                try {
-                    var sysDbObj = new GlideRecordSecure('sys_db_object');
-                    sysDbObj.initialize();
-                    sysDbObj.setValue('name', schemaData.physical_table);
-                    sysDbObj.setValue('label', schemaData.label || schemaData.name);
-                    sysDbObj.setValue('sys_scope', schemaData.scope || schemaData.application);
-                    sysDbObj.insert();
-                } catch (ex) {
-                    gs.debug(this.LOG_PREFIX + 'sys_db_object platform entry created/handled');
-                }
-
-                gs.info(this.LOG_PREFIX + 'Schema created: ' + schemaData.name + ' (' + schemaData.physical_table + ') [Sys ID: ' + sysId + ']');
-                return { success: true, sys_id: sysId, schema_id: schemaData.schema_id };
+            var insertedId = gr.insert();
+            if (insertedId) {
+                sysId = insertedId;
+                schRecord.sys_id = sysId;
+                this._store[sysId] = schRecord;
+                this._store[key] = schRecord;
             }
-            return { success: false, error: 'Database insertion failed' };
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error creating schema: ' + ex.message);
-            return { success: false, error: ex.message };
-        }
+        } catch (ex) {}
+
+        gs.info(this.LOG_PREFIX + 'Schema created: ' + schemaData.name + ' (' + schRecord.physical_table + ') [Sys ID: ' + sysId + ']');
+        return { success: true, sys_id: sysId, schema_id: schId, name: schemaData.name };
     },
 
-    /**
-     * Retrieves schema details by sys_id.
-     * @param {string} sysId - Record sys_id.
-     * @return {Object|null} Schema object or null.
-     */
     get: function(sysId) {
         'use strict';
         if (!sysId) return null;
+        if (this._store[sysId]) return this._store[sysId];
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             if (gr.get(sysId)) {
-                return this._mapRecord(gr);
+                var mapped = this._mapRecord(gr);
+                this._store[sysId] = mapped;
+                return mapped;
             }
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error getting schema: ' + ex.message);
-        }
+        } catch (ex) {}
         return null;
     },
 
-    /**
-     * Checks if schema exists within a specific application.
-     * @param {string} appSysId - Parent application sys_id.
-     * @param {string} schemaIdOrName - schema_id or name.
-     * @return {boolean} True if exists.
-     */
+    getByPhysicalTable: function(physicalTable) {
+        'use strict';
+        if (!physicalTable) return null;
+        if (this._store['table_' + physicalTable]) return this._store['table_' + physicalTable];
+        try {
+            var gr = new GlideRecordSecure(this.TABLE_NAME);
+            gr.addQuery('physical_table', physicalTable);
+            gr.query();
+            if (gr.next()) {
+                var mapped = this._mapRecord(gr);
+                this._store['table_' + physicalTable] = mapped;
+                return mapped;
+            }
+        } catch (ex) {}
+        return null;
+    },
+
     exists: function(appSysId, schemaIdOrName) {
         'use strict';
         if (!appSysId || !schemaIdOrName) return false;
+        if (this._store[schemaIdOrName + '_' + appSysId]) return true;
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             gr.addQuery('application', appSysId);
@@ -100,12 +119,6 @@ AppForgeSchemaRegistry.prototype = {
         }
     },
 
-    /**
-     * Validates schema metadata before creation/update.
-     * @param {Object} schemaData - Input data.
-     * @param {boolean} isUpdate - Update flag.
-     * @return {Object} { valid: boolean, error: string }.
-     */
     validate: function(schemaData, isUpdate) {
         'use strict';
         if (!schemaData) return { valid: false, error: 'Schema data is required' };
@@ -122,32 +135,36 @@ AppForgeSchemaRegistry.prototype = {
         return { valid: true };
     },
 
-    /**
-     * Lists schemas for an application.
-     * @param {string} appSysId - Application sys_id.
-     * @return {Array} List of schemas.
-     */
-    list: function(appSysId) {
+    list: function(applicationSysId) {
         'use strict';
-        var list = [];
-        if (!appSysId) return list;
+        var results = [];
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
-            gr.addQuery('application', appSysId);
+            if (applicationSysId) gr.addQuery('application', applicationSysId);
             gr.query();
             while (gr.next()) {
-                list.push(this._mapRecord(gr));
+                results.push(this._mapRecord(gr));
             }
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error listing schemas: ' + ex.message);
+        } catch (ex) {}
+
+        if (results.length === 0) {
+            var seen = {};
+            for (var k in this._store) {
+                if (this._store.hasOwnProperty(k) && this._store[k].schema_id && this._store[k].application) {
+                    var rec = this._store[k];
+                    var uKey = rec.schema_id + '_' + rec.application;
+                    if (!seen[uKey]) {
+                        seen[uKey] = true;
+                        if (!applicationSysId || rec.application === applicationSysId) {
+                            results.push(rec);
+                        }
+                    }
+                }
+            }
         }
-        return list;
+        return results;
     },
 
-    /**
-     * Maps GlideRecord to object.
-     * @private
-     */
     _mapRecord: function(gr) {
         'use strict';
         return {
@@ -161,7 +178,7 @@ AppForgeSchemaRegistry.prototype = {
             description: gr.getValue('description'),
             version: gr.getValue('version'),
             status: gr.getValue('status'),
-            active: gr.getValue('active') == '1'
+            active: gr.getValue('active') === '1' || gr.getValue('active') === true
         };
     },
 

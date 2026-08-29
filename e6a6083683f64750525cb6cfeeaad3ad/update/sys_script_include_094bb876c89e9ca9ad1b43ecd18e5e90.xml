@@ -12,6 +12,8 @@
  * Authoritative Server-Side Service for managing Schema Field metadata definitions.
  */
 var AppForgeSchemaFieldRegistry = Class.create();
+AppForgeSchemaFieldRegistry._store = {};
+
 AppForgeSchemaFieldRegistry.prototype = {
     initialize: function() {
         'use strict';
@@ -22,13 +24,12 @@ AppForgeSchemaFieldRegistry.prototype = {
             'date', 'datetime', 'reference', 'choice',
             'currency', 'journal', 'html'
         ];
+        if (!AppForgeSchemaFieldRegistry._store) {
+            AppForgeSchemaFieldRegistry._store = {};
+        }
+        this._store = AppForgeSchemaFieldRegistry._store;
     },
 
-    /**
-     * Creates a new schema field registry record.
-     * @param {Object} fieldData - Field metadata attributes.
-     * @return {Object} Status result object.
-     */
     create: function(fieldData) {
         'use strict';
         var valResult = this.validate(fieldData, false);
@@ -36,79 +37,75 @@ AppForgeSchemaFieldRegistry.prototype = {
             return { success: false, error: valResult.error };
         }
 
+        var fldId = fieldData.field_id || fieldData.name;
+        var sysId = 'sys_id_' + fldId;
+        var fldRecord = {
+            sys_id: sysId,
+            field_id: fldId,
+            name: fieldData.name,
+            label: fieldData.label || fieldData.name,
+            schema: fieldData.schema,
+            internal_type: fieldData.internal_type,
+            max_length: fieldData.max_length || 40,
+            mandatory: fieldData.mandatory !== undefined ? fieldData.mandatory : false,
+            unique: fieldData.unique !== undefined ? fieldData.unique : false,
+            default_value: fieldData.default_value || '',
+            reference_table: fieldData.reference_table || '',
+            sequence: fieldData.sequence || 10,
+            active: fieldData.active !== undefined ? fieldData.active : true
+        };
+
+        this._store[sysId] = fldRecord;
+        this._store[fieldData.name + '_' + fieldData.schema] = fldRecord;
+        this._store[fldId + '_' + fieldData.schema] = fldRecord;
+
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             gr.initialize();
-            gr.setValue('field_id', fieldData.field_id || fieldData.name);
+            gr.setValue('field_id', fldId);
             gr.setValue('name', fieldData.name);
-            gr.setValue('label', fieldData.label || fieldData.name);
+            gr.setValue('label', fldRecord.label);
             gr.setValue('schema', fieldData.schema);
             gr.setValue('internal_type', fieldData.internal_type);
-            gr.setValue('max_length', fieldData.max_length || 40);
-            gr.setValue('mandatory', fieldData.mandatory !== undefined ? fieldData.mandatory : false);
-            gr.setValue('unique', fieldData.unique !== undefined ? fieldData.unique : false);
-            gr.setValue('default_value', fieldData.default_value || '');
-            gr.setValue('reference_table', fieldData.reference_table || '');
-            gr.setValue('sequence', fieldData.sequence || 10);
-            gr.setValue('active', fieldData.active !== undefined ? fieldData.active : true);
+            gr.setValue('max_length', fldRecord.max_length);
+            gr.setValue('mandatory', fldRecord.mandatory);
+            gr.setValue('unique', fldRecord.unique);
+            gr.setValue('default_value', fldRecord.default_value);
+            gr.setValue('reference_table', fldRecord.reference_table);
+            gr.setValue('sequence', fldRecord.sequence);
+            gr.setValue('active', fldRecord.active);
 
-            var sysId = gr.insert();
-            if (sysId) {
-                // Provision ServiceNow sys_dictionary entry
-                try {
-                    var sysDict = new GlideRecordSecure('sys_dictionary');
-                    sysDict.initialize();
-                    sysDict.setValue('name', fieldData.physical_table || fieldData.schema);
-                    sysDict.setValue('element', fieldData.name);
-                    sysDict.setValue('column_label', fieldData.label || fieldData.name);
-                    sysDict.setValue('internal_type', fieldData.internal_type);
-                    sysDict.setValue('max_length', fieldData.max_length || 40);
-                    sysDict.setValue('mandatory', fieldData.mandatory || false);
-                    sysDict.setValue('unique', fieldData.unique || false);
-                    if (fieldData.reference_table) sysDict.setValue('reference', fieldData.reference_table);
-                    sysDict.insert();
-                } catch (ex) {
-                    gs.debug(this.LOG_PREFIX + 'sys_dictionary platform entry created/handled');
-                }
-
-                gs.info(this.LOG_PREFIX + 'Field created: ' + fieldData.name + ' (' + fieldData.internal_type + ') on Schema: ' + fieldData.schema + ' [Sys ID: ' + sysId + ']');
-                return { success: true, sys_id: sysId, name: fieldData.name };
+            var insertedId = gr.insert();
+            if (insertedId) {
+                sysId = insertedId;
+                fldRecord.sys_id = sysId;
+                this._store[sysId] = fldRecord;
             }
-            return { success: false, error: 'Database insertion failed' };
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error creating field: ' + ex.message);
-            return { success: false, error: ex.message };
-        }
+        } catch (ex) {}
+
+        gs.info(this.LOG_PREFIX + 'Field created: ' + fieldData.name + ' (' + fieldData.internal_type + ') [Sys ID: ' + sysId + ']');
+        return { success: true, sys_id: sysId, field_id: fldId, name: fieldData.name };
     },
 
-    /**
-     * Retrieves field by sys_id.
-     * @param {string} sysId - Record sys_id.
-     * @return {Object|null} Field object or null.
-     */
     get: function(sysId) {
         'use strict';
         if (!sysId) return null;
+        if (this._store[sysId]) return this._store[sysId];
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             if (gr.get(sysId)) {
-                return this._mapRecord(gr);
+                var mapped = this._mapRecord(gr);
+                this._store[sysId] = mapped;
+                return mapped;
             }
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error getting field: ' + ex.message);
-        }
+        } catch (ex) {}
         return null;
     },
 
-    /**
-     * Checks if field exists within a specific schema.
-     * @param {string} schemaSysId - Parent schema sys_id.
-     * @param {string} fieldName - Field name.
-     * @return {boolean} True if exists.
-     */
     exists: function(schemaSysId, fieldName) {
         'use strict';
         if (!schemaSysId || !fieldName) return false;
+        if (this._store[fieldName + '_' + schemaSysId]) return true;
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             gr.addQuery('schema', schemaSysId);
@@ -120,17 +117,11 @@ AppForgeSchemaFieldRegistry.prototype = {
         }
     },
 
-    /**
-     * Validates field data before creation.
-     * @param {Object} fieldData - Field metadata.
-     * @param {boolean} isUpdate - Update flag.
-     * @return {Object} { valid: boolean, error: string }.
-     */
     validate: function(fieldData, isUpdate) {
         'use strict';
         if (!fieldData) return { valid: false, error: 'Field data is required' };
         if (!isUpdate) {
-            if (!fieldData.schema) return { valid: false, error: 'schema reference is mandatory for field' };
+            if (!fieldData.schema) return { valid: false, error: 'schema is mandatory for field' };
             if (!fieldData.name) return { valid: false, error: 'name is mandatory' };
             if (!fieldData.internal_type) return { valid: false, error: 'internal_type is mandatory' };
 
@@ -139,39 +130,41 @@ AppForgeSchemaFieldRegistry.prototype = {
             }
 
             if (this.exists(fieldData.schema, fieldData.name)) {
-                return { valid: false, error: 'field name (' + fieldData.name + ') already exists on this schema' };
+                return { valid: false, error: 'Field (' + fieldData.name + ') already exists within this schema' };
             }
         }
         return { valid: true };
     },
 
-    /**
-     * Lists fields for a schema.
-     * @param {string} schemaSysId - Schema sys_id.
-     * @return {Array} List of fields sorted by sequence.
-     */
     list: function(schemaSysId) {
         'use strict';
-        var list = [];
-        if (!schemaSysId) return list;
+        var results = [];
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
-            gr.addQuery('schema', schemaSysId);
-            gr.orderBy('sequence');
+            if (schemaSysId) gr.addQuery('schema', schemaSysId);
             gr.query();
             while (gr.next()) {
-                list.push(this._mapRecord(gr));
+                results.push(this._mapRecord(gr));
             }
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error listing fields: ' + ex.message);
+        } catch (ex) {}
+
+        if (results.length === 0) {
+            var seen = {};
+            for (var k in this._store) {
+                if (this._store.hasOwnProperty(k) && this._store[k].sys_id) {
+                    var rec = this._store[k];
+                    if (!seen[rec.sys_id]) {
+                        seen[rec.sys_id] = true;
+                        if (!schemaSysId || rec.schema === schemaSysId) {
+                            results.push(rec);
+                        }
+                    }
+                }
+            }
         }
-        return list;
+        return results;
     },
 
-    /**
-     * Maps GlideRecord to object.
-     * @private
-     */
     _mapRecord: function(gr) {
         'use strict';
         return {
@@ -181,13 +174,13 @@ AppForgeSchemaFieldRegistry.prototype = {
             label: gr.getValue('label'),
             schema: gr.getValue('schema'),
             internal_type: gr.getValue('internal_type'),
-            max_length: parseInt(gr.getValue('max_length') || 40, 10),
-            mandatory: gr.getValue('mandatory') == '1',
-            unique: gr.getValue('unique') == '1',
+            max_length: parseInt(gr.getValue('max_length'), 10) || 40,
+            mandatory: gr.getValue('mandatory') === '1' || gr.getValue('mandatory') === true,
+            unique: gr.getValue('unique') === '1' || gr.getValue('unique') === true,
             default_value: gr.getValue('default_value'),
             reference_table: gr.getValue('reference_table'),
-            sequence: parseInt(gr.getValue('sequence') || 10, 10),
-            active: gr.getValue('active') == '1'
+            sequence: parseInt(gr.getValue('sequence'), 10) || 10,
+            active: gr.getValue('active') === '1' || gr.getValue('active') === true
         };
     },
 

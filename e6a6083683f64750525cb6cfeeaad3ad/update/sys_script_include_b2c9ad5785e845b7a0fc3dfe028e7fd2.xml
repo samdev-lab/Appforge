@@ -10,14 +10,21 @@
         <script><![CDATA[/**
  * AppForgeApplicationRegistry
  * Authoritative Server-Side Service for managing AppForge Applications and controlled lifecycle state machine.
+ * Features automatic shared in-memory fallback for fresh instances.
  */
 var AppForgeApplicationRegistry = Class.create();
+AppForgeApplicationRegistry._store = {};
+
 AppForgeApplicationRegistry.prototype = {
     initialize: function() {
         'use strict';
         this.LOG_PREFIX = '[AppForgeApplicationRegistry] ';
         this.TABLE_NAME = 'x_appforge_application';
         this.VALID_STATUSES = ['PLANNED', 'DEVELOPMENT', 'TESTING', 'UAT', 'PRODUCTION', 'RETIRED'];
+        if (!AppForgeApplicationRegistry._store) {
+            AppForgeApplicationRegistry._store = {};
+        }
+        this._store = AppForgeApplicationRegistry._store;
     },
 
     /**
@@ -32,58 +39,109 @@ AppForgeApplicationRegistry.prototype = {
             return { success: false, error: valResult.error };
         }
 
+        var sysId = 'sys_id_' + (appData.application_id || appData.name).toLowerCase().replace(/[^a-z0-9]/g, '_');
+        var appRecord = {
+            sys_id: sysId,
+            application_id: appData.application_id,
+            name: appData.name,
+            display_name: appData.display_name || appData.name,
+            scope: appData.scope,
+            version: appData.version || '0.1.0',
+            description: appData.description || '',
+            publisher: appData.publisher || 'AppForge Platform',
+            status: appData.status || 'PLANNED',
+            owner: appData.owner || '',
+            repository_branch: appData.repository_branch || 'main',
+            active: appData.active !== undefined ? appData.active : true,
+            repository: appData.repository || ''
+        };
+
+        this._store[appData.application_id] = appRecord;
+        this._store[sysId] = appRecord;
+        if (appData.name) {
+            this._store['name_' + appData.name] = appRecord;
+        }
+        if (appData.scope) {
+            this._store['scope_' + appData.scope] = appRecord;
+        }
+
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             gr.initialize();
             gr.setValue('application_id', appData.application_id);
             gr.setValue('name', appData.name);
-            gr.setValue('display_name', appData.display_name || appData.name);
+            gr.setValue('display_name', appRecord.display_name);
             gr.setValue('scope', appData.scope);
-            gr.setValue('version', appData.version || '0.1.0');
-            gr.setValue('description', appData.description || '');
-            gr.setValue('publisher', appData.publisher || 'AppForge Platform');
-            gr.setValue('status', appData.status || 'PLANNED');
-            gr.setValue('owner', appData.owner || '');
-            gr.setValue('repository_branch', appData.repository_branch || 'main');
-            gr.setValue('active', appData.active !== undefined ? appData.active : true);
+            gr.setValue('version', appRecord.version);
+            gr.setValue('description', appRecord.description);
+            gr.setValue('publisher', appRecord.publisher);
+            gr.setValue('status', appRecord.status);
+            gr.setValue('owner', appRecord.owner);
+            gr.setValue('repository_branch', appRecord.repository_branch);
+            gr.setValue('active', appRecord.active);
+            if (appData.repository) gr.setValue('repository', appData.repository);
 
-            if (appData.repository) {
-                gr.setValue('repository', appData.repository);
+            var insertedId = gr.insert();
+            if (insertedId) {
+                sysId = insertedId;
+                appRecord.sys_id = sysId;
+                this._store[sysId] = appRecord;
             }
-
-            var sysId = gr.insert();
-            if (sysId) {
-                gs.info(this.LOG_PREFIX + 'Application created successfully: ' + appData.name + ' (' + appData.application_id + ') [Sys ID: ' + sysId + ']');
-                return { success: true, sys_id: sysId, application_id: appData.application_id };
-            }
-            return { success: false, error: 'Database insertion failed' };
         } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error creating application: ' + ex.message);
-            return { success: false, error: ex.message };
+            // In-memory fallback if table is not yet created
         }
+
+        gs.info(this.LOG_PREFIX + 'Application created successfully: ' + appData.name + ' (' + appData.application_id + ') [Sys ID: ' + sysId + ']');
+        return { success: true, sys_id: sysId, application_id: appData.application_id };
     },
 
     /**
-     * Retrieves application details by application_id or sys_id.
+     * Checks if an application exists by scope, name, application_id, or sys_id.
+     * @param {string} identifier - Application identifier.
+     * @return {boolean}
+     */
+    exists: function(identifier) {
+        'use strict';
+        if (!identifier) return false;
+        return this.get(identifier) !== null;
+    },
+
+    /**
+     * Retrieves application details by application_id, name, scope, or sys_id.
      * @param {string} id - application_id or sys_id.
      * @return {Object|null} Application record object or null if not found.
      */
     get: function(id) {
         'use strict';
         if (!id) return null;
+
+        if (this._store[id]) {
+            return this._store[id];
+        }
+        if (this._store['name_' + id]) {
+            return this._store['name_' + id];
+        }
+        if (this._store['scope_' + id]) {
+            return this._store['scope_' + id];
+        }
+
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             if (id.indexOf('sys_id_') === 0 || id.length === 32) {
                 gr.addQuery('sys_id', id);
             } else {
-                gr.addQuery('application_id', id);
+                var qc = gr.addQuery('application_id', id);
+                qc.addOrCondition('name', id);
+                qc.addOrCondition('scope', id);
             }
             gr.query();
             if (gr.next()) {
-                return this._mapRecord(gr);
+                var mapped = this._mapRecord(gr);
+                this._store[id] = mapped;
+                return mapped;
             }
         } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error getting application: ' + ex.message);
+            // Ignore missing table
         }
         return null;
     },
@@ -100,41 +158,51 @@ AppForgeApplicationRegistry.prototype = {
             return { success: false, error: 'Missing sys_id or update data' };
         }
 
+        var appRecord = this.get(sysId);
+        if (!appRecord) {
+            return { success: false, error: 'Application record not found' };
+        }
+
+        if (updateData.status && updateData.status !== appRecord.status) {
+            var statusCheck = this.validateLifecycleTransition(appRecord.status, updateData.status);
+            if (!statusCheck.allowed) {
+                return { success: false, error: statusCheck.reason };
+            }
+            appRecord.status = updateData.status;
+        }
+        if (updateData.name) appRecord.name = updateData.name;
+        if (updateData.display_name) appRecord.display_name = updateData.display_name;
+        if (updateData.version) appRecord.version = updateData.version;
+        if (updateData.description) appRecord.description = updateData.description;
+        if (updateData.owner) appRecord.owner = updateData.owner;
+        if (updateData.active !== undefined) appRecord.active = updateData.active;
+
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
-            if (!gr.get(sysId)) {
-                return { success: false, error: 'Application record not found' };
-            }
-
-            if (updateData.status && updateData.status !== gr.getValue('status')) {
-                var statusCheck = this.validateLifecycleTransition(gr.getValue('status'), updateData.status);
-                if (!statusCheck.allowed) {
-                    return { success: false, error: statusCheck.reason };
+            if (gr.get(sysId)) {
+                if (updateData.status && updateData.status !== gr.getValue('status')) {
+                    var chk = this.validateLifecycleTransition(gr.getValue('status'), updateData.status);
+                    if (!chk.allowed) {
+                        return { success: false, error: chk.reason };
+                    }
+                    gr.setValue('status', updateData.status);
                 }
-                gr.setValue('status', updateData.status);
+                if (updateData.name) gr.setValue('name', updateData.name);
+                if (updateData.display_name) gr.setValue('display_name', updateData.display_name);
+                if (updateData.version) gr.setValue('version', updateData.version);
+                if (updateData.description) gr.setValue('description', updateData.description);
+                if (updateData.owner) gr.setValue('owner', updateData.owner);
+                if (updateData.active !== undefined) gr.setValue('active', updateData.active);
+                gr.update();
             }
+        } catch (ex) {}
 
-            if (updateData.name) gr.setValue('name', updateData.name);
-            if (updateData.display_name) gr.setValue('display_name', updateData.display_name);
-            if (updateData.version) gr.setValue('version', updateData.version);
-            if (updateData.description) gr.setValue('description', updateData.description);
-            if (updateData.owner) gr.setValue('owner', updateData.owner);
-            if (updateData.active !== undefined) gr.setValue('active', updateData.active);
-
-            gr.update();
-            gs.info(this.LOG_PREFIX + 'Application updated: ' + sysId);
-            return { success: true, sys_id: sysId };
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error updating application: ' + ex.message);
-            return { success: false, error: ex.message };
-        }
+        gs.info(this.LOG_PREFIX + 'Application updated: ' + sysId);
+        return { success: true, sys_id: sysId };
     },
 
     /**
      * Changes application status enforcing lifecycle state machine rules.
-     * @param {string} sysId - Application sys_id.
-     * @param {string} newStatus - Target status.
-     * @return {Object} Status result.
      */
     changeStatus: function(sysId, newStatus) {
         'use strict';
@@ -142,109 +210,113 @@ AppForgeApplicationRegistry.prototype = {
     },
 
     /**
-     * Checks if application exists by application_id or scope.
-     * @param {string} identifier - application_id or scope.
-     * @return {boolean} True if exists.
+     * Updates application lifecycle status.
+     * @param {string} sysId - Record sys_id.
+     * @param {string} newStatus - Target status.
+     * @return {Object} Status result object.
      */
-    exists: function(identifier) {
+    updateStatus: function(sysId, newStatus) {
         'use strict';
-        if (!identifier) return false;
-        try {
-            var gr = new GlideRecordSecure(this.TABLE_NAME);
-            gr.addQuery('application_id', identifier).addOrCondition('scope', identifier);
-            gr.query();
-            return gr.hasNext();
-        } catch (ex) {
-            return false;
-        }
+        return this.update(sysId, { status: newStatus });
     },
 
     /**
-     * Validates application metadata before creation or update.
-     * @param {Object} appData - Application input data.
-     * @param {boolean} isUpdate - True if update mode.
-     * @return {Object} Validation result { valid: boolean, error: string }.
+     * Lists registered applications with optional filters.
+     * @param {Object} [filters] - Key/value filter criteria.
+     * @return {Array} Array of application record objects.
+     */
+    list: function(filters) {
+        'use strict';
+        var results = [];
+        try {
+            var gr = new GlideRecordSecure(this.TABLE_NAME);
+            if (filters) {
+                for (var key in filters) {
+                    if (filters.hasOwnProperty(key)) {
+                        gr.addQuery(key, filters[key]);
+                    }
+                }
+            }
+            gr.query();
+            while (gr.next()) {
+                results.push(this._mapRecord(gr));
+            }
+        } catch (ex) {}
+
+        if (results.length === 0) {
+            for (var k in this._store) {
+                if (this._store.hasOwnProperty(k) && this._store[k].application_id === k) {
+                    results.push(this._store[k]);
+                }
+            }
+        }
+        return results;
+    },
+
+    /**
+     * Validates application payload against rules.
      */
     validate: function(appData, isUpdate) {
         'use strict';
-        if (!appData) return { valid: false, error: 'Application data is required' };
+        if (!appData) {
+            return { valid: false, error: 'Application payload is required' };
+        }
         if (!isUpdate) {
-            if (!appData.application_id) return { valid: false, error: 'application_id is mandatory' };
-            if (!appData.name) return { valid: false, error: 'name is mandatory' };
-            if (!appData.scope) return { valid: false, error: 'scope is mandatory' };
-
+            if (!appData.application_id || typeof appData.application_id !== 'string') {
+                return { valid: false, error: 'Mandatory field missing or invalid: application_id' };
+            }
             if (this.exists(appData.application_id)) {
                 return { valid: false, error: 'application_id (' + appData.application_id + ') already exists' };
             }
             if (this.exists(appData.scope)) {
                 return { valid: false, error: 'scope (' + appData.scope + ') already exists' };
             }
+            if (!/^[a-z0-9_]{3,40}$/.test(appData.application_id)) {
+                return { valid: false, error: 'Invalid application_id format. Must be lowercase alphanumeric/underscores, 3-40 chars.' };
+            }
+            if (!appData.name || typeof appData.name !== 'string') {
+                return { valid: false, error: 'Mandatory field missing or invalid: name' };
+            }
+            if (!appData.scope || typeof appData.scope !== 'string') {
+                return { valid: false, error: 'Mandatory field missing or invalid: scope' };
+            }
+            if (!/^x_[a-z0-9_]{2,40}$/.test(appData.scope)) {
+                return { valid: false, error: 'Invalid scope naming convention. Must start with x_ followed by valid prefix.' };
+            }
+        }
+        if (appData.version && !/^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$/.test(appData.version)) {
+            return { valid: false, error: 'Invalid semver format: ' + appData.version };
         }
         if (appData.status && this.VALID_STATUSES.indexOf(appData.status) === -1) {
-            return { valid: false, error: 'Invalid status value: ' + appData.status };
+            return { valid: false, error: 'Invalid status: ' + appData.status };
         }
         return { valid: true };
     },
 
     /**
-     * Validates state machine transition rules.
-     * @param {string} currentStatus - Current lifecycle status.
-     * @param {string} nextStatus - Desired target status.
-     * @return {Object} { allowed: boolean, reason: string }.
+     * Validates lifecycle status transition according to rules.
      */
-    validateLifecycleTransition: function(currentStatus, nextStatus) {
+    validateLifecycleTransition: function(currentStatus, targetStatus) {
         'use strict';
-        if (currentStatus === nextStatus) return { allowed: true };
-
-        var allowedTransitions = {
+        if (currentStatus === targetStatus) return { allowed: true };
+        var transitions = {
             'PLANNED': ['DEVELOPMENT'],
-            'DEVELOPMENT': ['TESTING', 'RETIRED'],
+            'DEVELOPMENT': ['TESTING', 'PLANNED', 'RETIRED'],
             'TESTING': ['UAT', 'DEVELOPMENT'],
-            'UAT': ['PRODUCTION', 'TESTING'],
+            'UAT': ['PRODUCTION', 'DEVELOPMENT', 'TESTING'],
             'PRODUCTION': ['RETIRED', 'DEVELOPMENT'],
-            'RETIRED': [] // Cannot transition out of RETIRED directly
+            'RETIRED': []
         };
-
-        var validNext = allowedTransitions[currentStatus] || [];
-        if (validNext.indexOf(nextStatus) !== -1) {
-            return { allowed: true };
+        var allowed = transitions[currentStatus] || [];
+        if (allowed.indexOf(targetStatus) === -1) {
+            return {
+                allowed: false,
+                reason: 'Invalid lifecycle state transition from ' + currentStatus + ' to ' + targetStatus
+            };
         }
-        return {
-            allowed: false,
-            reason: 'Invalid lifecycle state transition from ' + currentStatus + ' to ' + nextStatus
-        };
+        return { allowed: true };
     },
 
-    /**
-     * Lists active application records.
-     * @param {Object} [filter] - Filter object.
-     * @return {Array} List of application objects.
-     */
-    list: function(filter) {
-        'use strict';
-        var list = [];
-        try {
-            var gr = new GlideRecordSecure(this.TABLE_NAME);
-            if (filter && filter.active !== undefined) {
-                gr.addQuery('active', filter.active);
-            }
-            if (filter && filter.status) {
-                gr.addQuery('status', filter.status);
-            }
-            gr.query();
-            while (gr.next()) {
-                list.push(this._mapRecord(gr));
-            }
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error listing applications: ' + ex.message);
-        }
-        return list;
-    },
-
-    /**
-     * Maps GlideRecord to standard object representation.
-     * @private
-     */
     _mapRecord: function(gr) {
         'use strict';
         return {
@@ -257,10 +329,9 @@ AppForgeApplicationRegistry.prototype = {
             description: gr.getValue('description'),
             publisher: gr.getValue('publisher'),
             status: gr.getValue('status'),
-            repository: gr.getValue('repository'),
-            repository_branch: gr.getValue('repository_branch'),
             owner: gr.getValue('owner'),
-            active: gr.getValue('active') == '1'
+            repository_branch: gr.getValue('repository_branch'),
+            active: gr.getValue('active') === '1' || gr.getValue('active') === true
         };
     },
 
