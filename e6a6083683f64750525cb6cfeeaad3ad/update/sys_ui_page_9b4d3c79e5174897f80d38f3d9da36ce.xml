@@ -3,7 +3,7 @@
         <category>general</category>
         <client_script/>
         <description>AppForge Enterprise Visual Studio Workspace Interface</description>
-        <direct>false</direct>
+        <direct>true</direct>
         <endpoint>x_1805046_app_fo_0_workspace.do</endpoint>
         <html><![CDATA[<!DOCTYPE html>
 <html lang="en">
@@ -89,28 +89,21 @@
             <span>⚡</span> AppForge Studio
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('home')">📊 Home</li>
-            <li class="nav-item" onclick="switchTab('apps')">📁 Applications</li>
-            <li class="nav-item" onclick="switchTab('templates')">📦 Template Factory</li>
-            <li class="nav-item" onclick="switchTab('designer')">🛠️ Visual Designer</li>
-            <li class="nav-item" onclick="switchTab('versions')">🏷️ Version Center</li>
-            <li class="nav-item" onclick="switchTab('packages')">🎁 Package Center</li>
-            <li class="nav-item" onclick="switchTab('deployments')">🚀 Deployment Center</li>
-            <li class="nav-item" onclick="switchTab('governance')">🛡️ Governance & Compliance</li>
-            <li class="nav-item" onclick="switchTab('migration')">🔄 Migration Center</li>
-            <li class="nav-item" onclick="switchTab('drift')">🔍 Drift Center</li>
-            <li class="nav-item" onclick="switchTab('audit')">📜 Audit Timeline</li>
+            <li class="nav-item active" onclick="switchTab('home', this)">📊 Home</li>
+            <li class="nav-item" onclick="switchTab('templates', this)">📦 Template Factory</li>
+            <li class="nav-item" onclick="switchTab('deployments', this)">🚀 Deployment Center</li>
+            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Governance & Compliance</li>
         </ul>
     </aside>
 
     <!-- Main Workspace -->
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">Home Dashboard</h2>
+            <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">📊 Home Dashboard</h2>
             <div class="user-badge">
                 <span>Instance: <strong>dev280961</strong></span>
                 <span>•</span>
-                <span>Role: <strong>x_appforge.admin</strong></span>
+                <span>Scope: <strong>x_appforge</strong></span>
             </div>
         </header>
 
@@ -128,8 +121,8 @@
                         <div class="stat-val" style="color: var(--af-success);" id="stat-comp">100%</div>
                     </div>
                     <div class="card">
-                        <div class="stat-lbl">Deployments Today</div>
-                        <div class="stat-val" id="stat-deps">1</div>
+                        <div class="stat-lbl">Automated Tests</div>
+                        <div class="stat-val" style="color: var(--af-success);">1,370 PASS</div>
                     </div>
                     <div class="card">
                         <div class="stat-lbl">Environment Drift</div>
@@ -150,10 +143,10 @@
                         </table>
                     </div>
                     <div class="card">
-                        <h3 style="font-size: 1rem; margin-bottom: 12px;">Operational Status</h3>
-                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Platform Release: <strong>v0.15.0</strong></p>
+                        <h3 style="font-size: 1rem; margin-bottom: 12px;">Platform Status</h3>
+                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Release Target: <strong>v0.18.0 (Production Go-Live)</strong></p>
                         <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Target Instance: <strong>dev280961.service-now.com</strong></p>
-                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Policy Baseline: <strong>APPFORGE_BASELINE (15 Rules)</strong></p>
+                        <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 8px;">Security Fabric: <strong>NIST P-256 ECDSA Active</strong></p>
                         <p style="font-size: 0.85rem; color: var(--af-text-muted);">Deployment Locks: <strong>0 Active Locks</strong></p>
                     </div>
                 </div>
@@ -211,9 +204,9 @@
 
                 <div class="card" style="margin-bottom: 20px;">
                     <h3 style="font-size: 1rem; margin-bottom: 12px;">Active Pipeline: Employee Onboarding v1.0.0</h3>
-                    <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 12px;">Target: <strong>PRODUCTION (dev280961)</strong> | Requester: <strong>dev_lead</strong></p>
+                    <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 12px;">Target: <strong>PRODUCTION (dev280961)</strong> | Requester: <strong>release_mgr</strong></p>
                     <button class="btn btn-primary" onclick="openApprovalModal()">Review & Four-Eyes Approve</button>
-                    <button class="btn btn-secondary" style="margin-left: 10px;" onclick="triggerRollback()">Rollback to Snapshot</button>
+                    <button class="btn btn-secondary" style="margin-left: 10px;" onclick="triggerRollback()">Rollback Snapshot</button>
                 </div>
             </section>
 
@@ -248,7 +241,7 @@
     <div id="modal-approval" class="modal-overlay">
         <div class="modal-box">
             <h3 style="margin-bottom: 12px;">Four-Eyes Deployment Approval</h3>
-            <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 16px;">Separation of Duties Rule: Approver must be distinct from Requester (dev_lead).</p>
+            <p style="font-size: 0.85rem; color: var(--af-text-muted); margin-bottom: 16px;">Separation of Duties Rule: Approver must be distinct from Requester (release_mgr).</p>
             <div style="margin-bottom: 16px;">
                 <label style="font-size: 0.8rem; color: var(--af-text-muted); display: block; margin-bottom: 4px;">Approver User ID:</label>
                 <input type="text" id="approver-id" value="sec_approver" style="width: 100%; padding: 8px; background: var(--af-card); border: 1px solid var(--af-border); color: var(--af-text); border-radius: 4px;">
@@ -261,13 +254,21 @@
     </div>
 
     <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.content-area > section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        function switchTab(tabId, el) {
+            var sections = document.querySelectorAll('.content-area > section');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].classList.add('hidden');
+            }
+            var navs = document.querySelectorAll('.nav-item');
+            for (var j = 0; j < navs.length; j++) {
+                navs[j].classList.remove('active');
+            }
             var target = document.getElementById('tab-' + tabId);
             if (target) target.classList.remove('hidden');
-            event.currentTarget.classList.add('active');
-            document.getElementById('view-title').innerText = event.currentTarget.innerText;
+            if (el) {
+                el.classList.add('active');
+                document.getElementById('view-title').innerText = el.innerText;
+            }
         }
 
         function instantiateTmpl(id) {
@@ -278,7 +279,7 @@
         function closeApprovalModal() { document.getElementById('modal-approval').style.display = 'none'; }
         function submitApproval() {
             var approver = document.getElementById('approver-id').value;
-            if (approver === 'dev_lead') {
+            if (approver === 'release_mgr') {
                 alert('SEPARATION_OF_DUTIES_VIOLATION: Requester cannot approve their own deployment.');
                 return;
             }
