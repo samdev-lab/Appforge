@@ -10,10 +10,10 @@
         <image/>
         <link_type>DIRECT</link_type>
         <map_page/>
-        <mobile_title>⚡ AppForge Studio Workspace</mobile_title>
+        <mobile_title>🤖 AI Catalog Architect</mobile_title>
         <mobile_view_name>Mobile</mobile_view_name>
         <name></name>
-        <order>10</order>
+        <order>20</order>
         <override_menu_roles>false</override_menu_roles>
         <query/>
         <report/>
@@ -23,17 +23,17 @@
         <sys_created_on>2026-08-22 19:37:23</sys_created_on>
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
-        <sys_id>bff18021a92fe063eabacdf95e21d5e7</sys_id>
+        <sys_id>4c71825d4fc6002bb247cb1551c78d29</sys_id>
         <sys_mod_count>0</sys_mod_count>
-        <sys_name>⚡ AppForge Studio Workspace</sys_name>
+        <sys_name>🤖 AI Catalog Architect</sys_name>
         <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
         <sys_policy/>
         <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_app_module_bff18021a92fe063eabacdf95e21d5e7</sys_update_name>
+        <sys_update_name>sys_app_module_4c71825d4fc6002bb247cb1551c78d29</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
         <timeline_page/>
-        <title>⚡ AppForge Studio Workspace</title>
+        <title>🤖 AI Catalog Architect</title>
         <uncancelable>false</uncancelable>
         <uri_script>x_1805046_app_fo_0_workspace.do</uri_script>
         <view_name/>

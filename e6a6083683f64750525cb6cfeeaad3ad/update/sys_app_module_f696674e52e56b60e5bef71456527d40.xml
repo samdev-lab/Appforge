@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
     <sys_app_module action="INSERT_OR_UPDATE">
         <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
         <assessment/>
         <device_type>browser</device_type>
         <filter/>
@@ -13,7 +13,7 @@
         <mobile_title>📦 Catalog Factory Inventory</mobile_title>
         <mobile_view_name>Mobile</mobile_view_name>
         <name>x_1805046_app_fo_0_cf_item</name>
-        <order>80</order>
+        <order>40</order>
         <override_menu_roles>false</override_menu_roles>
         <query/>
         <report/>

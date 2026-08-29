@@ -44182,11 +44182,64 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
         <category>customer</category>
         <comments/>
+        <name>sys_app_application_1029d84583c34310525cb6cfeeaad3e8</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_application">
+    <sys_app_application action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category/>
+        <description>AppForge Enterprise Lifecycle Automation Hub</description>
+        <device_type>browser</device_type>
+        <hint/>
+        <name/>
+        <order>100</order>
+        <roles/>
+        <sys_class_name>sys_app_application</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>1029d84583c34310525cb6cfeeaad3e8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>App-forge</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_application_1029d84583c34310525cb6cfeeaad3e8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <title>App-forge</title>
+        <view_name/>
+    </sys_app_application>
+</record_update>
+]]></payload>
+        <payload_hash>5bdf2599af597afd33e5c376e004959c</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>cf47410ae3e2206a678d90168df98338</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_application_1029d84583c34310525cb6cfeeaad3e8</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>cf47410ae3e2206a678d90168df98338</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
         <name>sys_app_module_bff18021a92fe063eabacdf95e21d5e7</name>
         <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
     <sys_app_module action="INSERT_OR_UPDATE">
         <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
         <assessment/>
         <device_type>browser</device_type>
         <filter/>
@@ -44226,7 +44279,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     </sys_app_module>
 </record_update>
 ]]></payload>
-        <payload_hash>1c47bc63df96a1f68105ef16cad109fc</payload_hash>
+        <payload_hash>b368e54285b378c1c8a3ac155764ef64</payload_hash>
         <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
         <replace_on_upgrade>false</replace_on_upgrade>
         <sys_created_by>admin</sys_created_by>
@@ -44249,22 +44302,22 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
         <category>customer</category>
         <comments/>
-        <name>sys_app_module_0a2a3f5673a81333cc93c0c18a8d01d9</name>
+        <name>sys_app_module_4c71825d4fc6002bb247cb1551c78d29</name>
         <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
     <sys_app_module action="INSERT_OR_UPDATE">
         <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
         <assessment/>
         <device_type>browser</device_type>
         <filter/>
         <hint/>
         <homepage/>
         <image/>
-        <link_type>LIST</link_type>
+        <link_type>DIRECT</link_type>
         <map_page/>
-        <mobile_title>💼 Portfolios (SPM)</mobile_title>
+        <mobile_title>🤖 AI Catalog Architect</mobile_title>
         <mobile_view_name>Mobile</mobile_view_name>
-        <name>x_1805046_app_fo_0_ppm_portfolio</name>
+        <name></name>
         <order>20</order>
         <override_menu_roles>false</override_menu_roles>
         <query/>
@@ -44275,306 +44328,38 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <sys_created_on>2026-08-22 19:37:23</sys_created_on>
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
-        <sys_id>0a2a3f5673a81333cc93c0c18a8d01d9</sys_id>
+        <sys_id>4c71825d4fc6002bb247cb1551c78d29</sys_id>
         <sys_mod_count>0</sys_mod_count>
-        <sys_name>💼 Portfolios (SPM)</sys_name>
+        <sys_name>🤖 AI Catalog Architect</sys_name>
         <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
         <sys_policy/>
         <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_app_module_0a2a3f5673a81333cc93c0c18a8d01d9</sys_update_name>
+        <sys_update_name>sys_app_module_4c71825d4fc6002bb247cb1551c78d29</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
         <timeline_page/>
-        <title>💼 Portfolios (SPM)</title>
+        <title>🤖 AI Catalog Architect</title>
         <uncancelable>false</uncancelable>
-        <uri_script></uri_script>
+        <uri_script>x_1805046_app_fo_0_workspace.do</uri_script>
         <view_name/>
         <window_name/>
     </sys_app_module>
 </record_update>
 ]]></payload>
-        <payload_hash>b5f47a48da884affeb35866e70086313</payload_hash>
+        <payload_hash>99e838f0fbfb8ac37d3630421b9da39d</payload_hash>
         <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
         <replace_on_upgrade>false</replace_on_upgrade>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2026-08-29 11:45:00</sys_created_on>
-        <sys_id>90aa87093adac9fd5a516d0d4f9e6306</sys_id>
+        <sys_id>801168c490776a23fd23b150bd9b0857</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
         <table/>
-        <target_name>sys_app_module_0a2a3f5673a81333cc93c0c18a8d01d9</target_name>
+        <target_name>sys_app_module_4c71825d4fc6002bb247cb1551c78d29</target_name>
         <type>Script Include</type>
         <update_domain>global</update_domain>
-        <update_guid>90aa87093adac9fd5a516d0d4f9e6306</update_guid>
-        <update_guid_history/>
-        <update_set display_value=""/>
-        <view/>
-    </sys_update_xml>
-    <sys_update_xml action="INSERT_OR_UPDATE">
-        <action>INSERT_OR_UPDATE</action>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <category>customer</category>
-        <comments/>
-        <name>sys_app_module_05a53abe1867e2332fdcdc2b787c809d</name>
-        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
-    <sys_app_module action="INSERT_OR_UPDATE">
-        <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <assessment/>
-        <device_type>browser</device_type>
-        <filter/>
-        <hint/>
-        <homepage/>
-        <image/>
-        <link_type>LIST</link_type>
-        <map_page/>
-        <mobile_title>🎯 Programs (SPM)</mobile_title>
-        <mobile_view_name>Mobile</mobile_view_name>
-        <name>x_1805046_app_fo_0_ppm_program</name>
-        <order>30</order>
-        <override_menu_roles>false</override_menu_roles>
-        <query/>
-        <report/>
-        <roles/>
-        <sys_class_name>sys_app_module</sys_class_name>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
-        <sys_domain>global</sys_domain>
-        <sys_domain_path>/</sys_domain_path>
-        <sys_id>05a53abe1867e2332fdcdc2b787c809d</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>🎯 Programs (SPM)</sys_name>
-        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
-        <sys_policy/>
-        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_app_module_05a53abe1867e2332fdcdc2b787c809d</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <timeline_page/>
-        <title>🎯 Programs (SPM)</title>
-        <uncancelable>false</uncancelable>
-        <uri_script></uri_script>
-        <view_name/>
-        <window_name/>
-    </sys_app_module>
-</record_update>
-]]></payload>
-        <payload_hash>4f9be3847e9f9e6466ee39e492d29fad</payload_hash>
-        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
-        <replace_on_upgrade>false</replace_on_upgrade>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
-        <sys_id>244409811054e8c67ce18d9e6781de9a</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <table/>
-        <target_name>sys_app_module_05a53abe1867e2332fdcdc2b787c809d</target_name>
-        <type>Script Include</type>
-        <update_domain>global</update_domain>
-        <update_guid>244409811054e8c67ce18d9e6781de9a</update_guid>
-        <update_guid_history/>
-        <update_set display_value=""/>
-        <view/>
-    </sys_update_xml>
-    <sys_update_xml action="INSERT_OR_UPDATE">
-        <action>INSERT_OR_UPDATE</action>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <category>customer</category>
-        <comments/>
-        <name>sys_app_module_052eff72e4330902c50c2dd8cc230416</name>
-        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
-    <sys_app_module action="INSERT_OR_UPDATE">
-        <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <assessment/>
-        <device_type>browser</device_type>
-        <filter/>
-        <hint/>
-        <homepage/>
-        <image/>
-        <link_type>LIST</link_type>
-        <map_page/>
-        <mobile_title>📊 Projects (PPM)</mobile_title>
-        <mobile_view_name>Mobile</mobile_view_name>
-        <name>x_1805046_app_fo_0_ppm_project</name>
-        <order>40</order>
-        <override_menu_roles>false</override_menu_roles>
-        <query/>
-        <report/>
-        <roles/>
-        <sys_class_name>sys_app_module</sys_class_name>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
-        <sys_domain>global</sys_domain>
-        <sys_domain_path>/</sys_domain_path>
-        <sys_id>052eff72e4330902c50c2dd8cc230416</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>📊 Projects (PPM)</sys_name>
-        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
-        <sys_policy/>
-        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_app_module_052eff72e4330902c50c2dd8cc230416</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <timeline_page/>
-        <title>📊 Projects (PPM)</title>
-        <uncancelable>false</uncancelable>
-        <uri_script></uri_script>
-        <view_name/>
-        <window_name/>
-    </sys_app_module>
-</record_update>
-]]></payload>
-        <payload_hash>a56f521912340876a70a6935ae216e71</payload_hash>
-        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
-        <replace_on_upgrade>false</replace_on_upgrade>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
-        <sys_id>c98da208d3012423da03b38d155340d3</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <table/>
-        <target_name>sys_app_module_052eff72e4330902c50c2dd8cc230416</target_name>
-        <type>Script Include</type>
-        <update_domain>global</update_domain>
-        <update_guid>c98da208d3012423da03b38d155340d3</update_guid>
-        <update_guid_history/>
-        <update_set display_value=""/>
-        <view/>
-    </sys_update_xml>
-    <sys_update_xml action="INSERT_OR_UPDATE">
-        <action>INSERT_OR_UPDATE</action>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <category>customer</category>
-        <comments/>
-        <name>sys_app_module_76bfdeb12e559471c50acf7f742c1521</name>
-        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
-    <sys_app_module action="INSERT_OR_UPDATE">
-        <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <assessment/>
-        <device_type>browser</device_type>
-        <filter/>
-        <hint/>
-        <homepage/>
-        <image/>
-        <link_type>LIST</link_type>
-        <map_page/>
-        <mobile_title>📌 Project Tasks & Milestones</mobile_title>
-        <mobile_view_name>Mobile</mobile_view_name>
-        <name>x_1805046_app_fo_0_ppm_task</name>
-        <order>50</order>
-        <override_menu_roles>false</override_menu_roles>
-        <query/>
-        <report/>
-        <roles/>
-        <sys_class_name>sys_app_module</sys_class_name>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
-        <sys_domain>global</sys_domain>
-        <sys_domain_path>/</sys_domain_path>
-        <sys_id>76bfdeb12e559471c50acf7f742c1521</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>📌 Project Tasks & Milestones</sys_name>
-        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
-        <sys_policy/>
-        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_app_module_76bfdeb12e559471c50acf7f742c1521</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <timeline_page/>
-        <title>📌 Project Tasks & Milestones</title>
-        <uncancelable>false</uncancelable>
-        <uri_script></uri_script>
-        <view_name/>
-        <window_name/>
-    </sys_app_module>
-</record_update>
-]]></payload>
-        <payload_hash>c8bb2e1371edb5794f69be1d386eef26</payload_hash>
-        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
-        <replace_on_upgrade>false</replace_on_upgrade>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
-        <sys_id>bfbe6d3b7f3053129def805d7bb341ad</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <table/>
-        <target_name>sys_app_module_76bfdeb12e559471c50acf7f742c1521</target_name>
-        <type>Script Include</type>
-        <update_domain>global</update_domain>
-        <update_guid>bfbe6d3b7f3053129def805d7bb341ad</update_guid>
-        <update_guid_history/>
-        <update_set display_value=""/>
-        <view/>
-    </sys_update_xml>
-    <sys_update_xml action="INSERT_OR_UPDATE">
-        <action>INSERT_OR_UPDATE</action>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <category>customer</category>
-        <comments/>
-        <name>sys_app_module_a508a26bfef41001dc308caf1aa14d40</name>
-        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
-    <sys_app_module action="INSERT_OR_UPDATE">
-        <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
-        <assessment/>
-        <device_type>browser</device_type>
-        <filter/>
-        <hint/>
-        <homepage/>
-        <image/>
-        <link_type>LIST</link_type>
-        <map_page/>
-        <mobile_title>💡 Demand Intake & Approvals</mobile_title>
-        <mobile_view_name>Mobile</mobile_view_name>
-        <name>x_1805046_app_fo_0_ppm_demand</name>
-        <order>60</order>
-        <override_menu_roles>false</override_menu_roles>
-        <query/>
-        <report/>
-        <roles/>
-        <sys_class_name>sys_app_module</sys_class_name>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
-        <sys_domain>global</sys_domain>
-        <sys_domain_path>/</sys_domain_path>
-        <sys_id>a508a26bfef41001dc308caf1aa14d40</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>💡 Demand Intake & Approvals</sys_name>
-        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
-        <sys_policy/>
-        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_app_module_a508a26bfef41001dc308caf1aa14d40</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <timeline_page/>
-        <title>💡 Demand Intake & Approvals</title>
-        <uncancelable>false</uncancelable>
-        <uri_script></uri_script>
-        <view_name/>
-        <window_name/>
-    </sys_app_module>
-</record_update>
-]]></payload>
-        <payload_hash>7e65a3a969d2d7700f097d1dece92966</payload_hash>
-        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
-        <replace_on_upgrade>false</replace_on_upgrade>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
-        <sys_id>73e77e2d56dcd1f35cf3a327c61c879b</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
-        <table/>
-        <target_name>sys_app_module_a508a26bfef41001dc308caf1aa14d40</target_name>
-        <type>Script Include</type>
-        <update_domain>global</update_domain>
-        <update_guid>73e77e2d56dcd1f35cf3a327c61c879b</update_guid>
+        <update_guid>801168c490776a23fd23b150bd9b0857</update_guid>
         <update_guid_history/>
         <update_set display_value=""/>
         <view/>
@@ -44588,7 +44373,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
     <sys_app_module action="INSERT_OR_UPDATE">
         <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
         <assessment/>
         <device_type>browser</device_type>
         <filter/>
@@ -44600,7 +44385,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <mobile_title>🏭 Catalog Creation Requests</mobile_title>
         <mobile_view_name>Mobile</mobile_view_name>
         <name>x_1805046_app_fo_0_cf_request</name>
-        <order>70</order>
+        <order>30</order>
         <override_menu_roles>false</override_menu_roles>
         <query/>
         <report/>
@@ -44628,7 +44413,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     </sys_app_module>
 </record_update>
 ]]></payload>
-        <payload_hash>4fa307db2023099d17f91732a4b49468</payload_hash>
+        <payload_hash>54d404406fbee8d1d42aa2ab0dd9e109</payload_hash>
         <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
         <replace_on_upgrade>false</replace_on_upgrade>
         <sys_created_by>admin</sys_created_by>
@@ -44655,7 +44440,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
     <sys_app_module action="INSERT_OR_UPDATE">
         <active>true</active>
-        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
         <assessment/>
         <device_type>browser</device_type>
         <filter/>
@@ -44667,7 +44452,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <mobile_title>📦 Catalog Factory Inventory</mobile_title>
         <mobile_view_name>Mobile</mobile_view_name>
         <name>x_1805046_app_fo_0_cf_item</name>
-        <order>80</order>
+        <order>40</order>
         <override_menu_roles>false</override_menu_roles>
         <query/>
         <report/>
@@ -44695,7 +44480,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     </sys_app_module>
 </record_update>
 ]]></payload>
-        <payload_hash>5da34c09d006ea705f52f9551a62de52</payload_hash>
+        <payload_hash>5801e5fbdb0500e657d1d350139aa491</payload_hash>
         <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
         <replace_on_upgrade>false</replace_on_upgrade>
         <sys_created_by>admin</sys_created_by>
@@ -44709,6 +44494,542 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <type>Script Include</type>
         <update_domain>global</update_domain>
         <update_guid>01457a53038ad01cadc29ceaeaa131e3</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_1adaa99a757b17db9957d213b106fdbb</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>📋 Dynamic Variables</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_cf_variable</name>
+        <order>50</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>1adaa99a757b17db9957d213b106fdbb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>📋 Dynamic Variables</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_1adaa99a757b17db9957d213b106fdbb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>📋 Dynamic Variables</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>0fa1f5eae3d5dd935bf57cdc38268023</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>f677e07a1843bd76747ab5f86a33dd80</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_1adaa99a757b17db9957d213b106fdbb</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>f677e07a1843bd76747ab5f86a33dd80</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_82a384eb2ef6e0ae5754591c702321b2</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>🗃️ Variable Sets Library</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_cf_variable_set</name>
+        <order>60</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>82a384eb2ef6e0ae5754591c702321b2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>🗃️ Variable Sets Library</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_82a384eb2ef6e0ae5754591c702321b2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>🗃️ Variable Sets Library</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>d94fae734b9ef60524fe8cfa33da8609</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>38cc76826911d7388d2948f76d30aa49</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_82a384eb2ef6e0ae5754591c702321b2</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>38cc76826911d7388d2948f76d30aa49</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_0a2a3f5673a81333cc93c0c18a8d01d9</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>💼 Portfolios (SPM)</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_ppm_portfolio</name>
+        <order>70</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>0a2a3f5673a81333cc93c0c18a8d01d9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>💼 Portfolios (SPM)</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_0a2a3f5673a81333cc93c0c18a8d01d9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>💼 Portfolios (SPM)</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>711eab3fbaf3a1574863a2a55d28ec7b</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>90aa87093adac9fd5a516d0d4f9e6306</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_0a2a3f5673a81333cc93c0c18a8d01d9</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>90aa87093adac9fd5a516d0d4f9e6306</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_05a53abe1867e2332fdcdc2b787c809d</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>🎯 Programs (SPM)</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_ppm_program</name>
+        <order>80</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>05a53abe1867e2332fdcdc2b787c809d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>🎯 Programs (SPM)</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_05a53abe1867e2332fdcdc2b787c809d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>🎯 Programs (SPM)</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>8b24e1971c96cfeeaf4449ec2e9bed93</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>244409811054e8c67ce18d9e6781de9a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_05a53abe1867e2332fdcdc2b787c809d</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>244409811054e8c67ce18d9e6781de9a</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_052eff72e4330902c50c2dd8cc230416</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>📊 Projects (PPM)</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_ppm_project</name>
+        <order>90</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>052eff72e4330902c50c2dd8cc230416</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>📊 Projects (PPM)</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_052eff72e4330902c50c2dd8cc230416</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>📊 Projects (PPM)</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>679aa3da8f789e46ca476dc4a651e5e8</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>c98da208d3012423da03b38d155340d3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_052eff72e4330902c50c2dd8cc230416</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>c98da208d3012423da03b38d155340d3</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_76bfdeb12e559471c50acf7f742c1521</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>📌 Project Tasks & Milestones</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_ppm_task</name>
+        <order>100</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>76bfdeb12e559471c50acf7f742c1521</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>📌 Project Tasks & Milestones</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_76bfdeb12e559471c50acf7f742c1521</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>📌 Project Tasks & Milestones</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>59b571140bcb0d66d9897b83115a5ceb</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>bfbe6d3b7f3053129def805d7bb341ad</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_76bfdeb12e559471c50acf7f742c1521</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>bfbe6d3b7f3053129def805d7bb341ad</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_a508a26bfef41001dc308caf1aa14d40</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>💡 Demand Intake & Approvals</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_1805046_app_fo_0_ppm_demand</name>
+        <order>110</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>a508a26bfef41001dc308caf1aa14d40</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>💡 Demand Intake & Approvals</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_a508a26bfef41001dc308caf1aa14d40</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>💡 Demand Intake & Approvals</title>
+        <uncancelable>false</uncancelable>
+        <uri_script></uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>1f4d6a7849e2321c011f1f7d5c958c97</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>73e77e2d56dcd1f35cf3a327c61c879b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_a508a26bfef41001dc308caf1aa14d40</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>73e77e2d56dcd1f35cf3a327c61c879b</update_guid>
+        <update_guid_history/>
+        <update_set display_value=""/>
+        <view/>
+    </sys_update_xml>
+    <sys_update_xml action="INSERT_OR_UPDATE">
+        <action>INSERT_OR_UPDATE</action>
+        <application display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</application>
+        <category>customer</category>
+        <comments/>
+        <name>sys_app_module_9379c7220b576e54ea86fdd2b85e09a4</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="App-forge">1029d84583c34310525cb6cfeeaad3e8</application>
+        <assessment/>
+        <device_type>browser</device_type>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>DIRECT</link_type>
+        <map_page/>
+        <mobile_title>🛡️ Four-Eyes Production Gate</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name></name>
+        <order>120</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>9379c7220b576e54ea86fdd2b85e09a4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>🛡️ Four-Eyes Production Gate</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_app_module_9379c7220b576e54ea86fdd2b85e09a4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <timeline_page/>
+        <title>🛡️ Four-Eyes Production Gate</title>
+        <uncancelable>false</uncancelable>
+        <uri_script>x_1805046_app_fo_0_workspace.do</uri_script>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>
+]]></payload>
+        <payload_hash>41c823e1ff68c5d87fcf3e8c80a09eff</payload_hash>
+        <remote_update_set display_value="AppForge v0.18.0 Production Complete">9b4a123683f64750525cb6cfeeaad999</remote_update_set>
+        <replace_on_upgrade>false</replace_on_upgrade>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-29 11:45:00</sys_created_on>
+        <sys_id>61635874d35f64b23acbb7dea7f0eadf</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+        <table/>
+        <target_name>sys_app_module_9379c7220b576e54ea86fdd2b85e09a4</target_name>
+        <type>Script Include</type>
+        <update_domain>global</update_domain>
+        <update_guid>61635874d35f64b23acbb7dea7f0eadf</update_guid>
         <update_guid_history/>
         <update_set display_value=""/>
         <view/>
