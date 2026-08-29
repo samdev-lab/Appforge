@@ -65,15 +65,15 @@ th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.7
     <aside id="sidebar">
         <div class="logo-box"><span>⚡</span> AppForge SPM / PPM</div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('home', this)">📊 Executive Portfolio</li>
-            <li class="nav-item" onclick="switchTab('ppm_suite', this)">💼 Strategic Projects &amp; Demands</li>
-            <li class="nav-item" onclick="switchTab('deployments', this)">🚀 Deployment Center</li>
-            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Governance &amp; Policies</li>
+            <li class="nav-item active" onclick="switchTab('home', this)">]]>📊<![CDATA[ Executive Portfolio</li>
+            <li class="nav-item" onclick="switchTab('ppm_suite', this)">]]>💼<![CDATA[ Strategic Projects &amp; Demands</li>
+            <li class="nav-item" onclick="switchTab('deployments', this)">]]>🚀<![CDATA[ Deployment Center</li>
+            <li class="nav-item" onclick="switchTab('governance', this)">]]>🛡<![CDATA[️ Governance &amp; Policies</li>
         </ul>
     </aside>
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">📊 Executive Portfolio Dashboard</h2>
+            <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">]]>📊<![CDATA[ Executive Portfolio Dashboard</h2>
             <div class="user-badge"><span>Instance: <strong>dev280961</strong></span><span>•</span><span>Scope: <strong>x_1805046_app_fo_0</strong></span></div>
         </header>
         <div class="content-area">

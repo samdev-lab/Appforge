@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeIntelligenceContext</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeIntelligenceContext</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeIntelligenceContext
  * Prepares sanitized, secret-free, deterministic context packages for AI reasoning.

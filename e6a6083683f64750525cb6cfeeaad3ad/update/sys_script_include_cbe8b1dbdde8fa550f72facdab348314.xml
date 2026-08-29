@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeReleaseStateMachine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeReleaseStateMachine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeReleaseStateMachine
  * Manages the formal lifecycle state transitions and cryptographic immutability of AppForge releases.

@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeLifecycleManager</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeLifecycleManager</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeLifecycleManager
  * Governs application lifecycle transitions and release approval gates:

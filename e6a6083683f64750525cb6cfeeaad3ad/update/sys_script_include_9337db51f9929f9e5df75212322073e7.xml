@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeTemplateFactory</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeTemplateFactory</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeTemplateFactory
  * Authoritative Catalog & Instantiation Engine for Out-of-the-Box ServiceNow SPM / PPM Suite

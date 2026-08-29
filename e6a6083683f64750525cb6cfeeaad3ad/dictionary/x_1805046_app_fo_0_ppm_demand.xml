@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" db_object_id="eb4c9cbb6e63c7173f9ab139237e9640" label="Demand" max_length="40" name="x_1805046_app_fo_0_ppm_demand" type="collection">
+        <element label="Stage" max_length="40" name="u_stage" type="string"/>
+        <element label="Demand Number" max_length="40" name="u_demand_id" type="string"/>
+        <element label="Demand Title" max_length="120" name="u_title" type="string"/>
+        <element label="Risk Score (1-5)" max_length="40" name="u_risk_score" type="integer"/>
+        <element label="Business Case" max_length="500" name="u_business_case" type="string"/>
+        <element label="Estimated ROI ($)" max_length="40" name="u_roi_estimate" type="decimal"/>
+        <element label="Requester" max_length="40" name="u_requester" type="string"/>
+    </element>
+</database>

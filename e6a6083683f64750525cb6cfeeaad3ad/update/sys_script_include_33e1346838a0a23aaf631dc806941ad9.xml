@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeApplicationHealthEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeApplicationHealthEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeApplicationHealthEngine
  * Deterministic application health calculator producing 0–100 scores and states

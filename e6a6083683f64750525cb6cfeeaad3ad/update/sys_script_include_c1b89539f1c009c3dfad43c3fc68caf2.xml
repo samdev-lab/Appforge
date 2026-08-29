@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeChangeCorrelationEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeChangeCorrelationEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeChangeCorrelationEngine
  * Correlates detected incidents and anomalies with recent deployments, migrations, and package changes.

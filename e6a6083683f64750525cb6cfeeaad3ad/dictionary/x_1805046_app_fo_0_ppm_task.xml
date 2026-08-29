@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" db_object_id="4a7a4336f39b3c86cd99d4b834cf604f" label="Project Task" max_length="40" name="x_1805046_app_fo_0_ppm_task" type="collection">
+        <element label="Due Date" max_length="40" name="u_due_date" type="glide_date"/>
+        <element label="Assigned To" max_length="40" name="u_assigned_to" type="string"/>
+        <element label="Task Summary" max_length="200" name="u_short_description" type="string"/>
+        <element label="Duration (Days)" max_length="40" name="u_planned_duration_days" type="integer"/>
+        <element label="Milestone" max_length="40" name="u_is_milestone" type="boolean"/>
+        <element label="State" max_length="40" name="u_state" type="string"/>
+    </element>
+</database>

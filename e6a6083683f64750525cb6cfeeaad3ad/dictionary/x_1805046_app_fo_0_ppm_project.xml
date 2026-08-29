@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" db_object_id="29cd8a7ccf7476d4dfd39addd25c1d43" label="Project" max_length="40" name="x_1805046_app_fo_0_ppm_project" type="collection">
+        <element label="Planned End" max_length="40" name="u_planned_end" type="glide_date"/>
+        <element label="Project Manager" max_length="40" name="u_project_manager" type="string"/>
+        <element label="Estimated Cost ($)" max_length="40" name="u_estimated_cost" type="decimal"/>
+        <element label="% Complete" max_length="40" name="u_percent_complete" type="integer"/>
+        <element label="Priority" max_length="20" name="u_priority" type="string"/>
+        <element label="Project Name" max_length="120" name="u_name" type="string"/>
+        <element label="Project Number" max_length="40" name="u_number" type="string"/>
+        <element label="Planned Start" max_length="40" name="u_planned_start" type="glide_date"/>
+        <element label="State" max_length="40" name="u_state" type="string"/>
+        <element label="Actual Cost ($)" max_length="40" name="u_actual_cost" type="decimal"/>
+    </element>
+</database>

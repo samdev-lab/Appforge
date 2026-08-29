@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" db_object_id="f91d415f67921ea329882afa7518f877" label="Portfolio" max_length="40" name="x_1805046_app_fo_0_ppm_portfolio" type="collection">
+        <element label="Target Fiscal Year" max_length="10" name="u_target_year" type="string"/>
+        <element label="Description" max_length="500" name="u_description" type="string"/>
+        <element label="Status" max_length="40" name="u_status" type="string"/>
+        <element label="Portfolio Name" max_length="100" name="u_name" type="string"/>
+        <element label="Total Budget ($)" max_length="40" name="u_total_budget" type="decimal"/>
+        <element label="Portfolio Manager" max_length="40" name="u_portfolio_manager" type="string"/>
+    </element>
+</database>
