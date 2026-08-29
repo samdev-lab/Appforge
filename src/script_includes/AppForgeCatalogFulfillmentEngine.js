@@ -1,0 +1,134 @@
+/**
+ * AppForgeCatalogFulfillmentEngine
+ * Configures and orchestrates multi-stage fulfillment logic for Catalog Items.
+ * Supports RITMs, sequential/parallel Catalog Tasks (sc_task), and automatic Incident/Problem/Change creation.
+ */
+var AppForgeCatalogFulfillmentEngine = Class.create();
+AppForgeCatalogFulfillmentEngine.prototype = {
+    initialize: function() {
+        'use strict';
+    },
+
+    /**
+     * Builds complete fulfillment plan from template specification.
+     */
+    buildFulfillmentPlan: function(spec) {
+        'use strict';
+        spec = spec || {};
+        var plan = {
+            ritm: this.buildRitmConfig(spec.ritm || spec.ritm_config || {}),
+            tasks: this.buildTaskSequence(spec.tasks || spec.catalog_tasks || []),
+            incident_trigger: this.buildIncidentConfig(spec.incident || spec.incident_config || {}),
+            problem_trigger: this.buildProblemConfig(spec.problem || spec.problem_config || {}),
+            change_trigger: this.buildChangeConfig(spec.change || spec.change_config || {}),
+            generic_tasks: this.buildGenericTasks(spec.generic_tasks || [])
+        };
+        return plan;
+    },
+
+    buildRitmConfig: function(cfg) {
+        'use strict';
+        return {
+            assignment_group: cfg.assignment_group || 'Service Desk',
+            assigned_to: cfg.assigned_to || '',
+            priority: cfg.priority || '3',
+            impact: cfg.impact || '3',
+            urgency: cfg.urgency || '3',
+            short_description_template: cfg.short_description || 'Request for {item_name}',
+            field_mappings: cfg.field_mappings || [
+                { source_variable: 'requested_for', target_field: 'requested_for' },
+                { source_variable: 'description', target_field: 'description' }
+            ]
+        };
+    },
+
+    buildTaskSequence: function(tasksList) {
+        'use strict';
+        var tasks = [];
+        for (var i = 0; i < tasksList.length; i++) {
+            var t = tasksList[i];
+            tasks.push({
+                task_name: t.name || t.task_name || ('Task ' + (i + 1)),
+                short_description: t.short_description || t.name || 'Fulfillment Task',
+                description: t.description || '',
+                assignment_group: t.assignment_group || 'IT Support',
+                assigned_to: t.assigned_to || '',
+                priority: t.priority || '3',
+                order: t.order || ((i + 1) * 100),
+                execution_mode: t.execution_mode || (t.parallel === true ? 'PARALLEL' : 'SEQUENTIAL'),
+                dependencies: t.dependencies || [],
+                condition: t.condition || '',
+                due_duration_hours: t.due_duration_hours || 24
+            });
+        }
+        return tasks;
+    },
+
+    buildIncidentConfig: function(cfg) {
+        'use strict';
+        if (!cfg || cfg.enabled !== true && !cfg.category) {
+            return { enabled: false };
+        }
+        return {
+            enabled: true,
+            assignment_group: cfg.assignment_group || 'Incident Management',
+            category: cfg.category || 'Software',
+            subcategory: cfg.subcategory || '',
+            impact: cfg.impact || '3',
+            urgency: cfg.urgency || '3',
+            short_description: cfg.short_description || 'Catalog Generated Incident',
+            cmdb_ci: cfg.cmdb_ci || '',
+            variable_mappings: cfg.variable_mappings || []
+        };
+    },
+
+    buildProblemConfig: function(cfg) {
+        'use strict';
+        if (!cfg || cfg.enabled !== true && !cfg.short_description) {
+            return { enabled: false };
+        }
+        return {
+            enabled: true,
+            assignment_group: cfg.assignment_group || 'Problem Management',
+            priority: cfg.priority || '3',
+            short_description: cfg.short_description || 'Catalog Generated Problem',
+            root_cause: cfg.root_cause || '',
+            known_error: cfg.known_error || false
+        };
+    },
+
+    buildChangeConfig: function(cfg) {
+        'use strict';
+        if (!cfg || cfg.enabled !== true && !cfg.change_type) {
+            return { enabled: false };
+        }
+        return {
+            enabled: true,
+            change_type: cfg.change_type || 'Standard', // Standard, Normal, Emergency
+            assignment_group: cfg.assignment_group || 'Change Management',
+            risk: cfg.risk || 'Low',
+            impact: cfg.impact || '3',
+            justification: cfg.justification || 'Automated catalog standard change',
+            implementation_plan: cfg.implementation_plan || 'Execute automated deployment steps',
+            backout_plan: cfg.backout_plan || 'Restore previous release package'
+        };
+    },
+
+    buildGenericTasks: function(taskList) {
+        'use strict';
+        var list = [];
+        for (var k = 0; k < taskList.length; k++) {
+            var gt = taskList[k];
+            list.push({
+                task_type: gt.task_type || 'General Task',
+                short_description: gt.short_description || 'Catalog Generic Task',
+                assignment_group: gt.assignment_group || 'Operations',
+                assigned_to: gt.assigned_to || '',
+                order: (k + 1) * 100
+            });
+        }
+        return list;
+    },
+
+    type: 'AppForgeCatalogFulfillmentEngine'
+};

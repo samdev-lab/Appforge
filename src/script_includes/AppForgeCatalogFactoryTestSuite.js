@@ -1,0 +1,235 @@
+/**
+ * AppForgeCatalogFactoryTestSuite
+ * Comprehensive automated test suite certifying the ServiceNow Catalog Factory platform.
+ * Validates single & bulk catalog generation, 24 variable types, variable sets, approvals, fulfillment, validation & dry-run.
+ */
+var AppForgeCatalogFactoryTestSuite = Class.create();
+AppForgeCatalogFactoryTestSuite.prototype = {
+    initialize: function() {
+        'use strict';
+        this.engine = new AppForgeCatalogFactoryEngine();
+        this.validator = new AppForgeCatalogValidationEngine();
+        this.varBuilder = new AppForgeCatalogVariableBuilder();
+        this.fulfillment = new AppForgeCatalogFulfillmentEngine();
+        this.lifecycle = new AppForgeCatalogLifecycleManager();
+        this.importer = new AppForgeCatalogImportParser();
+        this.results = { passed: 0, failed: 0, total: 0, tests: [] };
+    },
+
+    assert: function(condition, testName, details) {
+        'use strict';
+        this.results.total++;
+        if (condition) {
+            this.results.passed++;
+            this.results.tests.push({ name: testName, status: 'PASSED' });
+        } else {
+            this.results.failed++;
+            this.results.tests.push({ name: testName, status: 'FAILED', details: details });
+            gs.error('[AppForgeCatalogFactoryTestSuite] FAILED: ' + testName + ' - ' + (details || ''));
+        }
+    },
+
+    runAllTests: function() {
+        'use strict';
+        gs.info('[AppForgeCatalogFactoryTestSuite] Starting Catalog Factory test run...');
+
+        this.testVariableBuilderAllTypes();
+        this.testVariableChoices();
+        this.testVariableSetBuilder();
+        this.testFulfillmentEngine();
+        this.testValidationAndDryRun();
+        this.testSingleCatalogGeneration();
+        this.testBulkCatalogImportAndCreation();
+        this.testLifecycleVersioningAndCloning();
+
+        gs.info('[AppForgeCatalogFactoryTestSuite] Completed: ' + this.results.passed + '/' + this.results.total + ' passed.');
+        return this.results;
+    },
+
+    testVariableBuilderAllTypes: function() {
+        'use strict';
+        var types = this.varBuilder.SUPPORTED_TYPES;
+        this.assert(types.length === 24, 'All 24 ServiceNow variable types supported', 'Expected 24 types, got ' + types.length);
+
+        var refVar = this.varBuilder.buildVariable({
+            name: 'employee_name',
+            question: 'Employee Name',
+            type: 'Reference',
+            reference_table: 'sys_user',
+            mandatory: true
+        });
+        this.assert(refVar.name === 'employee_name', 'Reference variable normalized name');
+        this.assert(refVar.reference_table === 'sys_user', 'Reference variable target table sys_user');
+        this.assert(refVar.mandatory === true, 'Reference variable mandatory flag');
+    },
+
+    testVariableChoices: function() {
+        'use strict';
+        var choices = this.varBuilder.buildChoices([
+            'Standard Laptop',
+            { label: 'Developer MacBook Pro', value: 'macbook_pro', is_default: true },
+            'High Performance Workstation'
+        ]);
+        this.assert(choices.length === 3, 'Choices builder generated 3 choices');
+        this.assert(choices[0].value === 'standard_laptop', 'Choice 1 value normalized');
+        this.assert(choices[1].is_default === true, 'Choice 2 is_default recognized');
+    },
+
+    testVariableSetBuilder: function() {
+        'use strict';
+        var vSet = this.varBuilder.buildVariableSet({
+            name: 'employee_info_vset',
+            title: 'Employee Information',
+            variables: [
+                { name: 'emp_id', question: 'Employee ID', type: 'Single Line Text', mandatory: true },
+                { name: 'department', question: 'Department', type: 'Reference', reference_table: 'cmn_department' }
+            ]
+        });
+        this.assert(vSet.name === 'employee_info_vset', 'Variable set name verified');
+        this.assert(vSet.variables.length === 2, 'Variable set contains 2 variables');
+    },
+
+    testFulfillmentEngine: function() {
+        'use strict';
+        var plan = this.fulfillment.buildFulfillmentPlan({
+            ritm: { assignment_group: 'Service Desk', priority: '2' },
+            tasks: [
+                { name: 'Create AD Account', assignment_group: 'IAM Team', order: 100 },
+                { name: 'Provision Laptop', assignment_group: 'Hardware Logistics', order: 200, parallel: true }
+            ],
+            incident: { enabled: true, category: 'Software' },
+            change: { enabled: true, change_type: 'Standard' }
+        });
+
+        this.assert(plan.ritm.assignment_group === 'Service Desk', 'RITM assignment group mapped');
+        this.assert(plan.tasks.length === 2, 'Fulfillment tasks count is 2');
+        this.assert(plan.tasks[1].execution_mode === 'PARALLEL', 'Parallel task execution mode set');
+        this.assert(plan.incident_trigger.enabled === true, 'Incident trigger enabled');
+        this.assert(plan.change_trigger.change_type === 'Standard', 'Standard change trigger mapped');
+    },
+
+    testValidationAndDryRun: function() {
+        'use strict';
+        // Invalid spec: missing name
+        var invalidSpec = { category: 'Hardware' };
+        var valRes = this.validator.validate(invalidSpec);
+        this.assert(valRes.valid === false, 'Validator catches missing catalog item name');
+
+        // Duplicate variables
+        var dupVarSpec = {
+            name: 'Test Catalog',
+            variables: [
+                { name: 'user_id', question: 'User 1' },
+                { name: 'user_id', question: 'User 2' }
+            ]
+        };
+        var dupRes = this.validator.validate(dupVarSpec);
+        this.assert(dupRes.valid === false, 'Validator catches duplicate variable names');
+
+        // Dry Run simulation
+        var dryRunSpec = {
+            name: 'New Employee Onboarding',
+            category: 'Human Resources',
+            variables: [
+                { name: 'emp_name', question: 'Employee Name', type: 'Single Line Text' },
+                { name: 'laptop_model', question: 'Laptop Model', type: 'Select Box', choices: ['MacBook', 'ThinkPad'] }
+            ],
+            approvals: [{ type: 'manager' }],
+            tasks: [{ name: 'Create Accounts' }]
+        };
+        var dryRunReport = this.validator.executeDryRun(dryRunSpec);
+        this.assert(dryRunReport.status === 'READY_TO_CREATE', 'Dry Run status READY_TO_CREATE');
+        this.assert(dryRunReport.forecast.variables_to_create === 2, 'Dry Run forecasted 2 variables');
+        this.assert(dryRunReport.forecast.fulfillment_tasks_to_generate === 1, 'Dry Run forecasted 1 task');
+    },
+
+    testSingleCatalogGeneration: function() {
+        'use strict';
+        var spec = {
+            name: 'Developer Cloud Workstation Request',
+            category: 'Engineering',
+            price: 250,
+            variables: [
+                { name: 'developer_name', question: 'Developer Name', type: 'Reference', reference_table: 'sys_user', mandatory: true },
+                { name: 'cloud_provider', question: 'Cloud Provider', type: 'Select Box', choices: ['AWS', 'GCP', 'Azure'] },
+                { name: 'region', question: 'Target Region', type: 'Single Line Text' }
+            ],
+            approvals: [
+                { type: 'manager' },
+                { type: 'group', assignment_group: 'Cloud Architecture Approval' }
+            ],
+            tasks: [
+                { name: 'Provision Cloud IAM Policy', assignment_group: 'Security Ops' },
+                { name: 'Deploy Terraform Workstation Stack', assignment_group: 'DevOps Team' }
+            ]
+        };
+
+        var result = this.engine.generateCatalogItem(spec);
+        this.assert(result.success === true, 'Catalog Item generated successfully');
+        this.assert(result.catalog_item.name === 'Developer Cloud Workstation Request', 'Generated catalog item name matches');
+        this.assert(result.variables.length === 3, 'Generated 3 variables');
+        this.assert(result.approvals.length === 2, 'Generated 2 approval gates');
+        this.assert(result.fulfillment.tasks.length === 2, 'Generated 2 fulfillment tasks');
+        this.assert(result.audit.total_variables === 3, 'Audit log recorded correct variable count');
+    },
+
+    testBulkCatalogImportAndCreation: function() {
+        'use strict';
+        var batch = [
+            {
+                name: 'VPN Remote Access Request',
+                category: 'Security',
+                variables: [{ name: 'justification', question: 'Business Reason', type: 'Multi Line Text' }],
+                tasks: [{ name: 'Grant VPN Profile' }]
+            },
+            {
+                name: 'Software License Assignment',
+                category: 'IT Software',
+                variables: [{ name: 'software_title', question: 'Software Name', type: 'Single Line Text' }],
+                tasks: [{ name: 'Assign SaaS License' }]
+            },
+            {
+                name: 'Database Read Replica Access',
+                category: 'Database Infrastructure',
+                variables: [{ name: 'cluster_name', question: 'DB Cluster', type: 'Single Line Text' }],
+                tasks: [{ name: 'Create Read-Only DB Credential' }]
+            }
+        ];
+
+        var bulkRes = this.engine.generateBulkCatalogs(batch);
+        this.assert(bulkRes.total_requested === 3, 'Bulk requested 3 items');
+        this.assert(bulkRes.successful_creations === 3, 'All 3 bulk items created successfully');
+        this.assert(bulkRes.failed_creations === 0, 'Zero failed bulk items');
+    },
+
+    testLifecycleVersioningAndCloning: function() {
+        'use strict';
+        var originalSpec = {
+            name: 'Executive Mobile Device Request',
+            version: '1.0',
+            variables: [{ name: 'device_model', question: 'Model', type: 'Single Line Text' }],
+            tasks: [{ name: 'Order Phone' }]
+        };
+
+        // Test Versioning
+        var v1_1 = this.lifecycle.createVersion(originalSpec, 'minor');
+        this.assert(v1_1.version === '1.1', 'Minor version incremented to 1.1');
+
+        var v2_0 = this.lifecycle.createVersion(originalSpec, 'major');
+        this.assert(v2_0.version === '2.0', 'Major version incremented to 2.0');
+
+        // Test Diff Comparison
+        v1_1.variables.push({ name: 'carrier_plan', question: 'Carrier Plan', type: 'Single Line Text' });
+        var diff = this.lifecycle.compareVersions(originalSpec, v1_1);
+        this.assert(diff.variables_added.length === 1, 'Version diff identified 1 added variable');
+        this.assert(diff.variables_added[0] === 'carrier_plan', 'Diff correctly named added variable carrier_plan');
+
+        // Test Cloning
+        var cloned = this.lifecycle.cloneCatalog(originalSpec, 'Contractor Mobile Device Request', { exclude_tasks: true });
+        this.assert(cloned.name === 'Contractor Mobile Device Request', 'Cloned catalog item has new name');
+        this.assert(cloned.variables.length === 1, 'Cloned catalog preserved variables');
+        this.assert(cloned.tasks.length === 0, 'Cloned catalog excluded tasks as requested');
+    },
+
+    type: 'AppForgeCatalogFactoryTestSuite'
+};

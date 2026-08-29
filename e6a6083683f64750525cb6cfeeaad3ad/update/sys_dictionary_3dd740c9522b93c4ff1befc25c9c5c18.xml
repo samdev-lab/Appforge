@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update>
-    <sys_dictionary action="INSERT_OR_UPDATE" element="u_roi_estimate" table="x_1805046_app_fo_0_ppm_demand">
+    <sys_dictionary action="INSERT_OR_UPDATE" element="" table="x_1805046_app_fo_0_cf_request">
         <active>true</active>
         <array>false</array>
         <attributes/>
@@ -8,7 +8,7 @@
         <choice>0</choice>
         <choice_field/>
         <choice_table/>
-        <column_label>ROI Estimate ($)</column_label>
+        <column_label/>
         <comments/>
         <create_roles/>
         <default_value/>
@@ -21,16 +21,16 @@
         <dynamic_creation_script/>
         <dynamic_default_value/>
         <dynamic_ref_qual/>
-        <element>u_roi_estimate</element>
+        <element/>
         <element_reference>false</element_reference>
         <foreign_database/>
         <formula/>
         <function_definition/>
         <function_field>false</function_field>
-        <internal_type display_value="decimal">decimal</internal_type>
+        <internal_type display_value="Collection">collection</internal_type>
         <mandatory>false</mandatory>
         <max_length>40</max_length>
-        <name>x_1805046_app_fo_0_ppm_demand</name>
+        <name>x_1805046_app_fo_0_cf_request</name>
         <next_element/>
         <primary>false</primary>
         <read_only>false</read_only>
@@ -47,13 +47,13 @@
         <sys_class_name>sys_dictionary</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2026-08-22 19:37:23</sys_created_on>
-        <sys_id>d3f2d5bed326cb7fe6de26d3ac6d9db2</sys_id>
+        <sys_id>3dd740c9522b93c4ff1befc25c9c5c18</sys_id>
         <sys_mod_count>0</sys_mod_count>
-        <sys_name>ROI Estimate ($)</sys_name>
+        <sys_name>x_1805046_app_fo_0_cf_request</sys_name>
         <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
         <sys_policy/>
         <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
-        <sys_update_name>sys_dictionary_x_1805046_app_fo_0_ppm_demand_u_roi_estimate</sys_update_name>
+        <sys_update_name>sys_dictionary_x_1805046_app_fo_0_cf_request_null</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
         <table_reference>false</table_reference>

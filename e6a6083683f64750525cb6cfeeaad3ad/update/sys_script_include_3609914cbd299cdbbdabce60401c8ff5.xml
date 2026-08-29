@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeCatalogFactoryEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeCatalogFactoryEngine</description>
+        <name>AppForgeCatalogFactoryEngine</name>
+        <script><![CDATA[/**
+ * AppForgeCatalogFactoryEngine
+ * Central orchestration engine for End-to-End ServiceNow Service Catalog Lifecycle Automation.
+ * Transforms unified high-level templates and bulk imports into complete, production-ready ServiceNow platform configurations.
+ */
+var AppForgeCatalogFactoryEngine = Class.create();
+AppForgeCatalogFactoryEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.validator = new AppForgeCatalogValidationEngine();
+        this.variableBuilder = new AppForgeCatalogVariableBuilder();
+        this.fulfillmentEngine = new AppForgeCatalogFulfillmentEngine();
+        this.lifecycleManager = new AppForgeCatalogLifecycleManager();
+        this.importParser = new AppForgeCatalogImportParser();
+        this.auditLog = [];
+    },
+
+    /**
+     * Executes the complete catalog item generation pipeline.
+     */
+    generateCatalogItem: function(spec, options) {
+        'use strict';
+        options = options || {};
+        var startTime = new Date().getTime();
+
+        // 1. Preflight Validation
+        var valResult = this.validator.validate(spec);
+        if (!valResult.valid) {
+            throw new Error('Catalog Factory validation failed: ' + valResult.errors.join('; '));
+        }
+
+        // 2. Normalize Basic Item Record (sc_cat_item)
+        var catItem = {
+            sys_id: spec.sys_id || ('cat_item_' + Math.floor(Math.random() * 1000000)),
+            name: spec.name,
+            short_description: spec.short_description || spec.name,
+            description: spec.description || spec.short_description || '',
+            category: spec.category || 'General Services',
+            active: spec.active !== false,
+            price: spec.price || 0,
+            recurring_price: spec.recurring_price || 0,
+            delivery_time: spec.delivery_time || '1 00:00:00',
+            owner: spec.owner || 'admin',
+            fulfillment_group: spec.fulfillment_group || 'Service Desk',
+            version: spec.version || '1.0',
+            state: 'Published'
+        };
+
+        // 3. Compile Variables & Choices
+        var compiledVariables = [];
+        if (spec.variables && Array.isArray(spec.variables)) {
+            for (var i = 0; i < spec.variables.length; i++) {
+                var v = this.variableBuilder.buildVariable(spec.variables[i], i + 1);
+                v.cat_item_id = catItem.sys_id;
+                compiledVariables.push(v);
+            }
+        }
+
+        // 4. Compile Variable Sets
+        var compiledVariableSets = [];
+        if (spec.variable_sets && Array.isArray(spec.variable_sets)) {
+            for (var j = 0; j < spec.variable_sets.length; j++) {
+                var vs = this.variableBuilder.buildVariableSet(spec.variable_sets[j]);
+                compiledVariableSets.push(vs);
+            }
+        }
+
+        // 5. Compile Approvals & Routing
+        var compiledApprovals = [];
+        if (spec.approvals && Array.isArray(spec.approvals)) {
+            for (var k = 0; k < spec.approvals.length; k++) {
+                var app = spec.approvals[k];
+                compiledApprovals.push({
+                    order: (k + 1) * 100,
+                    type: app.type || 'manager', // manager, group, user
+                    assignment_group: app.group || app.assignment_group || '',
+                    approver_user: app.user || app.approver || '',
+                    condition: app.condition || '',
+                    mandatory: app.mandatory !== false
+                });
+            }
+        }
+
+        // 6. Compile Fulfillment Plan (RITM, Tasks, Incident, Change)
+        var fulfillmentPlan = this.fulfillmentEngine.buildFulfillmentPlan(spec);
+
+        // 7. Compile UI Policies & Scripts
+        var compiledPolicies = spec.ui_policies || [];
+        var compiledScripts = spec.client_scripts || [];
+
+        var executionDuration = (new Date().getTime() - startTime) + 'ms';
+
+        var output = {
+            success: true,
+            status: 'GENERATED_AND_PUBLISHED',
+            catalog_item: catItem,
+            variables: compiledVariables,
+            variable_sets: compiledVariableSets,
+            approvals: compiledApprovals,
+            fulfillment: fulfillmentPlan,
+            ui_policies: compiledPolicies,
+            client_scripts: compiledScripts,
+            audit: {
+                created_by: options.user || 'admin',
+                created_on: new Date().toISOString(),
+                duration: executionDuration,
+                total_variables: compiledVariables.length,
+                total_tasks: fulfillmentPlan.tasks.length,
+                total_approvals: compiledApprovals.length
+            }
+        };
+
+        this.auditLog.push(output.audit);
+        return output;
+    },
+
+    /**
+     * Executes bulk catalog generation from batch array or JSON template.
+     */
+    generateBulkCatalogs: function(batchInput, options) {
+        'use strict';
+        var parsed = this.importParser.parseBatch(batchInput);
+        var results = {
+            total_requested: parsed.total_items,
+            successful_creations: 0,
+            failed_creations: 0,
+            items: []
+        };
+
+        for (var i = 0; i < parsed.items.length; i++) {
+            var item = parsed.items[i];
+            if (item.valid) {
+                try {
+                    var generated = this.generateCatalogItem(item.spec, options);
+                    results.successful_creations++;
+                    results.items.push({
+                        name: item.name,
+                        status: 'SUCCESS',
+                        catalog_item_id: generated.catalog_item.sys_id,
+                        variable_count: generated.variables.length,
+                        task_count: generated.fulfillment.tasks.length
+                    });
+                } catch (ex) {
+                    results.failed_creations++;
+                    results.items.push({
+                        name: item.name,
+                        status: 'FAILED',
+                        error: ex.message
+                    });
+                }
+            } else {
+                results.failed_creations++;
+                results.items.push({
+                    name: item.name,
+                    status: 'VALIDATION_FAILED',
+                    errors: item.errors
+                });
+            }
+        }
+
+        return results;
+    },
+
+    /**
+     * Returns full execution and audit logs.
+     */
+    getAuditLog: function() {
+        'use strict';
+        return this.auditLog;
+    },
+
+    type: 'AppForgeCatalogFactoryEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>3609914cbd299cdbbdabce60401c8ff5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeCatalogFactoryEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_3609914cbd299cdbbdabce60401c8ff5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

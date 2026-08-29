@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeCatalogLifecycleManager</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeCatalogLifecycleManager</description>
+        <name>AppForgeCatalogLifecycleManager</name>
+        <script><![CDATA[/**
+ * AppForgeCatalogLifecycleManager
+ * Manages the complete lifecycle states, versioning, rollback, cloning, and diff comparisons of Catalog Factory definitions.
+ */
+var AppForgeCatalogLifecycleManager = Class.create();
+AppForgeCatalogLifecycleManager.prototype = {
+    initialize: function() {
+        'use strict';
+        this.STATES = [
+            'Draft', 'Validation', 'Pending Approval', 'Approved',
+            'Generating', 'Generated', 'Testing', 'Published', 'Retired'
+        ];
+    },
+
+    /**
+     * Transitions a catalog request to the next valid lifecycle state.
+     */
+    transitionState: function(currentRecord, targetState, actor) {
+        'use strict';
+        if (!currentRecord) {
+            throw new Error('Current record must be provided for state transition.');
+        }
+
+        if (this.STATES.indexOf(targetState) === -1) {
+            throw new Error('Invalid lifecycle state: "' + targetState + '".');
+        }
+
+        var prevState = currentRecord.state || 'Draft';
+        currentRecord.state = targetState;
+        currentRecord.updated_by = actor || 'admin';
+        currentRecord.updated_on = new Date().toISOString();
+
+        if (!currentRecord.state_history) {
+            currentRecord.state_history = [];
+        }
+
+        currentRecord.state_history.push({
+            from: prevState,
+            to: targetState,
+            actor: actor || 'admin',
+            timestamp: new Date().toISOString()
+        });
+
+        return currentRecord;
+    },
+
+    /**
+     * Creates a new version of an existing Catalog Item configuration.
+     */
+    createVersion: function(existingSpec, versionType) {
+        'use strict';
+        if (!existingSpec) {
+            throw new Error('Existing specification required to increment version.');
+        }
+
+        var currentVersion = existingSpec.version || '1.0';
+        var parts = currentVersion.split('.');
+        var major = parseInt(parts[0], 10) || 1;
+        var minor = parseInt(parts[1], 10) || 0;
+
+        if (versionType === 'major') {
+            major += 1;
+            minor = 0;
+        } else {
+            minor += 1;
+        }
+
+        var newSpec = JSON.parse(JSON.stringify(existingSpec));
+        newSpec.version = major + '.' + minor;
+        newSpec.previous_version = currentVersion;
+        newSpec.state = 'Draft';
+        newSpec.version_created_on = new Date().toISOString();
+
+        return newSpec;
+    },
+
+    /**
+     * Compares two versions and returns structural diff.
+     */
+    compareVersions: function(oldSpec, newSpec) {
+        'use strict';
+        oldSpec = oldSpec || {};
+        newSpec = newSpec || {};
+
+        var diff = {
+            old_version: oldSpec.version || '1.0',
+            new_version: newSpec.version || '1.1',
+            variables_added: [],
+            variables_removed: [],
+            tasks_added: [],
+            tasks_removed: [],
+            property_changes: []
+        };
+
+        var oldVars = (oldSpec.variables || []).map(function(v) { return v.name; });
+        var newVars = (newSpec.variables || []).map(function(v) { return v.name; });
+
+        for (var i = 0; i < newVars.length; i++) {
+            if (oldVars.indexOf(newVars[i]) === -1) diff.variables_added.push(newVars[i]);
+        }
+        for (var j = 0; j < oldVars.length; j++) {
+            if (newVars.indexOf(oldVars[j]) === -1) diff.variables_removed.push(oldVars[j]);
+        }
+
+        if (oldSpec.name !== newSpec.name) {
+            diff.property_changes.push({ property: 'name', old_val: oldSpec.name, new_val: newSpec.name });
+        }
+        if (oldSpec.category !== newSpec.category) {
+            diff.property_changes.push({ property: 'category', old_val: oldSpec.category, new_val: newSpec.category });
+        }
+
+        return diff;
+    },
+
+    /**
+     * Clones an existing catalog specification into a new item definition.
+     */
+    cloneCatalog: function(sourceSpec, newName, options) {
+        'use strict';
+        if (!sourceSpec) throw new Error('Source specification is required for cloning.');
+        options = options || {};
+
+        var cloned = JSON.parse(JSON.stringify(sourceSpec));
+        cloned.name = newName || (sourceSpec.name + ' (Copy)');
+        cloned.version = '1.0';
+        cloned.state = 'Draft';
+        cloned.cloned_from = sourceSpec.name;
+
+        if (options.exclude_variables === true) cloned.variables = [];
+        if (options.exclude_tasks === true) cloned.tasks = [];
+        if (options.exclude_approvals === true) cloned.approvals = [];
+
+        return cloned;
+    },
+
+    type: 'AppForgeCatalogLifecycleManager'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>b9c6e009fcc9da75b31628f5e6cbb7b2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeCatalogLifecycleManager</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_b9c6e009fcc9da75b31628f5e6cbb7b2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

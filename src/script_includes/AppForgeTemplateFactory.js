@@ -50,6 +50,8 @@ AppForgeTemplateFactory.prototype = {
         var key = templateId;
         if (key === 'ppm' || key === 'spm' || key === 'ppm_suite') {
             key = 'spm_ppm_suite';
+        } else if (key === 'catalog_builder' || key === 'catalog_lifecycle_manager' || key === 'catalog_automation') {
+            key = 'catalog_factory';
         }
         if (!this._templates[key]) {
             if (this._templates['spm_ppm_suite']) return JSON.parse(JSON.stringify(this._templates['spm_ppm_suite']));
@@ -600,6 +602,122 @@ AppForgeTemplateFactory.prototype = {
                                 { path: '/projects/{id}', http_method: 'GET', authentication: 'oauth', authorization_role: 'x_appforge_ppm.user' }
                             ]
                         }
+                    ]
+                }
+            }
+        };
+
+        // 8. Catalog Factory Template (End-to-End Service Catalog Lifecycle Automation)
+        catalog['catalog_factory'] = {
+            template_id: 'catalog_factory',
+            name: 'Catalog Factory',
+            category: 'Service Management & Automation',
+            description: 'End-to-End ServiceNow Catalog Lifecycle Automation. Generates Catalog Items, Variables, Variable Sets, Approvals, UI Policies, Client Scripts, RITMs, and multi-stage Fulfillment Tasks from a single template.',
+            version: '1.0.0',
+            icon: 'layers',
+            features: [
+                '24 Variable Types Support',
+                'Reusable Variable Sets',
+                'Multi-Tier Sequential/Parallel Approvals',
+                'RITM & Multi-Task Fulfillment Routing',
+                'Incident, Problem & Change Triggers',
+                'Pre-Flight Validation & Dry-Run Simulator',
+                'Bulk Excel / JSON Importer'
+            ],
+            definition: {
+                application: {
+                    name: 'Catalog Factory',
+                    application_id: 'app_catalog_factory',
+                    scope: 'x_1805046_app_fo_0',
+                    description: 'Automated Catalog Lifecycle Management & Builder Platform',
+                    version: '1.0.0',
+                    owner: 'admin',
+                    status: 'DEVELOPMENT'
+                },
+                modules: [
+                    { name: 'Catalog Builder Wizard', module_id: 'mod_cf_wizard', order: 10 },
+                    { name: 'Catalog Requests', module_id: 'mod_cf_requests', order: 20 },
+                    { name: 'Catalog Inventory', module_id: 'mod_cf_items', order: 30 },
+                    { name: 'Variable Sets Library', module_id: 'mod_cf_varsets', order: 40 },
+                    { name: 'Fulfillment Task Templates', module_id: 'mod_cf_tasks', order: 50 }
+                ],
+                schemas: [
+                    {
+                        name: 'Catalog Creation Request',
+                        schema_id: 'sch_cf_request',
+                        table_name: 'x_1805046_app_fo_0_cf_request',
+                        label: 'Catalog Creation Request',
+                        fields: [
+                            { name: 'u_number', label: 'Request Number', type: 'string', length: 40, mandatory: true },
+                            { name: 'u_catalog_item_name', label: 'Catalog Item Name', type: 'string', length: 120, mandatory: true },
+                            { name: 'u_category', label: 'Category', type: 'string', length: 60, mandatory: true },
+                            { name: 'u_short_description', label: 'Short Description', type: 'string', length: 255 },
+                            { name: 'u_state', label: 'State', type: 'string', length: 40, default_value: 'Draft' },
+                            { name: 'u_version', label: 'Version', type: 'string', length: 20, default_value: '1.0' },
+                            { name: 'u_requester', label: 'Requester', type: 'string', length: 40, default_value: 'admin' },
+                            { name: 'u_approver', label: 'Approver', type: 'string', length: 40 },
+                            { name: 'u_fulfillment_plan', label: 'Fulfillment Plan (JSON)', type: 'string', length: 4000 }
+                        ]
+                    },
+                    {
+                        name: 'Catalog Variable',
+                        schema_id: 'sch_cf_variable',
+                        table_name: 'x_1805046_app_fo_0_cf_variable',
+                        label: 'Catalog Variable',
+                        fields: [
+                            { name: 'u_name', label: 'Variable Name', type: 'string', length: 80, mandatory: true },
+                            { name: 'u_question', label: 'Question Text', type: 'string', length: 200, mandatory: true },
+                            { name: 'u_type', label: 'Type', type: 'string', length: 40, default_value: 'Single Line Text' },
+                            { name: 'u_order', label: 'Order', type: 'integer', default_value: '100' },
+                            { name: 'u_mandatory', label: 'Mandatory', type: 'boolean', default_value: 'false' },
+                            { name: 'u_reference_table', label: 'Reference Table', type: 'string', length: 80 }
+                        ]
+                    }
+                ],
+                experience: {
+                    forms: [
+                        {
+                            name: 'Catalog Request Standard Form',
+                            form_id: 'frm_cf_request',
+                            table_name: 'x_1805046_app_fo_0_cf_request',
+                            sections: [
+                                { title: 'General Info', fields: ['u_number', 'u_catalog_item_name', 'u_category', 'u_state'] },
+                                { title: 'Governance & Lifecycle', fields: ['u_version', 'u_requester', 'u_approver'] }
+                            ]
+                        }
+                    ],
+                    lists: [
+                        {
+                            name: 'All Catalog Requests',
+                            list_id: 'lst_cf_requests',
+                            table_name: 'x_1805046_app_fo_0_cf_request',
+                            columns: ['u_number', 'u_catalog_item_name', 'u_category', 'u_state', 'u_version']
+                        }
+                    ]
+                },
+                logic: {
+                    business_rules: [
+                        {
+                            name: 'Auto-Generate Catalog on Approval',
+                            rule_id: 'br_cf_auto_generate',
+                            table_name: 'x_1805046_app_fo_0_cf_request',
+                            when: 'after',
+                            event: 'update',
+                            condition: "current.u_state == 'Approved'",
+                            action_script: "gs.info('[Catalog Factory] Auto-generating catalog item for ' + current.u_catalog_item_name);"
+                        }
+                    ]
+                },
+                security: {
+                    roles: [
+                        { name: 'x_1805046_app_fo_0.admin', description: 'Catalog Factory Administrator' },
+                        { name: 'x_1805046_app_fo_0.builder', description: 'Catalog Factory Builder' },
+                        { name: 'x_1805046_app_fo_0.approver', description: 'Catalog Factory Approver' }
+                    ],
+                    acls: [
+                        { table: 'x_1805046_app_fo_0_cf_request', operation: 'read', role: 'x_1805046_app_fo_0.builder', decision: 'allow' },
+                        { table: 'x_1805046_app_fo_0_cf_request', operation: 'create', role: 'x_1805046_app_fo_0.builder', decision: 'allow' },
+                        { table: 'x_1805046_app_fo_0_cf_request', operation: 'write', role: 'x_1805046_app_fo_0.admin', decision: 'allow' }
                     ]
                 }
             }
