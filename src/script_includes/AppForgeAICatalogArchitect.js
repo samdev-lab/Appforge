@@ -1,0 +1,178 @@
+/**
+ * AppForgeAICatalogArchitect
+ * Natural Language Prompt-to-Catalog Synthesis Engine.
+ * Parses plain-text business requirements into structured Catalog Factory specifications.
+ */
+var AppForgeAICatalogArchitect = Class.create();
+AppForgeAICatalogArchitect.prototype = {
+    initialize: function() {
+        'use strict';
+        this.factory = new AppForgeCatalogFactoryEngine();
+    },
+
+    /**
+     * Synthesizes a structured Catalog Factory specification from a natural language prompt.
+     */
+    synthesizeFromPrompt: function(promptText, options) {
+        'use strict';
+        if (!promptText || promptText.trim() === '') {
+            throw new Error('Prompt text cannot be empty.');
+        }
+
+        options = options || {};
+        var lower = promptText.toLowerCase();
+
+        // 1. Determine Title & Category
+        var name = 'Custom Service Request';
+        var category = 'General Services';
+        var price = 0;
+
+        if (lower.indexOf('laptop') !== -1 || lower.indexOf('hardware') !== -1 || lower.indexOf('macbook') !== -1) {
+            name = 'Developer Hardware & Laptop Provisioning';
+            category = 'Hardware Logistics';
+            price = 1200;
+        } else if (lower.indexOf('cloud') !== -1 || lower.indexOf('aws') !== -1 || lower.indexOf('azure') !== -1) {
+            name = 'Cloud Infrastructure Access Request';
+            category = 'Cloud Engineering';
+            price = 150;
+        } else if (lower.indexOf('onboarding') !== -1 || lower.indexOf('employee') !== -1 || lower.indexOf('new hire') !== -1) {
+            name = 'Enterprise Employee Onboarding';
+            category = 'Employee Services';
+        } else if (lower.indexOf('vpn') !== -1 || lower.indexOf('security') !== -1 || lower.indexOf('access') !== -1) {
+            name = 'Zero Trust VPN & Security Access';
+            category = 'Information Security';
+        } else if (lower.indexOf('database') !== -1 || lower.indexOf('sql') !== -1) {
+            name = 'Production Database Access & Migration';
+            category = 'Database Infrastructure';
+        }
+
+        // 2. Synthesize Dynamic Variables
+        var variables = [];
+        variables.push({
+            name: 'requested_for',
+            question: 'Requested For User',
+            type: 'Reference',
+            reference_table: 'sys_user',
+            mandatory: true,
+            order: 100
+        });
+
+        if (lower.indexOf('environment') !== -1 || lower.indexOf('prod') !== -1 || lower.indexOf('dev') !== -1) {
+            variables.push({
+                name: 'target_environment',
+                question: 'Target Environment',
+                type: 'Select Box',
+                choices: ['Development', 'Staging / UAT', 'Production (Requires Change)'],
+                mandatory: true,
+                order: 200
+            });
+        }
+
+        if (lower.indexOf('cloud') !== -1 || lower.indexOf('aws') !== -1) {
+            variables.push({
+                name: 'cloud_account_id',
+                question: 'Cloud Account ID / Tenant',
+                type: 'Single Line Text',
+                mandatory: true,
+                order: 300
+            });
+            variables.push({
+                name: 'iam_role',
+                question: 'IAM Role Requested',
+                type: 'Select Box',
+                choices: ['ReadOnlyAccess', 'DeveloperPowerUser', 'AdminOpsAccess'],
+                mandatory: true,
+                order: 400
+            });
+        }
+
+        if (lower.indexOf('laptop') !== -1 || lower.indexOf('hardware') !== -1) {
+            variables.push({
+                name: 'laptop_model',
+                question: 'Laptop Model Preference',
+                type: 'Select Box',
+                choices: ['Apple MacBook Pro 16"', 'Lenovo ThinkPad X1 Carbon', 'Dell Precision Workstation'],
+                mandatory: true,
+                order: 300
+            });
+            variables.push({
+                name: 'shipping_address',
+                question: 'Office or Home Delivery Address',
+                type: 'Multi Line Text',
+                mandatory: true,
+                order: 400
+            });
+        }
+
+        variables.push({
+            name: 'business_justification',
+            question: 'Business Justification',
+            type: 'Multi Line Text',
+            mandatory: true,
+            order: 500
+        });
+
+        // 3. Synthesize Approval Hierarchy
+        var approvals = [{ type: 'manager', mandatory: true }];
+        if (lower.indexOf('security') !== -1 || lower.indexOf('prod') !== -1 || lower.indexOf('admin') !== -1 || lower.indexOf('cloud') !== -1) {
+            approvals.push({
+                type: 'group',
+                assignment_group: 'Security Operations & Governance',
+                mandatory: true
+            });
+        }
+
+        // 4. Synthesize Multi-Stage Fulfillment Tasks
+        var tasks = [];
+        if (lower.indexOf('cloud') !== -1) {
+            tasks.push({ name: 'Validate Cloud Security Policy & IAM Role', assignment_group: 'Security Ops', order: 100 });
+            tasks.push({ name: 'Provision Cloud Credentials via Terraform', assignment_group: 'DevOps & Cloud Engineering', order: 200 });
+        } else if (lower.indexOf('laptop') !== -1) {
+            tasks.push({ name: 'Asset Tagging & Hardware Procurement', assignment_group: 'Hardware Logistics', order: 100 });
+            tasks.push({ name: 'Configure MDM & Encryption Profiles', assignment_group: 'EUC Support', order: 200 });
+        } else {
+            tasks.push({ name: 'Provision User Account & Group Access', assignment_group: 'IAM Support', order: 100 });
+            tasks.push({ name: 'Verify End-to-End System Access', assignment_group: 'Service Desk', order: 200 });
+        }
+
+        // 5. Change Trigger if Production
+        var changeConfig = { enabled: false };
+        if (lower.indexOf('prod') !== -1 || lower.indexOf('database') !== -1) {
+            changeConfig = {
+                enabled: true,
+                change_type: 'Standard',
+                assignment_group: 'Change Management',
+                risk: 'Low',
+                justification: 'Automated Standard Change triggered via AppForge Catalog Item'
+            };
+        }
+
+        var spec = {
+            name: name,
+            category: category,
+            price: price,
+            description: 'AI Generated Catalog Item from prompt: "' + promptText + '"',
+            variables: variables,
+            approvals: approvals,
+            tasks: tasks,
+            change: changeConfig,
+            ai_generated: true,
+            source_prompt: promptText
+        };
+
+        return spec;
+    },
+
+    /**
+     * Synthesizes and publishes the catalog item in 1 execution.
+     */
+    synthesizeAndPublish: function(promptText, options) {
+        'use strict';
+        var spec = this.synthesizeFromPrompt(promptText, options);
+        var result = this.factory.generateCatalogItem(spec, options);
+        result.spec = spec;
+        return result;
+    },
+
+    type: 'AppForgeAICatalogArchitect'
+};

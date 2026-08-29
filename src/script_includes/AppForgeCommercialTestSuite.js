@@ -1,0 +1,86 @@
+/**
+ * AppForgeCommercialTestSuite
+ * Automated Test Suite certifying Commercial SaaS features: AI Prompt-to-Catalog Architect, ATF Test Generator, and Instance Health Diagnostics.
+ */
+var AppForgeCommercialTestSuite = Class.create();
+AppForgeCommercialTestSuite.prototype = {
+    initialize: function() {
+        'use strict';
+        this.aiArchitect = new AppForgeAICatalogArchitect();
+        this.atfGen = new AppForgeATFGenerator();
+        this.health = new AppForgeInstanceHealthEngine();
+        this.results = { passed: 0, failed: 0, total: 0, tests: [], details: [] };
+    },
+
+    assert: function(condition, testName, details) {
+        'use strict';
+        this.results.total++;
+        if (condition) {
+            this.results.passed++;
+            this.results.tests.push({ name: testName, status: 'PASSED' });
+            this.results.details.push({ name: testName, passed: true });
+        } else {
+            this.results.failed++;
+            this.results.tests.push({ name: testName, status: 'FAILED', details: details });
+            this.results.details.push({ name: testName, passed: false, details: details });
+            gs.error('[AppForgeCommercialTestSuite] FAILED: ' + testName + ' - ' + (details || ''));
+        }
+    },
+
+    runAllTests: function() {
+        'use strict';
+        gs.info('[AppForgeCommercialTestSuite] Starting Commercial SaaS test run...');
+
+        this.testAICatalogArchitect();
+        this.testATFTestGenerator();
+        this.testInstanceHealthScan();
+
+        gs.info('[AppForgeCommercialTestSuite] Completed: ' + this.results.passed + '/' + this.results.total + ' passed.');
+        return this.results;
+    },
+
+    testAICatalogArchitect: function() {
+        'use strict';
+        var prompt1 = 'I need an AWS Cloud Access Request for Production environment with IAM role selection and Security approval.';
+        var spec1 = this.aiArchitect.synthesizeFromPrompt(prompt1);
+
+        this.assert(spec1.name === 'Cloud Infrastructure Access Request', 'AI synthesized cloud request name');
+        this.assert(spec1.category === 'Cloud Engineering', 'AI classified category as Cloud Engineering');
+        this.assert(spec1.variables.length >= 4, 'AI generated 4+ dynamic variables');
+        this.assert(spec1.approvals.length === 2, 'AI generated Manager + Security approvals');
+        this.assert(spec1.change.enabled === true, 'AI enabled Standard Change trigger for Production');
+
+        var synthResult = this.aiArchitect.synthesizeAndPublish('Need MacBook Pro laptop for new engineer hire');
+        this.assert(synthResult.success === true, 'AI synthesizeAndPublish succeeded');
+        this.assert(synthResult.catalog_item.name === 'Developer Hardware & Laptop Provisioning', 'AI generated laptop catalog item');
+    },
+
+    testATFTestGenerator: function() {
+        'use strict';
+        var spec = {
+            name: 'Cloud Infrastructure Access Request',
+            variables: [
+                { name: 'requested_for', mandatory: true },
+                { name: 'cloud_account_id', mandatory: true }
+            ],
+            tasks: [{ name: 'Task 1' }, { name: 'Task 2' }]
+        };
+
+        var atf = this.atfGen.generateATFTest(spec);
+        this.assert(atf.total_steps === 6, 'ATF Generator produced 6 test steps');
+        this.assert(atf.steps[0].step_type === 'Impersonate', 'Step 1 is Impersonate');
+        this.assert(atf.steps[1].step_type === 'Open a Catalog Item (SP)', 'Step 2 is Open Catalog Item');
+        this.assert(atf.steps[4].table === 'sc_req_item', 'Step 5 validates sc_req_item');
+        this.assert(atf.steps[5].expected_count === 2, 'Step 6 validates 2 sc_task records');
+    },
+
+    testInstanceHealthScan: function() {
+        'use strict';
+        var scan = this.health.runHealthScan();
+        this.assert(scan.instance_health_score === 100, 'Instance health score is 100%');
+        this.assert(scan.status === 'HEALTHY', 'Instance status is HEALTHY');
+        this.assert(scan.checks.length === 4, 'All 4 diagnostic checks passed');
+    },
+
+    type: 'AppForgeCommercialTestSuite'
+};
