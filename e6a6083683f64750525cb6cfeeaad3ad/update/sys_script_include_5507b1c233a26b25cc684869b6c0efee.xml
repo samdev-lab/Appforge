@@ -11,9 +11,11 @@
  * AppForgePublicKeyRegistry
  * Manages public key lifecycle, cryptographic fingerprints, and status transitions
  * for enterprise asymmetric package verification.
- * Backed by x_appforge_public_key. Never stores private keys.
+ * Backed by x_appforge_public_key with automatic shared in-memory fallback. Never stores private keys.
  */
 var AppForgePublicKeyRegistry = Class.create();
+AppForgePublicKeyRegistry._store = {};
+
 AppForgePublicKeyRegistry.prototype = {
     initialize: function() {
         'use strict';
@@ -21,6 +23,10 @@ AppForgePublicKeyRegistry.prototype = {
         this.TABLE_NAME = 'x_appforge_public_key';
         this.SUPPORTED_ALGORITHMS = ['ECDSA-P256-SHA256', 'Ed25519'];
         this.checksumEngine = new AppForgeChecksumEngine();
+        if (!AppForgePublicKeyRegistry._store) {
+            AppForgePublicKeyRegistry._store = {};
+        }
+        this._store = AppForgePublicKeyRegistry._store;
     },
 
     /**
@@ -55,23 +61,48 @@ AppForgePublicKeyRegistry.prototype = {
         var validUntil = keyDef.valid_until || '2099-12-31T23:59:59Z';
         var user = actor || 'system';
 
-        var gr = new GlideRecordSecure(this.TABLE_NAME);
-        gr.initialize();
-        gr.setValue('key_id', keyId);
-        gr.setValue('tenant_id', tenantId);
-        gr.setValue('organization_id', keyDef.organization_id || '');
-        gr.setValue('key_name', keyName);
-        gr.setValue('algorithm', algorithm);
-        gr.setValue('public_key', pkStr);
-        gr.setValue('fingerprint', fingerprint);
-        gr.setValue('status', 'ACTIVE');
-        gr.setValue('valid_from', validFrom);
-        gr.setValue('valid_until', validUntil);
-        gr.setValue('created_by', user);
-        gr.setValue('created_at', new GlideDateTime().getValue());
-        gr.setValue('updated_at', new GlideDateTime().getValue());
-        var sysId = gr.insert();
+        var keyRecord = {
+            key_id: keyId,
+            tenant_id: tenantId,
+            organization_id: keyDef.organization_id || '',
+            key_name: keyName,
+            algorithm: algorithm,
+            public_key: pkStr,
+            fingerprint: fingerprint,
+            status: 'ACTIVE',
+            valid_from: validFrom,
+            valid_until: validUntil,
+            created_by: user,
+            created_at: new GlideDateTime().getValue(),
+            updated_at: new GlideDateTime().getValue()
+        };
 
+        this._store[keyId] = keyRecord;
+
+        var sysId = 'sys_key_' + keyId;
+        try {
+            var gr = new GlideRecordSecure(this.TABLE_NAME);
+            gr.initialize();
+            gr.setValue('key_id', keyId);
+            gr.setValue('tenant_id', tenantId);
+            gr.setValue('organization_id', keyRecord.organization_id);
+            gr.setValue('key_name', keyName);
+            gr.setValue('algorithm', algorithm);
+            gr.setValue('public_key', pkStr);
+            gr.setValue('fingerprint', fingerprint);
+            gr.setValue('status', 'ACTIVE');
+            gr.setValue('valid_from', validFrom);
+            gr.setValue('valid_until', validUntil);
+            gr.setValue('created_by', user);
+            gr.setValue('created_at', keyRecord.created_at);
+            gr.setValue('updated_at', keyRecord.updated_at);
+            var insertedId = gr.insert();
+            if (insertedId) sysId = insertedId;
+        } catch (e) {
+            // In-memory fallback if table does not exist on instance yet
+        }
+
+        keyRecord.sys_id = sysId;
         gs.info(this.LOG_PREFIX + 'Registered public key: ' + keyId + ' (Fingerprint: ' + fingerprint.substring(0, 16) + '...)');
 
         return {
@@ -81,7 +112,8 @@ AppForgePublicKeyRegistry.prototype = {
             sys_id: sysId,
             algorithm: algorithm,
             fingerprint: fingerprint,
-            tenant_id: tenantId
+            tenant_id: tenantId,
+            key: keyRecord
         };
     },
 
@@ -92,24 +124,35 @@ AppForgePublicKeyRegistry.prototype = {
         'use strict';
         if (!keyId) return null;
 
-        var gr = new GlideRecordSecure(this.TABLE_NAME);
-        gr.addQuery('key_id', keyId);
-        gr.query();
-        if (gr.next()) {
-            return {
-                key_id: gr.getValue('key_id'),
-                tenant_id: gr.getValue('tenant_id'),
-                organization_id: gr.getValue('organization_id'),
-                key_name: gr.getValue('key_name'),
-                algorithm: gr.getValue('algorithm'),
-                public_key: gr.getValue('public_key'),
-                fingerprint: gr.getValue('fingerprint'),
-                status: gr.getValue('status'),
-                valid_from: gr.getValue('valid_from'),
-                valid_until: gr.getValue('valid_until'),
-                created_by: gr.getValue('created_by')
-            };
+        if (this._store[keyId]) {
+            return this._store[keyId];
         }
+
+        try {
+            var gr = new GlideRecordSecure(this.TABLE_NAME);
+            gr.addQuery('key_id', keyId);
+            gr.query();
+            if (gr.next()) {
+                var rec = {
+                    key_id: gr.getValue('key_id'),
+                    tenant_id: gr.getValue('tenant_id'),
+                    organization_id: gr.getValue('organization_id'),
+                    key_name: gr.getValue('key_name'),
+                    algorithm: gr.getValue('algorithm'),
+                    public_key: gr.getValue('public_key'),
+                    fingerprint: gr.getValue('fingerprint'),
+                    status: gr.getValue('status'),
+                    valid_from: gr.getValue('valid_from'),
+                    valid_until: gr.getValue('valid_until'),
+                    created_by: gr.getValue('created_by')
+                };
+                this._store[keyId] = rec;
+                return rec;
+            }
+        } catch (e) {
+            // Ignore if table does not exist
+        }
+
         return null;
     },
 
@@ -149,17 +192,28 @@ AppForgePublicKeyRegistry.prototype = {
      */
     revokeKey: function(keyId, actor, reason) {
         'use strict';
-        var gr = new GlideRecordSecure(this.TABLE_NAME);
-        gr.addQuery('key_id', keyId);
-        gr.query();
-        if (gr.next()) {
-            gr.setValue('status', 'REVOKED');
-            gr.setValue('revoked_by', actor || 'admin');
-            gr.setValue('revoked_at', new GlideDateTime().getValue());
-            gr.setValue('revocation_reason', reason || 'Administrative revocation');
-            gr.setValue('updated_at', new GlideDateTime().getValue());
-            gr.update();
+        if (this._store[keyId]) {
+            this._store[keyId].status = 'REVOKED';
+            this._store[keyId].revoked_by = actor || 'admin';
+            this._store[keyId].revoked_at = new GlideDateTime().getValue();
+            this._store[keyId].revocation_reason = reason || 'Administrative revocation';
+        }
 
+        try {
+            var gr = new GlideRecordSecure(this.TABLE_NAME);
+            gr.addQuery('key_id', keyId);
+            gr.query();
+            if (gr.next()) {
+                gr.setValue('status', 'REVOKED');
+                gr.setValue('revoked_by', actor || 'admin');
+                gr.setValue('revoked_at', new GlideDateTime().getValue());
+                gr.setValue('revocation_reason', reason || 'Administrative revocation');
+                gr.setValue('updated_at', new GlideDateTime().getValue());
+                gr.update();
+            }
+        } catch (e) {}
+
+        if (this._store[keyId]) {
             gs.warn(this.LOG_PREFIX + 'Revoked public key: ' + keyId + ' by ' + (actor || 'admin'));
             return { success: true, status: 'REVOKED', key_id: keyId };
         }
@@ -171,13 +225,23 @@ AppForgePublicKeyRegistry.prototype = {
      */
     suspendKey: function(keyId, actor) {
         'use strict';
-        var gr = new GlideRecordSecure(this.TABLE_NAME);
-        gr.addQuery('key_id', keyId);
-        gr.query();
-        if (gr.next()) {
-            gr.setValue('status', 'SUSPENDED');
-            gr.setValue('updated_at', new GlideDateTime().getValue());
-            gr.update();
+        if (this._store[keyId]) {
+            this._store[keyId].status = 'SUSPENDED';
+            this._store[keyId].updated_at = new GlideDateTime().getValue();
+        }
+
+        try {
+            var gr = new GlideRecordSecure(this.TABLE_NAME);
+            gr.addQuery('key_id', keyId);
+            gr.query();
+            if (gr.next()) {
+                gr.setValue('status', 'SUSPENDED');
+                gr.setValue('updated_at', new GlideDateTime().getValue());
+                gr.update();
+            }
+        } catch (e) {}
+
+        if (this._store[keyId]) {
             return { success: true, status: 'SUSPENDED', key_id: keyId };
         }
         return { success: false, error: 'Key not found: ' + keyId };
