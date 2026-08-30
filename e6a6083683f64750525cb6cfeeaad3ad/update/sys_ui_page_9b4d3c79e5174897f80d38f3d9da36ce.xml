@@ -73,26 +73,27 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             <span style="font-size: 1.5rem; color: #0284c7;">⚡</span>
             <div>
                 <div>AppForge</div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">Marketplace &amp; Catalog Studio</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">v0.20 Master Platform</div>
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('marketplace', this)">🏪 Template Marketplace</li>
-            <li class="nav-item" onclick="switchTab('manager', this)">⚡ Single-Page Bulk Manager</li>
+            <li class="nav-item active" onclick="switchTab('marketplace', this)">🏪 Solution Marketplace</li>
+            <li class="nav-item" onclick="switchTab('manager', this)">⚡ Bulk Catalog Manager</li>
+            <li class="nav-item" onclick="switchTab('team', this)">👥 AppForge Team Workspace</li>
             <li class="nav-item" onclick="switchTab('items', this)">📦 Published Catalog Items</li>
             <li class="nav-item" onclick="switchTab('requests', this)">📋 Requests &amp; Fulfillment</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
-            <div>Target Instance: <strong>dev280961</strong></div>
-            <div style="margin-top: 4px;">User: <strong>admin</strong></div>
+            <div>Instance: <strong>dev280961</strong></div>
+            <div style="margin-top: 4px;">Role: <strong>Platform Admin</strong></div>
         </div>
     </aside>
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🏪 AppForge Template Marketplace</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🏪 AppForge Solution Marketplace</h2>
             <div class="user-badge">
-                <span class="badge badge-success">● CERTIFIED v0.20.0</span>
+                <span class="badge badge-success">● CERTIFIED v0.20</span>
                 <span>•</span>
                 <span>Scope: <strong>x_1805046_app_fo_0</strong></span>
             </div>
@@ -100,51 +101,67 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
         <div class="content-area">
             
-            <!-- VIEW 1: TEMPLATE MARKETPLACE -->
+            <!-- VIEW 1: SOLUTION MARKETPLACE -->
             <section id="tab-marketplace">
                 <div class="card" style="padding: 18px 24px; margin-bottom: 20px;">
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <span class="cat-pill active" onclick="filterCategory(this, 'All')">All Categories</span>
+                        <span class="cat-pill active" onclick="filterCategory(this, 'All')">All Products</span>
                         <span class="cat-pill" onclick="filterCategory(this, 'Catalog')">Catalog &amp; Forms</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'SPM')">SPM</span>
                         <span class="cat-pill" onclick="filterCategory(this, 'ITSM')">ITSM</span>
                         <span class="cat-pill" onclick="filterCategory(this, 'CSM')">CSM</span>
                         <span class="cat-pill" onclick="filterCategory(this, 'CRM')">CRM</span>
                         <span class="cat-pill" onclick="filterCategory(this, 'FSM')">FSM</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'SPM')">SPM</span>
                     </div>
                 </div>
 
                 <div class="grid-3" id="template-grid">
-                    <!-- Template 1: Bulk Catalog Automation (Fully Implemented & Certified) -->
+                    <!-- Product 1: Bulk Catalog Manager (Reference Product - Certified) -->
                     <div class="template-item-card" data-category="Catalog">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                                 <span style="font-size: 2rem;">⚡</span>
-                                <span class="badge badge-success">INSTALLED &amp; READY</span>
+                                <span class="badge badge-success">INSTALLED &amp; ACTIVE</span>
                             </div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Bulk Catalog Automation</h3>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Bulk Catalog Manager</h3>
                             <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">Catalog / Automation • v1.0.0 • AppForge</div>
-                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Create and manage hundreds of ServiceNow Catalog Items from a single Excel workbook with variables and fulfillment rules.</p>
+                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Create and manage hundreds of Service Catalog items from a single Excel workbook with variables and fulfillment rules.</p>
                             <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 10px; font-size: 0.78rem; color: #475569; margin-bottom: 16px;">
-                                <strong>Includes:</strong><br/>
-                                • Excel Import • Variables • Approval • Tasks • Incident • Change
+                                <strong>Plan:</strong> Professional ($499/mo) • Unlimited Items
                             </div>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$299 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$499 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
                             <div style="display: flex; gap: 6px;">
                                 <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('bulk_catalog_automation')">Details</button>
-                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="switchTab('manager', document.querySelectorAll('.nav-item')[1])">Open Workspace ↗</button>
+                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="switchTab('manager', document.querySelectorAll('.nav-item')[1])">Open ↗</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Template 2: ITSM Accelerator -->
+                    <!-- Product 2: SPM Accelerator -->
+                    <div class="template-item-card" data-category="SPM">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <span style="font-size: 2rem;">📊</span>
+                                <span class="badge badge-warning">TRIAL AVAILABLE</span>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">SPM Accelerator</h3>
+                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">SPM • v1.0.0 • AppForge</div>
+                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Strategic Portfolio Management, demand pipeline, scoring matrix, and capital budgeting accelerator.</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$599 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
+                            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="openDetailsModal('spm_accelerator')">Install Trial 🚀</button>
+                        </div>
+                    </div>
+
+                    <!-- Product 3: ITSM Accelerator -->
                     <div class="template-item-card" data-category="ITSM">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                                 <span style="font-size: 2rem;">🚨</span>
-                                <span class="badge badge-warning">COMING SOON</span>
+                                <span class="badge badge-warning">AVAILABLE</span>
                             </div>
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">ITSM Accelerator</h3>
                             <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">ITSM • v1.0.0 • AppForge</div>
@@ -152,24 +169,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
                             <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$450 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
-                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('itsm_accelerator')">Details</button>
-                        </div>
-                    </div>
-
-                    <!-- Template 3: CSM Accelerator -->
-                    <div class="template-item-card" data-category="CSM">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">💬</span>
-                                <span class="badge badge-warning">COMING SOON</span>
-                            </div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">CSM Accelerator</h3>
-                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">CSM • v1.0.0 • AppForge</div>
-                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Customer Service Management hub with case escalation and SLA workflows.</p>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$499 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
-                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('csm_accelerator')">Details</button>
+                            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="openDetailsModal('itsm_accelerator')">Install Trial 🚀</button>
                         </div>
                     </div>
                 </div>
@@ -181,14 +181,14 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Single-Page Bulk Catalog Management Workspace</h3>
                     <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 20px;">Manage the complete implementation lifecycle: Excel upload, variables, assignment, approvals, fulfillment actions, and publishing.</p>
 
-                    <!-- Section 1: Customer & Catalog Scope -->
+                    <!-- Scope Selection -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px;">
                         <div>
                             <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Customer / Tenant</label>
                             <select class="input-control"><option>Acme Global Enterprises (tenant_acme_01)</option><option>NovaTech Healthcare</option></select>
                         </div>
                         <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Target Catalog</label>
+                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Target Service Catalog</label>
                             <select class="input-control"><option>Service Catalog (OOTB)</option><option>Technical Catalog</option></select>
                         </div>
                         <div>
@@ -197,7 +197,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         </div>
                     </div>
 
-                    <!-- Section 2: Excel Template Actions -->
+                    <!-- Excel Template -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px; border: 1px solid var(--af-border); border-radius: 8px;">
                         <div>
                             <strong style="font-size: 0.9rem; color: #0f172a;">Standardized Excel Template (7 Sheets)</strong>
@@ -209,7 +209,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         </div>
                     </div>
 
-                    <!-- Section 3: "After Submit" Fulfillment Designer -->
+                    <!-- "After Submit" Fulfillment Designer -->
                     <div style="margin-bottom: 20px; padding: 18px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px;">
                         <h4 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 10px;">After Submit — What should AppForge create in ServiceNow?</h4>
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
@@ -235,11 +235,11 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                                 <input type="checkbox" /> ☐ Notification
                             </label>
                             <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" /> ☐ Native Flow Designer
+                                <input type="checkbox" /> ☐ Flow Designer Flow
                             </label>
                         </div>
 
-                        <!-- Assignment & Approval Inputs -->
+                        <!-- Assignment & Approval -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 1px solid var(--af-border); padding-top: 14px;">
                             <div>
                                 <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Default Assignment Group</label>
@@ -252,7 +252,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         </div>
                     </div>
 
-                    <!-- Section 4: Validation, Preview & Publishing Buttons -->
+                    <!-- Actions -->
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 18px;">
                         <div style="font-size: 0.84rem; color: #16a34a; font-weight: 600;">
                             ✓ 3 Catalog Items • ✓ 12 Variables • ✓ 7 Fulfillment Steps • 0 Errors
@@ -266,7 +266,51 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                 </div>
             </section>
 
-            <!-- VIEW 3: PUBLISHED CATALOG ITEMS (3 REAL LIVE ITEMS) -->
+            <!-- VIEW 3: APPFORGE INTERNAL TEAM WORKSPACE -->
+            <section id="tab-team" class="hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">AppForge Implementation Team Workspace</h3>
+                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Manage customer implementations, subscriptions, deployments, and health scores.</p>
+                        </div>
+                        <span class="badge badge-info">INTERNAL ACCESS ONLY</span>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Customer Account</th>
+                                <th>Primary Contact</th>
+                                <th>Implementation Stage</th>
+                                <th>Products Installed</th>
+                                <th>Health Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Acme Global Enterprises</strong><br/><span style="font-size: 0.76rem; color: #64748b;">dev280961.service-now.com</span></td>
+                                <td>sarah.security@acme.com</td>
+                                <td><span class="badge badge-success">GO LIVE</span></td>
+                                <td>Bulk Catalog, Onboarding</td>
+                                <td><strong style="color: #16a34a;">95% HEALTHY</strong></td>
+                                <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Manage Implementation ↗</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>NovaTech Healthcare</strong><br/><span style="font-size: 0.76rem; color: #64748b;">novatech.service-now.com</span></td>
+                                <td>john.admin@novatech.org</td>
+                                <td><span class="badge badge-info">PRODUCTION READY</span></td>
+                                <td>Bulk Catalog Manager</td>
+                                <td><strong style="color: #16a34a;">92% HEALTHY</strong></td>
+                                <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Manage Implementation ↗</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 4: PUBLISHED CATALOG ITEMS (3 REAL LIVE ITEMS) -->
             <section id="tab-items" class="hidden">
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -319,7 +363,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                 </div>
             </section>
 
-            <!-- VIEW 4: REQUESTS & FULFILLMENT -->
+            <!-- VIEW 5: REQUESTS & FULFILLMENT -->
             <section id="tab-requests" class="hidden">
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -365,7 +409,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     <div class="modal-box">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
             <div>
-                <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;" id="dt-name">Bulk Catalog Automation</h3>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;" id="dt-name">Bulk Catalog Manager</h3>
                 <div style="font-size: 0.8rem; color: #0284c7; font-weight: 600;" id="dt-meta">Catalog / Automation • v1.0.0 • AppForge</div>
             </div>
             <span class="badge badge-success" id="dt-status">CERTIFIED</span>
@@ -373,14 +417,15 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.5; margin-bottom: 16px;" id="dt-desc">Create and manage hundreds of ServiceNow Catalog Items from a single Excel template.</p>
         
         <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 0.82rem; color: #334155;">
-            <strong>Objects Created on Installation:</strong><br/>
-            • 1 Workspace Page • 1 Navigation Module (<code>Bulk Catalog Manager</code>)<br/>
-            • 2 Roles/ACLs • 7 Script Includes • 3 APIs
+            <strong>Commercial Plans:</strong><br/>
+            • <strong>Community:</strong> Free (up to 50 items)<br/>
+            • <strong>Professional:</strong> $499/mo (up to 500 items)<br/>
+            • <strong>Enterprise:</strong> $1,499/mo (Unlimited items &amp; Priority SLA)
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
-            <button class="btn btn-primary" onclick="installFromModal()">Install Solution 🚀</button>
+            <button class="btn btn-primary" onclick="installFromModal()">1-Click Install Solution 🚀</button>
         </div>
     </div>
 </div>
@@ -415,14 +460,19 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function openDetailsModal(id) {
         if (id === 'bulk_catalog_automation') {
-            document.getElementById('dt-name').innerText = 'Bulk Catalog Automation';
+            document.getElementById('dt-name').innerText = 'Bulk Catalog Manager';
             document.getElementById('dt-meta').innerText = 'Catalog / Automation • v1.0.0 • AppForge';
             document.getElementById('dt-status').innerText = 'CERTIFIED & READY';
             document.getElementById('dt-desc').innerText = 'Create and manage hundreds of ServiceNow Catalog Items from a single Excel workbook with variables and fulfillment rules.';
+        } else if (id === 'spm_accelerator') {
+            document.getElementById('dt-name').innerText = 'SPM Accelerator';
+            document.getElementById('dt-meta').innerText = 'SPM • v1.0.0 • AppForge';
+            document.getElementById('dt-status').innerText = 'TRIAL READY';
+            document.getElementById('dt-desc').innerText = 'Strategic Portfolio Management, demand pipeline, scoring matrix, and capital budgeting accelerator.';
         } else {
             document.getElementById('dt-name').innerText = id.replace('_', ' ').toUpperCase();
             document.getElementById('dt-meta').innerText = 'Accelerator • v1.0.0 • AppForge';
-            document.getElementById('dt-status').innerText = 'COMING SOON';
+            document.getElementById('dt-status').innerText = 'AVAILABLE';
             document.getElementById('dt-desc').innerText = 'Enterprise accelerator module for ServiceNow.';
         }
         document.getElementById('modal-template-details').style.display = 'flex';
@@ -434,13 +484,13 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function installFromModal() {
         closeDetailsModal();
-        alert('🎉 TEMPLATE INSTALLED SUCCESSFULLY!\n\n• Solution: Bulk Catalog Automation\n• Module Created: Bulk Catalog Manager\n• Status: Ready to Use');
+        alert('🎉 22-STEP ONE-CLICK INSTALLATION COMPLETE!\n\n• Solution: Bulk Catalog Manager\n• Module Created: Bulk Catalog Manager\n• License: Active (Professional Tier)\n• Status: Ready to Use in ServiceNow');
         switchTab('manager', document.querySelectorAll('.nav-item')[1]);
     }
 
     function publishCatalogDirectly() {
         alert('🚀 BULK CATALOG PUBLISHED LIVE TO SERVICENOW!\n\n• Items Created: 3 (sc_cat_item)\n• Variables Created: 12 (item_option_new)\n• Tasks & Approvals: Configured\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Status: LIVE IN PRODUCTION');
-        switchTab('items', document.querySelectorAll('.nav-item')[2]);
+        switchTab('items', document.querySelectorAll('.nav-item')[3]);
     }
 </script>
 </j:jelly>

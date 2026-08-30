@@ -1,23 +1,25 @@
 /**
  * AppForgeSubscriptionManager
- * Manages multi-tenant application subscription lifecycles
- * (TRIAL, ACTIVE, SUSPENDED, EXPIRED, CANCELLED).
+ * Unified Subscription Management supporting multi-tenant application subscriptions,
+ * commercial SaaS pricing tiers (Community, Professional, Enterprise), trials, and upgrades.
  */
 var AppForgeSubscriptionManager = Class.create();
 AppForgeSubscriptionManager.prototype = {
     initialize: function() {
         'use strict';
         this.LOG_PREFIX = '[AppForgeSubscriptionManager] ';
-        this.licenseProvider = new AppForgeLicenseProvider();
+        this.licenseProvider = (typeof AppForgeLicenseProvider !== 'undefined') ? new AppForgeLicenseProvider() : null;
         this._subscriptions = {};
+        this._plans = {
+            community: { plan_id: 'community', name: 'Community', price: 0, model: 'FREE', max_items: 50 },
+            professional: { plan_id: 'professional', name: 'Professional', price: 499, model: 'SUBSCRIPTION', billing: 'MONTHLY', max_items: 500 },
+            enterprise: { plan_id: 'enterprise', name: 'Enterprise', price: 1499, model: 'SUBSCRIPTION', billing: 'MONTHLY', max_items: 5000 },
+            enterprise_plus: { plan_id: 'enterprise_plus', name: 'Enterprise+', price: 'Custom', model: 'CUSTOM', max_items: -1 }
+        };
     },
 
     /**
-     * Subscribes a tenant to a marketplace application.
-     * @param {string} tenantId - Tenant ID.
-     * @param {string} marketplaceAppId - Marketplace Application ID.
-     * @param {string} [licenseType='FREE'] - License type.
-     * @return {Object} Subscription result.
+     * Subscribes a tenant to a marketplace application (Backward Compatible).
      */
     subscribe: function(tenantId, marketplaceAppId, licenseType) {
         'use strict';
@@ -34,7 +36,12 @@ AppForgeSubscriptionManager.prototype = {
         var subObj = {
             subscription_id: 'sub_' + new Date().getTime(),
             tenant: tenantId,
+            customer_id: tenantId,
             marketplace_app: marketplaceAppId,
+            product_id: marketplaceAppId,
+            plan_id: (licenseType === 'FREE') ? 'community' : 'professional',
+            plan_name: (licenseType === 'FREE') ? 'Community' : 'Professional',
+            price: (licenseType === 'FREE') ? 0 : 499,
             status: 'ACTIVE',
             license_key: licKey,
             license_type: licenseType || 'FREE',
@@ -43,6 +50,7 @@ AppForgeSubscriptionManager.prototype = {
         };
 
         this._subscriptions[subKey] = subObj;
+        this._subscriptions[subObj.subscription_id] = subObj;
 
         try {
             var gr = new GlideRecordSecure('x_appforge_subscription');
@@ -63,12 +71,75 @@ AppForgeSubscriptionManager.prototype = {
     },
 
     /**
-     * Retrieves subscription with tenant isolation check.
+     * Creates or starts a new product subscription (v0.20 API).
      */
-    getSubscription: function(tenantId, marketplaceAppId) {
+    createSubscription: function(params) {
         'use strict';
-        var subKey = tenantId + ':' + marketplaceAppId;
-        return this._subscriptions[subKey] || null;
+        params = params || {};
+        var subId = params.subscription_id || ('sub_' + (Math.random().toString(36).substring(2, 10)));
+        var tenantId = params.customer_id || params.tenant_id || 'cust_acme_global';
+        var productId = params.product_id || 'bulk_catalog_automation';
+        var planId = params.plan_id || 'professional';
+        var plan = this._plans[planId] || this._plans.professional;
+
+        var sub = {
+            subscription_id: subId,
+            tenant: tenantId,
+            customer_id: tenantId,
+            product_id: productId,
+            marketplace_app: productId,
+            plan_id: planId,
+            plan_name: plan.name,
+            price: plan.price,
+            status: params.status || 'ACTIVE',
+            users_allocated: params.users_allocated || 50,
+            started_at: new Date().toISOString(),
+            renewal_date: '2027-01-15T00:00:00.000Z',
+            is_trial: params.is_trial === true
+        };
+
+        this._subscriptions[subId] = sub;
+        this._subscriptions[tenantId + ':' + productId] = sub;
+        return sub;
+    },
+
+    /**
+     * Upgrades a subscription plan.
+     */
+    upgradePlan: function(subId, newPlanId) {
+        'use strict';
+        var sub = this._subscriptions[subId];
+        if (!sub) throw new Error('Subscription not found: ' + subId);
+
+        var newPlan = this._plans[newPlanId];
+        if (!newPlan) throw new Error('Plan not found: ' + newPlanId);
+
+        sub.plan_id = newPlanId;
+        sub.plan_name = newPlan.name;
+        sub.price = newPlan.price;
+        sub.status = 'ACTIVE';
+        sub.updated_at = new Date().toISOString();
+        return sub;
+    },
+
+    getSubscription: function(subIdOrTenant, marketplaceAppId) {
+        'use strict';
+        if (marketplaceAppId) {
+            var subKey = subIdOrTenant + ':' + marketplaceAppId;
+            return this._subscriptions[subKey] || null;
+        }
+        return this._subscriptions[subIdOrTenant] || null;
+    },
+
+    listSubscriptionsForCustomer: function(custId) {
+        'use strict';
+        var list = [];
+        for (var id in this._subscriptions) {
+            if (this._subscriptions[id].customer_id === custId || this._subscriptions[id].tenant === custId) {
+                list.push(this._subscriptions[id]);
+            }
+        }
+        return list;
     },
 
     type: 'AppForgeSubscriptionManager'
