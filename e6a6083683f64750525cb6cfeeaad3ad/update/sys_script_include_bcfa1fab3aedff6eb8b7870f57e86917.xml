@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeCatalogReferenceResolver</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeCatalogReferenceResolver</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeCatalogReferenceResolver
  * Resolves ServiceNow reference entities (users, groups, categories, catalogs, tables)

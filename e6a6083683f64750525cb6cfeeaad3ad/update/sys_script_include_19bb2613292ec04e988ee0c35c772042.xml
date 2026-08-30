@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeChecksumEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeChecksumEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeChecksumEngine
  * Generates deterministic SHA-256 checksums for application packages from canonicalized metadata.

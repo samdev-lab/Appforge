@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeDeploymentPreflight</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeDeploymentPreflight</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeDeploymentPreflight
  * Comprehensive pre-flight evaluation engine before application package deployment.

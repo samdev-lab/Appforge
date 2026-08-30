@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge automated test suite component: AppForgeEnterpriseTrustTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeEnterpriseTrustTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeEnterpriseTrustTestSuite
  * Automated test suite for Prompt 021: Enterprise Trust Fabric & Update Set Reverse-Engineering.

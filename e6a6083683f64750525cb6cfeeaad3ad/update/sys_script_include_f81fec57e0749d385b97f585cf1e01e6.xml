@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeCatalogImportParser</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeCatalogImportParser</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeCatalogImportParser
  * Parses bulk Excel/CSV/JSON templates to create multiple ServiceNow Catalog Items in a single operation.

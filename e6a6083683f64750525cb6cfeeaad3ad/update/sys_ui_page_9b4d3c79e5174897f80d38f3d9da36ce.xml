@@ -72,10 +72,10 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('bulk', this)">📂 Bulk Catalog Factory</li>
-            <li class="nav-item" onclick="switchTab('builder', this)">🛠️ Interactive Catalog Builder</li>
-            <li class="nav-item" onclick="switchTab('items', this)">📦 Published Catalog Items</li>
-            <li class="nav-item" onclick="switchTab('requests', this)">📋 Requests &amp; Fulfillment</li>
+            <li class="nav-item active" onclick="switchTab('bulk', this)">]]>📂<![CDATA[ Bulk Catalog Factory</li>
+            <li class="nav-item" onclick="switchTab('builder', this)">]]>🛠<![CDATA[️ Interactive Catalog Builder</li>
+            <li class="nav-item" onclick="switchTab('items', this)">]]>📦<![CDATA[ Published Catalog Items</li>
+            <li class="nav-item" onclick="switchTab('requests', this)">]]>📋<![CDATA[ Requests &amp; Fulfillment</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
             <div>Instance: <strong>dev280961 (Production)</strong></div>
@@ -85,7 +85,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">📂 Bulk Catalog Factory</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">]]>📂<![CDATA[ Bulk Catalog Factory</h2>
             <div class="user-badge">
                 <span class="badge badge-success">● LIVE ON PDI</span>
                 <span>•</span>
@@ -104,7 +104,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">1. Select Customer &amp; ServiceNow Application Scope</h3>
                             <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Enforces multi-tenant isolation and target scope mapping.</p>
                         </div>
-                        <button class="btn btn-secondary" onclick="downloadTemplate()">📥 Download Excel Template (7 Sheets)</button>
+                        <button class="btn btn-secondary" onclick="downloadTemplate()">]]>📥<![CDATA[ Download Excel Template (7 Sheets)</button>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
                         <div>
@@ -136,13 +136,13 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 16px;">Supports 7 sheets: Catalog Items, Variables, Choices, Variable Sets, UI Policies, Actions, and Fulfillment Flows.</p>
                     
                     <div style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 24px; text-align: center; background: #f8fafc; margin-bottom: 16px;">
-                        <span style="font-size: 2rem;">📊</span>
+                        <span style="font-size: 2rem;">]]>📊<![CDATA[</span>
                         <div style="font-size: 0.9rem; font-weight: 600; color: #0f172a; margin-top: 6px;">Ready to parse: <code>AppForge_Standard_Catalog_Template_v1.0.xlsx</code></div>
                         <div style="font-size: 0.78rem; color: #64748b; margin-top: 4px;">Contains 3 comprehensive enterprise catalog definitions (Hardware, Cloud, Security)</div>
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="runValidation()">🔍 Step 1: Validate Workbook</button>
+                        <button class="btn btn-secondary" onclick="runValidation()">]]>🔍<![CDATA[ Step 1: Validate Workbook</button>
                         <button class="btn btn-primary" id="btn-preview" onclick="runPreview()">⚡ Step 2: Generate Dry-Run Preview</button>
                     </div>
                 </div>
@@ -216,13 +216,13 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     </table>
 
                     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                        <strong style="color: #16a34a;">🛡️ Four-Eyes Production Release Gate (POL-SEC-006)</strong><br/>
+                        <strong style="color: #16a34a;">]]>🛡<![CDATA[️ Four-Eyes Production Release Gate (POL-SEC-006)</strong><br/>
                         <span style="font-size: 0.84rem; color: #475569;">Requester: <code>admin</code> • Security Approver: <code>sarah.security</code> (Independent Officer)</span>
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
                         <button class="btn btn-secondary" onclick="rollbackSimulation()">↩ Rollback Job</button>
-                        <button class="btn btn-primary" onclick="executeBulkImport()">🚀 Step 3: Approve &amp; Execute Bulk Import</button>
+                        <button class="btn btn-primary" onclick="executeBulkImport()">]]>🚀<![CDATA[ Step 3: Approve &amp; Execute Bulk Import</button>
                     </div>
                 </div>
             </section>
@@ -246,7 +246,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         <input type="text" id="cfg-desc" class="input-control" value="Standard developer MacBook Pro / Dell XPS provisioning with asset tagging." />
                     </div>
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button class="btn btn-primary" onclick="alert('Item published live to sc_cat_item!')">Publish Catalog Item 🚀</button>
+                        <button class="btn btn-primary" onclick="alert('Item published live to sc_cat_item!')">Publish Catalog Item ]]>🚀<![CDATA[</button>
                     </div>
                 </div>
             </section>
@@ -360,11 +360,11 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     }
 
     function downloadTemplate() {
-        alert('📥 DOWNLOADING STANDARDIZED EXCEL TEMPLATE...\n\n• File: AppForge_Bulk_Catalog_Template_v1.0.xlsx\n• Sheets: 7 (Catalog Items, Variables, Choices, Variable Sets, UI Policies, Actions, Fulfillment)\n• Status: Ready to populate.');
+        alert(']]>📥<![CDATA[ DOWNLOADING STANDARDIZED EXCEL TEMPLATE...\n\n• File: AppForge_Bulk_Catalog_Template_v1.0.xlsx\n• Sheets: 7 (Catalog Items, Variables, Choices, Variable Sets, UI Policies, Actions, Fulfillment)\n• Status: Ready to populate.');
     }
 
     function runValidation() {
-        alert('🔍 VALIDATION COMPLETE:\n\n✓ 3 Catalog Items parsed\n✓ 12 Form Variables verified\n✓ 7 Fulfillment tasks mapped\n✓ 0 Security violations\n\nReady for Dry-Run Preview.');
+        alert(']]>🔍<![CDATA[ VALIDATION COMPLETE:\n\n✓ 3 Catalog Items parsed\n✓ 12 Form Variables verified\n✓ 7 Fulfillment tasks mapped\n✓ 0 Security violations\n\nReady for Dry-Run Preview.');
     }
 
     function runPreview() {
@@ -373,7 +373,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     }
 
     function executeBulkImport() {
-        alert('🚀 BULK CATALOG FACTORY EXECUTION COMPLETE!\n\n• Job ID: JOB-CAT-2026-9041\n• Correlation ID: AF-CATALOG-2026-894211\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Created: 3 Catalog Items (sc_cat_item)\n• Created: 12 Variables (item_option_new)\n• Created: 7 Fulfillment Tasks (sc_task)\n• Status: LIVE IN SERVICE CATALOG');
+        alert(']]>🚀<![CDATA[ BULK CATALOG FACTORY EXECUTION COMPLETE!\n\n• Job ID: JOB-CAT-2026-9041\n• Correlation ID: AF-CATALOG-2026-894211\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Created: 3 Catalog Items (sc_cat_item)\n• Created: 12 Variables (item_option_new)\n• Created: 7 Fulfillment Tasks (sc_task)\n• Status: LIVE IN SERVICE CATALOG');
         switchTab('items', document.querySelectorAll('.nav-item')[2]);
     }
 

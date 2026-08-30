@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeMigrationReconciler</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeMigrationReconciler</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeMigrationReconciler
  * Reconciles post-migration state across source/target counts, checksum accuracy, orphan references, and failure rates.

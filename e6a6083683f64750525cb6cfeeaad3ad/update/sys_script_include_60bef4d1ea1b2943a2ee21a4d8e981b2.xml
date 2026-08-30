@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge automated test suite component: AppForgeGovernanceTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeGovernanceTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeGovernanceTestSuite
  * Automated Test Runner for AppForge Enterprise Governance, Policy-as-Code & Compliance Factory (Prompt 015).

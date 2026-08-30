@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeReleaseNotesGenerator</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeReleaseNotesGenerator</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeReleaseNotesGenerator
  * Generates structured, deterministic release notes from package difference analysis.
@@ -40,7 +42,7 @@ AppForgeReleaseNotesGenerator.prototype = {
         }
 
         if (diff.added && diff.added.length > 0) {
-            lines.push('### 🚀 What\'s New');
+            lines.push('### ]]>🚀<![CDATA[ What\'s New');
             for (var a = 0; a < diff.added.length; a++) {
                 lines.push('- Added ' + diff.added[a].type + ': `' + diff.added[a].name + '`');
             }
@@ -48,7 +50,7 @@ AppForgeReleaseNotesGenerator.prototype = {
         }
 
         if (diff.modified && diff.modified.length > 0) {
-            lines.push('### 🔄 Changes & Improvements');
+            lines.push('### ]]>🔄<![CDATA[ Changes & Improvements');
             for (var m = 0; m < diff.modified.length; m++) {
                 lines.push('- Updated ' + diff.modified[m].type + ': `' + diff.modified[m].name + '` (' + (diff.modified[m].detail || 'modified') + ')');
             }
@@ -56,7 +58,7 @@ AppForgeReleaseNotesGenerator.prototype = {
         }
 
         if (diff.removed && diff.removed.length > 0) {
-            lines.push('### 🗑️ Deprecations & Removals');
+            lines.push('### ]]>🗑<![CDATA[️ Deprecations & Removals');
             for (var r = 0; r < diff.removed.length; r++) {
                 lines.push('- Removed ' + diff.removed[r].type + ': `' + diff.removed[r].name + '`');
             }

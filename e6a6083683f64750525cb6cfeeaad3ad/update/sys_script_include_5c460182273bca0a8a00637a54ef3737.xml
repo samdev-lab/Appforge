@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeIdempotencyManager</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeIdempotencyManager</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeIdempotencyManager
  * Ensures integration requests with identical idempotency keys (e.g. X-Request-ID, delivery_id)

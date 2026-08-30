@@ -4,6 +4,7 @@
         <can_delegate>true</can_delegate>
         <description>AppForge Platform Administrator with full access to governance, tenancy, and deployments</description>
         <elevated_privilege>false</elevated_privilege>
+        <federated_id>D3VoZaHsoE2ErR+IEryvy3DSf8dyK4bQsSaLY+QoznA=</federated_id>
         <grantable>true</grantable>
         <includes_roles/>
         <name>x_1805046_app_fo_0.admin</name>
@@ -18,6 +19,7 @@
         <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
         <sys_policy/>
         <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_a2e8ed3abcd744877e4b3a950d1439f6</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
     </sys_user_role>

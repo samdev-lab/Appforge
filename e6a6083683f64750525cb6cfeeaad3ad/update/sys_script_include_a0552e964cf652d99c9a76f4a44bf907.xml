@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeIntegrationValidator</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeIntegrationValidator</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeIntegrationValidator
  * Validates complete Integration and API definition blocks (Inbound APIs, Resources, Outbound Integrations, Webhooks, Auth configs).
