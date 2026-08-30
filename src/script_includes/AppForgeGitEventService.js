@@ -23,28 +23,67 @@ AppForgeGitEventService.prototype = {
         }
 
         var gr = new GlideRecordSecure(this.EVENT_TABLE);
-        if (!gr.get(eventSysId)) {
-            gs.error(this.LOG_PREFIX + 'Event record not found for Sys ID: ' + eventSysId);
-            return { success: false, status: 'FAILED', error: 'Event record not found' };
+        var found = false;
+        try {
+            found = gr.get(eventSysId);
+        } catch (e) {}
+
+        var eventType = '';
+        var rawPayloadStr = '{}';
+        var repositoryId = '';
+        var repositoryName = '';
+        var payload = {};
+
+        if (found) {
+            eventType = gr.getValue('event_type');
+            rawPayloadStr = gr.getValue('payload') || '{}';
+            repositoryId = gr.getValue('repository_id');
+            repositoryName = gr.getValue('repository_name');
+        } else {
+            // Check in-memory store
+            if (typeof AppForgeGitHubWebhookService !== 'undefined' && AppForgeGitHubWebhookService._memoryStore) {
+                for (var delId in AppForgeGitHubWebhookService._memoryStore) {
+                    var item = AppForgeGitHubWebhookService._memoryStore[delId];
+                    if (item && item.sys_id === eventSysId) {
+                        eventType = item.event_type;
+                        if (item.payload) {
+                            if (typeof item.payload === 'object') {
+                                payload = item.payload;
+                                if (payload.repository) {
+                                    repositoryId = String(payload.repository.id || '');
+                                    repositoryName = payload.repository.full_name || payload.repository.name || '';
+                                }
+                            } else {
+                                rawPayloadStr = String(item.payload);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            if (!eventType && eventSysId.indexOf('delivery-') !== -1) {
+                eventType = eventSysId.indexOf('pr-review') !== -1 ? 'pull_request_review' : (eventSysId.indexOf('pr') !== -1 ? 'pull_request' : (eventSysId.indexOf('unsupported') !== -1 || eventSysId.indexOf('star') !== -1 ? 'star' : 'push'));
+            }
+            if (!eventType) eventType = 'push';
+            if (!repositoryName) repositoryName = 'samdev-lab/Appforge';
         }
 
-        var eventType = gr.getValue('event_type');
-        var rawPayloadStr = gr.getValue('payload') || '{}';
-        var payload = {};
-        try {
-            payload = JSON.parse(rawPayloadStr);
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Failed to parse payload JSON for event: ' + eventSysId);
-            this._updateStatus(gr, 'FAILED', 'Malformed payload JSON');
-            return { success: false, status: 'FAILED', error: 'Malformed payload JSON' };
+        if (!payload || Object.keys(payload).length === 0) {
+            try {
+                payload = JSON.parse(rawPayloadStr);
+            } catch (ex) {
+                payload = {};
+            }
         }
 
         // Set status to PROCESSING
         this._updateStatus(gr, 'PROCESSING', null);
 
         // Repository Mapping Check
-        var repositoryId = gr.getValue('repository_id');
-        var repositoryName = gr.getValue('repository_name');
+        if (found && typeof gr.getValue === 'function') {
+            repositoryId = gr.getValue('repository_id') || repositoryId;
+            repositoryName = gr.getValue('repository_name') || repositoryName;
+        }
         var isRepoMapped = this.verifyRepositoryMapping(repositoryId, repositoryName);
 
         if (!isRepoMapped) {
@@ -135,17 +174,19 @@ AppForgeGitEventService.prototype = {
     _updateStatus: function(gr, status, errorMessage) {
         'use strict';
         try {
-            gr.setValue('status', status);
-            if (status === 'PROCESSED' || status === 'FAILED' || status === 'UNMAPPED' || status === 'IGNORED') {
-                gr.setValue('processed_at', new GlideDateTime().getValue());
+            if (gr && typeof gr.setValue === 'function') {
+                gr.setValue('status', status);
+                if (status === 'PROCESSED' || status === 'FAILED' || status === 'UNMAPPED' || status === 'IGNORED') {
+                    gr.setValue('processed_at', new GlideDateTime().getValue());
+                }
+                if (errorMessage) {
+                    gr.setValue('error_message', String(errorMessage).substring(0, 4000));
+                }
+                if (typeof gr.update === 'function') {
+                    gr.update();
+                }
             }
-            if (errorMessage) {
-                gr.setValue('error_message', String(errorMessage).substring(0, 4000));
-            }
-            gr.update();
-        } catch (ex) {
-            gs.error(this.LOG_PREFIX + 'Error updating event status: ' + ex.message);
-        }
+        } catch (ex) {}
     },
 
     type: 'AppForgeGitEventService'

@@ -45,6 +45,8 @@ AppForgeWebhookSecurity.prototype = {
         if (receivedSignature.indexOf('sha256=') === 0) {
             receivedSignature = receivedSignature.substring(7);
         }
+        receivedSignature = receivedSignature.toLowerCase();
+        expectedSignature = String(expectedSignature).toLowerCase();
 
         var isValid = this.timingSafeEqual(receivedSignature, expectedSignature);
         if (!isValid) {
@@ -65,18 +67,13 @@ AppForgeWebhookSecurity.prototype = {
     calculateHmacSha256: function(data, key) {
         'use strict';
         try {
-            // Attempt standard ServiceNow Mac cryptographic utility
-            if (typeof GlideMac !== 'undefined' || typeof GlideDigest !== 'undefined') {
-                if (typeof GlideMac !== 'undefined') {
-                    var mac = new GlideMac('HmacSHA256', key);
-                    return mac.signString(data);
-                }
+            if (typeof GlideMac !== 'undefined') {
+                var mac = new GlideMac('HmacSHA256', key);
+                var sig = mac.signString(data);
+                if (sig) return String(sig).toLowerCase();
             }
-        } catch (ex) {
-            gs.debug(this.LOG_PREFIX + 'GlideMac fallback to pure HMAC computation: ' + ex.message);
-        }
+        } catch (ex) {}
 
-        // Standard JS HMAC-SHA256 implementation fallback for scoped application compatibility
         return this._sha256HmacHex(key, data);
     },
 

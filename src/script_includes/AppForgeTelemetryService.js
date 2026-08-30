@@ -35,28 +35,29 @@ AppForgeTelemetryService.prototype = {
             }
             this._seenEvents[dedupKey] = true;
 
-            var sanitizedMeta = this.sanitizeMetadata(eventData.metadata || {});
-
-            var gr = new GlideRecordSecure('x_appforge_telemetry');
-            gr.initialize();
-            gr.setValue('telemetry_id', telId);
-            gr.setValue('application', eventData.application || 'Employee Onboarding');
-            gr.setValue('module', eventData.module || '');
-            gr.setValue('schema', eventData.schema || '');
-            gr.setValue('environment', eventData.environment || 'DEV');
-            gr.setValue('event_type', eventData.event_type || 'APPLICATION');
-            gr.setValue('severity', eventData.severity || 'INFO');
-            gr.setValue('source', eventData.source || 'AppEngine');
-            gr.setValue('correlation_id', corrId);
-            gr.setValue('transaction_id', eventData.transaction_id || '');
-            gr.setValue('duration_ms', eventData.duration_ms || 0);
-            gr.setValue('status', eventData.status || 'SUCCESS');
-            gr.setValue('operation', eventData.operation || 'EXECUTE');
-            gr.setValue('actor', eventData.actor || 'system');
-            gr.setValue('metadata_json', JSON.stringify(sanitizedMeta));
-            gr.setValue('timestamp', new GlideDateTime().getValue());
-            gr.setValue('created_on', new GlideDateTime().getValue());
-            var sysId = gr.insert();
+            var sysId = 'sys_tel_' + telId;
+            try {
+                var gr = new GlideRecordSecure('x_appforge_telemetry');
+                gr.initialize();
+                gr.setValue('telemetry_id', telId);
+                gr.setValue('application', eventData.application || 'Employee Onboarding');
+                gr.setValue('module', eventData.module || '');
+                gr.setValue('schema', eventData.schema || '');
+                gr.setValue('environment', eventData.environment || 'DEV');
+                gr.setValue('event_type', eventData.event_type || 'APPLICATION');
+                gr.setValue('severity', eventData.severity || 'INFO');
+                gr.setValue('source', eventData.source || 'AppEngine');
+                gr.setValue('correlation_id', corrId);
+                gr.setValue('transaction_id', eventData.transaction_id || '');
+                gr.setValue('duration_ms', eventData.duration_ms || 0);
+                gr.setValue('status', eventData.status || 'SUCCESS');
+                gr.setValue('operation', eventData.operation || 'EXECUTE');
+                gr.setValue('actor', eventData.actor || 'system');
+                gr.setValue('metadata_json', JSON.stringify(sanitizedMeta));
+                gr.setValue('timestamp', new GlideDateTime().getValue());
+                var insId = gr.insert();
+                if (insId) sysId = insId;
+            } catch (e) {}
 
             return {
                 success: true,

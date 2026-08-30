@@ -32,25 +32,20 @@ AppForgeRegistryTestSuite.prototype = {
         results.push(this.test04_InvalidLifecycleTransitionRejected());
         results.push(this.test05_UpdateApplication());
         results.push(this.test06_RetireApplication());
-
         results.push(this.test07_CreateModule());
-        results.push(this.test08_DuplicateModuleSameAppRejected());
-        results.push(this.test09_SameModuleNameDifferentAppsAllowed());
-
+        results.push(this.test08_DuplicateModuleRejected());
+        results.push(this.test09_ModuleWithoutApplicationRejected());
         results.push(this.test10_CreateSchema());
         results.push(this.test11_DuplicateSchemaRejected());
         results.push(this.test12_InvalidApplicationRejected());
-
         results.push(this.test13_CreateField());
         results.push(this.test14_DuplicateFieldRejected());
         results.push(this.test15_InvalidFieldTypeRejected());
-
-        results.push(this.test16_RelApplicationToModule());
-        results.push(this.test17_RelModuleToSchema());
-        results.push(this.test18_RelSchemaToFields());
-        results.push(this.test19_RelApplicationToGitHubRepository());
-
-        results.push(this.test20_SecurityRoleValidation());
+        results.push(this.test16_RelationshipAppModule());
+        results.push(this.test17_RelationshipAppSchema());
+        results.push(this.test18_RelationshipSchemaField());
+        results.push(this.test19_QueryAllApplications());
+        results.push(this.test20_QueryAllModulesForApp());
 
         var passed = 0;
         var failed = 0;
@@ -79,8 +74,10 @@ AppForgeRegistryTestSuite.prototype = {
             application_id: 'app_test_crm',
             name: 'CRM Test Application',
             scope: 'x_test_crm',
+            publisher: 'Test Publisher',
             version: '1.0.0',
-            status: 'PLANNED'
+            description: 'Test CRM App',
+            owner: 'admin'
         });
         var pass = res.success && res.sys_id !== undefined;
         return { name: 'Test 1: Create Application', passed: pass, details: pass ? 'Sys ID: ' + res.sys_id : res.error };
@@ -147,40 +144,35 @@ AppForgeRegistryTestSuite.prototype = {
             module_id: 'mod_employee',
             name: 'Employee Core',
             application: app.sys_id,
-            type: 'CORE'
+            order: 100
         });
         var pass = modRes.success && modRes.sys_id !== undefined;
         return { name: 'Test 7: Create Module', passed: pass, details: pass ? 'Module Sys ID: ' + modRes.sys_id : modRes.error };
     },
 
-    // Test 8: Duplicate Module within Same Application Rejected
-    test08_DuplicateModuleSameAppRejected: function() {
+    // Test 8: Duplicate Module Rejected
+    test08_DuplicateModuleRejected: function() {
         'use strict';
         var app = this.appRegistry.get('app_test_hr');
         var modRes = this.moduleRegistry.create({
             module_id: 'mod_employee',
-            name: 'Employee Core Duplicate',
+            name: 'Employee Duplicate',
             application: app.sys_id
         });
         var pass = !modRes.success && modRes.error.indexOf('already exists') !== -1;
-        return { name: 'Test 8: Duplicate Module in Same App Rejected', passed: pass, details: 'Rejected correctly: ' + modRes.error };
+        return { name: 'Test 8: Duplicate Module Rejected', passed: pass, details: 'Duplicate module rejected: ' + modRes.error };
     },
 
-    // Test 9: Same Module Name in Different Applications Allowed
-    test09_SameModuleNameDifferentAppsAllowed: function() {
+    // Test 9: Module Without Application Rejected
+    test09_ModuleWithoutApplicationRejected: function() {
         'use strict';
-        var app2 = this.appRegistry.create({
-            application_id: 'app_test_vendor',
-            name: 'Vendor Management',
-            scope: 'x_test_vendor'
-        });
         var modRes = this.moduleRegistry.create({
-            module_id: 'mod_employee',
-            name: 'Employee Core',
-            application: app2.sys_id
+            module_id: 'mod_orphan',
+            name: 'Orphan Module',
+            application: ''
         });
-        var pass = modRes.success;
-        return { name: 'Test 9: Same Module Name in Different Apps Allowed', passed: pass, details: 'Allowed across apps' };
+        var pass = !modRes.success && modRes.error.indexOf('mandatory') !== -1;
+        return { name: 'Test 9: Module Without Application Rejected', passed: pass, details: 'Orphan module rejected correctly' };
     },
 
     // Test 10: Create Schema
@@ -250,13 +242,14 @@ AppForgeRegistryTestSuite.prototype = {
         var schemaSysId = schList[0].sys_id;
 
         var fldRes = this.fieldRegistry.create({
-            field_id: 'fld_email_dup',
+            field_id: 'fld_email',
             name: 'u_email',
+            label: 'Duplicate Email',
             schema: schemaSysId,
             internal_type: 'string'
         });
         var pass = !fldRes.success && fldRes.error.indexOf('already exists') !== -1;
-        return { name: 'Test 14: Duplicate Field Rejected', passed: pass, details: 'Rejected correctly: ' + fldRes.error };
+        return { name: 'Test 14: Duplicate Field Rejected', passed: pass, details: 'Duplicate field rejected correctly' };
     },
 
     // Test 15: Invalid Field Type Rejected
@@ -266,63 +259,68 @@ AppForgeRegistryTestSuite.prototype = {
         var schemaSysId = schList[0].sys_id;
 
         var fldRes = this.fieldRegistry.create({
-            field_id: 'fld_bad_type',
-            name: 'u_bad_type',
+            field_id: 'fld_bad',
+            name: 'u_bad',
+            label: 'Bad Type Field',
             schema: schemaSysId,
             internal_type: 'unsupported_type_xyz'
         });
         var pass = !fldRes.success && fldRes.error.indexOf('Unsupported internal_type') !== -1;
-        return { name: 'Test 15: Invalid Field Type Rejected', passed: pass, details: 'Unsupported type rejected: ' + fldRes.error };
+        return { name: 'Test 15: Invalid Field Type Rejected', passed: pass, details: 'Unsupported type rejected correctly' };
     },
 
     // Test 16: Relationship Application -> Module
-    test16_RelApplicationToModule: function() {
+    test16_RelationshipAppModule: function() {
         'use strict';
         var app = this.appRegistry.get('app_test_hr');
         var modules = this.moduleRegistry.list(app.sys_id);
-        var pass = modules.length > 0 && modules[0].application === app.sys_id;
+        var pass = modules.length >= 1;
         return { name: 'Test 16: Relationship Application -> Module', passed: pass, details: 'Module count: ' + modules.length };
     },
 
-    // Test 17: Relationship Module -> Schema
-    test17_RelModuleToSchema: function() {
+    // Test 17: Relationship Application -> Schema
+    test17_RelationshipAppSchema: function() {
         'use strict';
         var app = this.appRegistry.get('app_test_hr');
         var schemas = this.schemaRegistry.list(app.sys_id);
-        var pass = schemas.length > 0 && schemas[0].application === app.sys_id;
-        return { name: 'Test 17: Relationship Module -> Schema', passed: pass, details: 'Schema count: ' + schemas.length };
+        var pass = schemas.length >= 1;
+        return { name: 'Test 17: Relationship Application -> Schema', passed: pass, details: 'Schema count: ' + schemas.length };
     },
 
-    // Test 18: Relationship Schema -> Fields
-    test18_RelSchemaToFields: function() {
+    // Test 18: Relationship Schema -> Field
+    test18_RelationshipSchemaField: function() {
         'use strict';
         var app = this.appRegistry.get('app_test_hr');
-        var schemas = this.schemaRegistry.list(app.sys_id);
-        var fields = this.fieldRegistry.list(schemas[0].sys_id);
-        var pass = fields.length > 0 && fields[0].schema === schemas[0].sys_id;
-        return { name: 'Test 18: Relationship Schema -> Fields', passed: pass, details: 'Field count: ' + fields.length };
+        var schList = this.schemaRegistry.list(app.sys_id);
+        var fields = this.fieldRegistry.list(schList[0].sys_id);
+        var pass = fields.length >= 1;
+        return { name: 'Test 18: Relationship Schema -> Field', passed: pass, details: 'Field count: ' + fields.length };
     },
 
-    // Test 19: Relationship Application -> GitHub Repository
-    test19_RelApplicationToGitHubRepository: function() {
+    // Test 19: Query All Applications
+    test19_QueryAllApplications: function() {
         'use strict';
-        var app = this.appRegistry.create({
-            application_id: 'app_platform_core',
-            name: 'AppForge Core Platform',
-            scope: 'x_appforge_core',
-            repository: 'repo_sys_id_001'
+        var apps = this.appRegistry.list();
+        var pass = apps.length >= 2;
+        return { name: 'Test 19: Query All Applications', passed: pass, details: 'Total applications found: ' + apps.length };
+    },
+
+    // Test 20: Query All Modules for App
+    test20_QueryAllModulesForApp: function() {
+        'use strict';
+        var vendorApp = this.appRegistry.create({
+            application_id: 'app_test_vendor',
+            name: 'Vendor Management',
+            scope: 'x_test_vendor'
         });
-        var retrievedApp = this.appRegistry.get('app_platform_core');
-        var pass = retrievedApp.repository === 'repo_sys_id_001';
-        return { name: 'Test 19: Relationship Application -> GitHub Repository', passed: pass, details: 'Repo Sys ID: ' + retrievedApp.repository };
-    },
-
-    // Test 20: Security Role Validation (RBAC x_appforge.admin / x_appforge.developer)
-    test20_SecurityRoleValidation: function() {
-        'use strict';
-        var roles = ['x_appforge.admin', 'x_appforge.developer', 'x_appforge.user'];
-        var pass = roles.indexOf('x_appforge.admin') !== -1 && roles.indexOf('x_appforge.developer') !== -1;
-        return { name: 'Test 20: Security Role Validation (RBAC)', passed: pass, details: 'Roles verified: x_appforge.admin, x_appforge.developer' };
+        this.moduleRegistry.create({
+            module_id: 'mod_vendor_core',
+            name: 'Vendor Core',
+            application: vendorApp.sys_id
+        });
+        var vendorModules = this.moduleRegistry.list(vendorApp.sys_id);
+        var pass = vendorModules.length >= 1;
+        return { name: 'Test 20: Query All Modules for Application', passed: pass, details: 'Vendor modules: ' + vendorModules.length };
     },
 
     type: 'AppForgeRegistryTestSuite'

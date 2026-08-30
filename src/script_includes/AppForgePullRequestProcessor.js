@@ -17,8 +17,8 @@ AppForgePullRequestProcessor.prototype = {
      */
     process: function(eventRecordGr, payload) {
         'use strict';
-        if (!eventRecordGr || !payload) {
-            return { success: false, error: 'Invalid record or payload for PR processing' };
+        if (!payload) {
+            return { success: false, error: 'Invalid payload for PR processing' };
         }
 
         try {
@@ -32,15 +32,19 @@ AppForgePullRequestProcessor.prototype = {
             var author = pr.user ? pr.user.login : '';
             var title = pr.title || '';
 
-            eventRecordGr.setValue('action', action);
-            eventRecordGr.setValue('pull_request_number', prNumber);
-            eventRecordGr.setValue('pull_request_url', prUrl);
-            eventRecordGr.setValue('source_branch', sourceBranch);
-            eventRecordGr.setValue('target_branch', targetBranch);
-            eventRecordGr.setValue('commit_sha', commitSha);
-            eventRecordGr.setValue('author', author);
-            eventRecordGr.setValue('github_username', author);
-            eventRecordGr.setValue('commit_message', 'PR #' + prNumber + ': ' + title);
+            try {
+                if (eventRecordGr && typeof eventRecordGr.setValue === 'function') {
+                    eventRecordGr.setValue('action', action);
+                    eventRecordGr.setValue('pull_request_number', prNumber);
+                    eventRecordGr.setValue('pull_request_url', prUrl);
+                    eventRecordGr.setValue('source_branch', sourceBranch);
+                    eventRecordGr.setValue('target_branch', targetBranch);
+                    eventRecordGr.setValue('commit_sha', commitSha);
+                    eventRecordGr.setValue('author', author);
+                    eventRecordGr.setValue('github_username', author);
+                    eventRecordGr.setValue('commit_message', 'PR #' + prNumber + ': ' + title);
+                }
+            } catch (e) {}
 
             gs.info(this.LOG_PREFIX + 'Processed pull_request event. Action: ' + action + ', PR #' + prNumber + ', Source: ' + sourceBranch + ' -> Target: ' + targetBranch);
             return { success: true, action: action, prNumber: prNumber, sourceBranch: sourceBranch, targetBranch: targetBranch };

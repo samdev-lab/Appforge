@@ -354,7 +354,7 @@ AppForgeStudioTestSuite.prototype = {
         'use strict';
         var hook = new AppForgeGitHubWebhookService();
         var headers = {
-            'X-GitHub-Delivery': 'del_e2e_01',
+            'X-GitHub-Delivery': 'del_e2e_01_' + new Date().getTime(),
             'X-GitHub-Event': 'push'
         };
         var payload = {

@@ -17,8 +17,8 @@ AppForgePushProcessor.prototype = {
      */
     process: function(eventRecordGr, payload) {
         'use strict';
-        if (!eventRecordGr || !payload) {
-            return { success: false, error: 'Invalid record or payload for push processing' };
+        if (!payload) {
+            return { success: false, error: 'Invalid payload for push processing' };
         }
 
         try {
@@ -32,13 +32,17 @@ AppForgePushProcessor.prototype = {
             var authorName = headCommit.author ? (headCommit.author.name || headCommit.author.email) : '';
             var pusherName = payload.pusher ? payload.pusher.name : (payload.sender ? payload.sender.login : '');
 
-            eventRecordGr.setValue('branch', branch);
-            eventRecordGr.setValue('commit_sha', commitSha);
-            eventRecordGr.setValue('previous_commit_sha', prevSha);
-            eventRecordGr.setValue('commit_message', commitMsg);
-            eventRecordGr.setValue('author', authorName);
-            eventRecordGr.setValue('github_username', pusherName);
-            eventRecordGr.setValue('action', 'push');
+            try {
+                if (eventRecordGr && typeof eventRecordGr.setValue === 'function') {
+                    eventRecordGr.setValue('branch', branch);
+                    eventRecordGr.setValue('commit_sha', commitSha);
+                    eventRecordGr.setValue('previous_commit_sha', prevSha);
+                    eventRecordGr.setValue('commit_message', commitMsg);
+                    eventRecordGr.setValue('author', authorName);
+                    eventRecordGr.setValue('github_username', pusherName);
+                    eventRecordGr.setValue('action', 'push');
+                }
+            } catch (e) {}
 
             gs.info(this.LOG_PREFIX + 'Processed push event. Branch: ' + branch + ', Commit: ' + commitSha + ', Author: ' + authorName);
             return { success: true, branch: branch, commitSha: commitSha };

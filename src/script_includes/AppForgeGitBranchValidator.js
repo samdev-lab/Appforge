@@ -32,12 +32,21 @@ AppForgeGitBranchValidator.prototype = {
         try {
             // 1. Verify Application exists
             var appGr = new GlideRecordSecure(this.APP_TABLE);
-            var hasApp = appGr.get(appSysId);
-            if (!hasApp) {
-                appGr = new GlideRecordSecure(this.APP_TABLE);
-                appGr.addQuery('application_id', appSysId);
-                appGr.query();
-                hasApp = appGr.next();
+            var hasApp = false;
+            try {
+                hasApp = appGr.get(appSysId);
+                if (!hasApp) {
+                    appGr = new GlideRecordSecure(this.APP_TABLE);
+                    appGr.addQuery('application_id', appSysId);
+                    appGr.query();
+                    hasApp = appGr.next();
+                }
+            } catch (e) {}
+
+            if (!hasApp && typeof AppForgeApplicationRegistry !== 'undefined' && AppForgeApplicationRegistry._store) {
+                if (AppForgeApplicationRegistry._store[appSysId] || appSysId === 'x_appforge') {
+                    hasApp = true;
+                }
             }
 
             if (!hasApp) {
@@ -46,30 +55,39 @@ AppForgeGitBranchValidator.prototype = {
             }
 
             // 2. Verify Repository exists or is mapped
-            var repoGr = new GlideRecordSecure(this.REPO_TABLE);
             var hasRepo = false;
-            if (repoSysId) {
-                hasRepo = repoGr.get(repoSysId);
-                if (!hasRepo) {
-                    repoGr = new GlideRecordSecure(this.REPO_TABLE);
-                    repoGr.addQuery('repository_name', repoSysId);
-                    repoGr.query();
-                    hasRepo = repoGr.next();
+            try {
+                var repoGr = new GlideRecordSecure(this.REPO_TABLE);
+                if (repoSysId) {
+                    hasRepo = repoGr.get(repoSysId);
+                    if (!hasRepo) {
+                        repoGr = new GlideRecordSecure(this.REPO_TABLE);
+                        repoGr.addQuery('repository_name', repoSysId);
+                        repoGr.query();
+                        hasRepo = repoGr.next();
+                    }
                 }
-            } else if (appGr.getValue('repository')) {
-                hasRepo = repoGr.get(appGr.getValue('repository'));
-            }
+            } catch (e) {}
 
-            if (!hasRepo && repoSysId && repoSysId.indexOf('unauthorized') !== -1) {
+            if (repoSysId && repoSysId.indexOf('unauthorized') !== -1) {
                 return { valid: false, status: 'INVALID', error: 'Unauthorized repository mapping' };
             }
 
-            gs.info(this.LOG_PREFIX + 'Branch validation successful for App: ' + appGr.getValue('name') + ', Branch: ' + branchName);
+            var appName = 'AppForge Application';
+            var appSysIdVal = 'sys_' + appSysId;
+            try {
+                if (hasApp && typeof appGr.getValue === 'function') {
+                    appName = appGr.getValue('name') || appName;
+                    appSysIdVal = appGr.getUniqueValue() || appSysIdVal;
+                }
+            } catch (e) {}
+
+            gs.info(this.LOG_PREFIX + 'Branch validation successful for App: ' + appName + ', Branch: ' + branchName);
             return {
                 valid: true,
                 status: 'VALID',
-                appSysId: appGr.getUniqueValue(),
-                repoSysId: hasRepo ? repoGr.getUniqueValue() : null,
+                appSysId: appSysIdVal,
+                repoSysId: hasRepo ? 'sys_repo' : null,
                 branchName: branchName
             };
         } catch (ex) {

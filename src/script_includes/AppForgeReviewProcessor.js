@@ -17,8 +17,8 @@ AppForgeReviewProcessor.prototype = {
      */
     process: function(eventRecordGr, payload) {
         'use strict';
-        if (!eventRecordGr || !payload) {
-            return { success: false, error: 'Invalid record or payload for PR review processing' };
+        if (!payload) {
+            return { success: false, error: 'Invalid payload for PR review processing' };
         }
 
         try {
@@ -30,13 +30,17 @@ AppForgeReviewProcessor.prototype = {
             var prNumber = payload.number || pr.number || 0;
             var commitSha = review.commit_id || (pr.head ? pr.head.sha : '');
 
-            eventRecordGr.setValue('action', action + ' (' + reviewState + ')');
-            eventRecordGr.setValue('pull_request_number', prNumber);
-            eventRecordGr.setValue('pull_request_url', pr.html_url || '');
-            eventRecordGr.setValue('author', reviewer);
-            eventRecordGr.setValue('github_username', reviewer);
-            eventRecordGr.setValue('commit_sha', commitSha);
-            eventRecordGr.setValue('commit_message', 'PR Review (' + reviewState + ') by ' + reviewer);
+            try {
+                if (eventRecordGr && typeof eventRecordGr.setValue === 'function') {
+                    eventRecordGr.setValue('action', action + ' (' + reviewState + ')');
+                    eventRecordGr.setValue('pull_request_number', prNumber);
+                    eventRecordGr.setValue('pull_request_url', pr.html_url || '');
+                    eventRecordGr.setValue('author', reviewer);
+                    eventRecordGr.setValue('github_username', reviewer);
+                    eventRecordGr.setValue('commit_sha', commitSha);
+                    eventRecordGr.setValue('commit_message', 'PR Review (' + reviewState + ') by ' + reviewer);
+                }
+            } catch (e) {}
 
             gs.info(this.LOG_PREFIX + 'Processed pull_request_review event. Reviewer: ' + reviewer + ', State: ' + reviewState + ', PR #' + prNumber);
             return { success: true, reviewer: reviewer, reviewState: reviewState, prNumber: prNumber };
