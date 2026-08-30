@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeInstalledApplicationRegistry</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeInstalledApplicationRegistry</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeInstalledApplicationRegistry
  * Manages full lifecycle tracking and enterprise traceability for installed ServiceNow applications.

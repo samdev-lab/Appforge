@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeCatalogLifecycleManager</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeCatalogLifecycleManager</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeCatalogLifecycleManager
  * Manages the complete lifecycle states, versioning, rollback, cloning, and diff comparisons of Catalog Factory definitions.

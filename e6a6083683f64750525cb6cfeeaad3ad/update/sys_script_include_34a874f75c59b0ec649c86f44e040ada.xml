@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeTemplateInstallationRegistry</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeTemplateInstallationRegistry</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeTemplateInstallationRegistry
  * Tracks and audits template installations per customer/tenant.

@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgePrompt026MarketplaceTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgePrompt026MarketplaceTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgePrompt026MarketplaceTestSuite
  * Dedicated Automated Test Suite certifying Prompt 026 requirements:

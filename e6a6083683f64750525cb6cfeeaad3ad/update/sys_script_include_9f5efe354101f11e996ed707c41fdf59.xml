@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeIntegrationExecutor</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeIntegrationExecutor</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeIntegrationExecutor
  * Server-side provisioning and execution engine for Integration & API Factory.

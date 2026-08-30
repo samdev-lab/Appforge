@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeDecommissioningEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeDecommissioningEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeDecommissioningEngine
  * Enforces strict, non-destructive, governed decommissioning for installed ServiceNow applications.

@@ -77,10 +77,10 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('marketplace', this)">🏪 Template Marketplace</li>
+            <li class="nav-item active" onclick="switchTab('marketplace', this)">]]>🏪<![CDATA[ Template Marketplace</li>
             <li class="nav-item" onclick="switchTab('manager', this)">⚡ Single-Page Bulk Manager</li>
-            <li class="nav-item" onclick="switchTab('items', this)">📦 Published Catalog Items</li>
-            <li class="nav-item" onclick="switchTab('requests', this)">📋 Requests &amp; Fulfillment</li>
+            <li class="nav-item" onclick="switchTab('items', this)">]]>📦<![CDATA[ Published Catalog Items</li>
+            <li class="nav-item" onclick="switchTab('requests', this)">]]>📋<![CDATA[ Requests &amp; Fulfillment</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
             <div>Target Instance: <strong>dev280961</strong></div>
@@ -90,7 +90,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🏪 AppForge Template Marketplace</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">]]>🏪<![CDATA[ AppForge Template Marketplace</h2>
             <div class="user-badge">
                 <span class="badge badge-success">● CERTIFIED v0.20.0</span>
                 <span>•</span>
@@ -143,7 +143,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="template-item-card" data-category="ITSM">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">🚨</span>
+                                <span style="font-size: 2rem;">]]>🚨<![CDATA[</span>
                                 <span class="badge badge-warning">COMING SOON</span>
                             </div>
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">ITSM Accelerator</h3>
@@ -160,7 +160,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="template-item-card" data-category="CSM">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">💬</span>
+                                <span style="font-size: 2rem;">]]>💬<![CDATA[</span>
                                 <span class="badge badge-warning">COMING SOON</span>
                             </div>
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">CSM Accelerator</h3>
@@ -204,8 +204,8 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <div style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">Download the template, fill requirements, and upload directly.</div>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-secondary" onclick="alert('📥 DOWNLOADING AppForge_Bulk_Catalog_Template.xlsx (Sample Employee Laptop Request included)...')">📥 Download Template</button>
-                            <button class="btn btn-primary" onclick="alert('✓ Excel File Loaded: AppForge_Bulk_Catalog_Template.xlsx (3 Catalog Items, 12 Variables)')">📤 Upload Excel</button>
+                            <button class="btn btn-secondary" onclick="alert(']]>📥<![CDATA[ DOWNLOADING AppForge_Bulk_Catalog_Template.xlsx (Sample Employee Laptop Request included)...')">]]>📥<![CDATA[ Download Template</button>
+                            <button class="btn btn-primary" onclick="alert('✓ Excel File Loaded: AppForge_Bulk_Catalog_Template.xlsx (3 Catalog Items, 12 Variables)')">]]>📤<![CDATA[ Upload Excel</button>
                         </div>
                     </div>
 
@@ -258,9 +258,9 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             ✓ 3 Catalog Items • ✓ 12 Variables • ✓ 7 Fulfillment Steps • 0 Errors
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-secondary" onclick="alert('🔍 VALIDATION REPORT:\n\n• 3 Items Validated\n• 0 Schema Collisions\n• Security Policy Gate: PASSED')">Validate</button>
-                            <button class="btn btn-secondary" onclick="alert('📊 DRY-RUN PREVIEW:\n\n• CREATE: 3\n• UPDATE: 0\n• SKIP: 0\n• Batch Count: 1 Batch')">Preview</button>
-                            <button class="btn btn-primary" onclick="publishCatalogDirectly()">Create &amp; Publish to ServiceNow 🚀</button>
+                            <button class="btn btn-secondary" onclick="alert(']]>🔍<![CDATA[ VALIDATION REPORT:\n\n• 3 Items Validated\n• 0 Schema Collisions\n• Security Policy Gate: PASSED')">Validate</button>
+                            <button class="btn btn-secondary" onclick="alert(']]>📊<![CDATA[ DRY-RUN PREVIEW:\n\n• CREATE: 3\n• UPDATE: 0\n• SKIP: 0\n• Batch Count: 1 Batch')">Preview</button>
+                            <button class="btn btn-primary" onclick="publishCatalogDirectly()">Create &amp; Publish to ServiceNow ]]>🚀<![CDATA[</button>
                         </div>
                     </div>
                 </div>
@@ -380,7 +380,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
-            <button class="btn btn-primary" onclick="installFromModal()">Install Solution 🚀</button>
+            <button class="btn btn-primary" onclick="installFromModal()">Install Solution ]]>🚀<![CDATA[</button>
         </div>
     </div>
 </div>
@@ -434,12 +434,12 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function installFromModal() {
         closeDetailsModal();
-        alert('🎉 TEMPLATE INSTALLED SUCCESSFULLY!\n\n• Solution: Bulk Catalog Automation\n• Module Created: Bulk Catalog Manager\n• Status: Ready to Use');
+        alert(']]>🎉<![CDATA[ TEMPLATE INSTALLED SUCCESSFULLY!\n\n• Solution: Bulk Catalog Automation\n• Module Created: Bulk Catalog Manager\n• Status: Ready to Use');
         switchTab('manager', document.querySelectorAll('.nav-item')[1]);
     }
 
     function publishCatalogDirectly() {
-        alert('🚀 BULK CATALOG PUBLISHED LIVE TO SERVICENOW!\n\n• Items Created: 3 (sc_cat_item)\n• Variables Created: 12 (item_option_new)\n• Tasks & Approvals: Configured\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Status: LIVE IN PRODUCTION');
+        alert(']]>🚀<![CDATA[ BULK CATALOG PUBLISHED LIVE TO SERVICENOW!\n\n• Items Created: 3 (sc_cat_item)\n• Variables Created: 12 (item_option_new)\n• Tasks & Approvals: Configured\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Status: LIVE IN PRODUCTION');
         switchTab('items', document.querySelectorAll('.nav-item')[2]);
     }
 </script>

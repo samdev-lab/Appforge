@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeCrossTenantTrustFabric</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeCrossTenantTrustFabric</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeCrossTenantTrustFabric
  * Manages explicit, scoped, and auditable cross-tenant trust relationships.
