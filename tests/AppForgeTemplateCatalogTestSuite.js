@@ -1,0 +1,133 @@
+/**
+ * AppForgeTemplateCatalogTestSuite
+ * Automated Test Suite certifying Template Catalog, One-Click Installation, Native Navigation Synthesis, Idempotency, and Upgrades.
+ */
+var AppForgeTemplateCatalogTestSuite = Class.create();
+AppForgeTemplateCatalogTestSuite.prototype = {
+    initialize: function() {
+        'use strict';
+        this.registry = new AppForgeTemplateRegistry();
+        this.service = new AppForgeTemplateInstallationService(this.registry);
+        this.results = { passed: 0, failed: 0, total: 0, tests: [], details: [] };
+    },
+
+    assert: function(condition, testName, details) {
+        'use strict';
+        this.results.total++;
+        if (condition) {
+            this.results.passed++;
+            this.results.tests.push({ name: testName, status: 'PASSED' });
+            this.results.details.push({ name: testName, passed: true });
+        } else {
+            this.results.failed++;
+            this.results.tests.push({ name: testName, status: 'FAILED', details: details });
+            this.results.details.push({ name: testName, passed: false, details: details });
+            gs.error('[AppForgeTemplateCatalogTestSuite] FAILED: ' + testName + ' - ' + (details || ''));
+        }
+    },
+
+    runAllTests: function() {
+        'use strict';
+        gs.info('[AppForgeTemplateCatalogTestSuite] Starting Template Catalog & One-Click Installer test run...');
+
+        this.testCatalogListingAndFilters();
+        this.testSearchFunctionality();
+        this.testOneClickInstallation();
+        this.testIdempotentInstallation();
+        this.testTemplateUpgrade();
+        this.testUncertifiedTemplateBlocking();
+
+        gs.info('[AppForgeTemplateCatalogTestSuite] Completed: ' + this.results.passed + '/' + this.results.total + ' passed.');
+        return this.results;
+    },
+
+    testCatalogListingAndFilters: function() {
+        'use strict';
+        var allTemplates = this.registry.listTemplates();
+        this.assert(allTemplates.length >= 6, 'Template Catalog lists 6+ certified templates');
+
+        var hrTemplates = this.registry.listTemplates({ category: 'HR' });
+        this.assert(hrTemplates.length >= 2, 'HR category filter returns 2+ templates (Onboarding, Offboarding)');
+
+        var itsmTemplates = this.registry.listTemplates({ category: 'ITSM' });
+        this.assert(itsmTemplates.length >= 1, 'ITSM category filter returns Incident Management Lite');
+    },
+
+    testSearchFunctionality: function() {
+        'use strict';
+        var searchResults = this.registry.listTemplates({ search: 'vendor' });
+        this.assert(searchResults.length === 1, 'Search for "vendor" returns Vendor Management template');
+        this.assert(searchResults[0].template_id === 'vendor_management', 'Search matched vendor_management ID');
+    },
+
+    testOneClickInstallation: function() {
+        'use strict';
+        var installRes = this.service.installTemplate({
+            template_id: 'employee_onboarding',
+            tenant_id: 'tenant_enterprise_01',
+            application_name: 'Employee Onboarding',
+            target_environment: 'DEV'
+        });
+
+        this.assert(installRes.success === true, 'Employee Onboarding one-click installation succeeded');
+        this.assert(installRes.status === 'INSTALLED', 'Installation status is INSTALLED');
+        this.assert(installRes.tables.length === 2, 'Created 2 physical database tables');
+        this.assert(installRes.navigation_menu.modules.length === 4, 'Synthesized 4 native ServiceNow navigation modules');
+    },
+
+    testIdempotentInstallation: function() {
+        'use strict';
+        var secondInstall = this.service.installTemplate({
+            template_id: 'employee_onboarding',
+            tenant_id: 'tenant_enterprise_01',
+            application_name: 'Employee Onboarding'
+        });
+
+        this.assert(secondInstall.success === true, 'Second installation handled gracefully');
+        this.assert(secondInstall.idempotent_replay === true, 'Duplicate installation protected by idempotent replay');
+    },
+
+    testTemplateUpgrade: function() {
+        'use strict';
+        // Register v1.1.0 for testing upgrade
+        this.registry.registerTemplate({
+            template_id: 'employee_onboarding',
+            name: 'Employee Onboarding',
+            version: '1.1.0',
+            status: 'PUBLISHED',
+            modules: [{ name: 'Onboarding Requests', table: 'onboarding_request' }]
+        });
+
+        var activeInst = this.service.installRegistry.findActiveInstallation('tenant_enterprise_01', 'employee_onboarding');
+        this.assert(activeInst !== null, 'Active installation found for upgrade test');
+
+        if (activeInst) {
+            var upgradeRes = this.service.upgradeApplication(activeInst.installation_id, '1.1.0');
+            this.assert(upgradeRes.success === true, 'Application upgraded to v1.1.0 successfully');
+            this.assert(upgradeRes.upgraded_to === '1.1.0', 'Upgraded target version is 1.1.0');
+        }
+    },
+
+    testUncertifiedTemplateBlocking: function() {
+        'use strict';
+        this.registry.registerTemplate({
+            template_id: 'unverified_draft_app',
+            name: 'Unverified Draft App',
+            status: 'DRAFT'
+        });
+
+        var blocked = false;
+        try {
+            this.service.installTemplate({
+                template_id: 'unverified_draft_app',
+                tenant_id: 'tenant_test'
+            });
+        } catch (e) {
+            blocked = true;
+        }
+
+        this.assert(blocked === true, 'Uncertified DRAFT template installation blocked by security policy');
+    },
+
+    type: 'AppForgeTemplateCatalogTestSuite'
+};

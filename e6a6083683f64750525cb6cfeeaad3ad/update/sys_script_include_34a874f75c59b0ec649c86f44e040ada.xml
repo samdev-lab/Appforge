@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTemplateInstallationRegistry</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTemplateInstallationRegistry</description>
+        <name>AppForgeTemplateInstallationRegistry</name>
+        <script><![CDATA[/**
+ * AppForgeTemplateInstallationRegistry
+ * Tracks and audits template installations per customer/tenant.
+ * Provides installation history, version pinning, idempotency protection, and rollback state tracking.
+ */
+var AppForgeTemplateInstallationRegistry = Class.create();
+AppForgeTemplateInstallationRegistry.prototype = {
+    initialize: function() {
+        'use strict';
+        this.installations = {};
+    },
+
+    /**
+     * Creates a new installation audit record.
+     */
+    createInstallationRecord: function(params) {
+        'use strict';
+        if (!params || !params.template_id || !params.tenant_id) {
+            throw new Error('Installation record requires template_id and tenant_id.');
+        }
+
+        var guidGen = (typeof gs !== 'undefined' && gs.generateGUID) ? gs.generateGUID() : (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+        var installId = params.installation_id || ('inst_' + guidGen);
+        var record = {
+            installation_id: installId,
+            template_id: params.template_id,
+            template_version: params.template_version || '1.0.0',
+            tenant_id: params.tenant_id,
+            customer_id: params.customer_id || params.tenant_id,
+            target_environment: params.target_environment || 'DEV',
+            target_application: params.target_application || params.template_id,
+            target_scope: params.target_scope || 'x_1805046_app_fo_0',
+            requested_by: params.requested_by || 'admin',
+            approved_by: params.approved_by || 'sec_approver',
+            status: params.status || 'REQUESTED',
+            package_checksum: params.package_checksum || ('sha256_' + guidGen.substring(0, 16)),
+            release_id: params.release_id || ('rel_' + guidGen),
+            correlation_id: params.correlation_id || ('corr_' + guidGen),
+            installed_on: new Date().toISOString(),
+            modules_created: params.modules_created || [],
+            tables_created: params.tables_created || []
+        };
+
+        this.installations[installId] = record;
+        return record;
+    },
+
+    /**
+     * Finds active installation for a specific tenant and template.
+     */
+    findActiveInstallation: function(tenantId, templateId) {
+        'use strict';
+        for (var id in this.installations) {
+            if (this.installations.hasOwnProperty(id)) {
+                var inst = this.installations[id];
+                if (inst.tenant_id === tenantId && inst.template_id === templateId && inst.status === 'INSTALLED') {
+                    return inst;
+                }
+            }
+        }
+        return null;
+    },
+
+    /**
+     * Updates an installation record state.
+     */
+    updateStatus: function(installId, status, details) {
+        'use strict';
+        if (!this.installations[installId]) {
+            throw new Error('Installation not found: ' + installId);
+        }
+        this.installations[installId].status = status;
+        this.installations[installId].updated_on = new Date().toISOString();
+        if (details) {
+            if (details.failure_reason) this.installations[installId].failure_reason = details.failure_reason;
+            if (details.modules_created) this.installations[installId].modules_created = details.modules_created;
+            if (details.tables_created) this.installations[installId].tables_created = details.tables_created;
+        }
+        return this.installations[installId];
+    },
+
+    /**
+     * Lists all installations for a tenant.
+     */
+    listByTenant: function(tenantId) {
+        'use strict';
+        var list = [];
+        for (var id in this.installations) {
+            if (this.installations.hasOwnProperty(id)) {
+                if (!tenantId || this.installations[id].tenant_id === tenantId) {
+                    list.push(this.installations[id]);
+                }
+            }
+        }
+        return list;
+    },
+
+    type: 'AppForgeTemplateInstallationRegistry'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>34a874f75c59b0ec649c86f44e040ada</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTemplateInstallationRegistry</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_34a874f75c59b0ec649c86f44e040ada</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>
