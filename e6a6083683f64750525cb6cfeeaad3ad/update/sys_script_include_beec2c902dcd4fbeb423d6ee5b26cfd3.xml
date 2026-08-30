@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeMigrationRiskEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeMigrationRiskEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeMigrationRiskEngine
  * Calculates risk classifications (LOW, MEDIUM, HIGH, CRITICAL) for schema evolutions and data migrations.

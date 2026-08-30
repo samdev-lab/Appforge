@@ -82,11 +82,11 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('cat-factory', this)">🏭 Catalog Factory Studio</li>
-            <li class="nav-item" onclick="switchTab('home', this)">💼 Strategic Portfolios (SPM)</li>
-            <li class="nav-item" onclick="switchTab('projects', this)">🚀 Projects &amp; Milestones</li>
-            <li class="nav-item" onclick="switchTab('demands', this)">💡 Demand Intake &amp; Approval</li>
-            <li class="nav-item" onclick="switchTab('deployments', this)">🛡️ Four-Eyes Governance</li>
+            <li class="nav-item active" onclick="switchTab('cat-factory', this)">]]>🏭<![CDATA[ Catalog Factory Studio</li>
+            <li class="nav-item" onclick="switchTab('home', this)">]]>💼<![CDATA[ Strategic Portfolios (SPM)</li>
+            <li class="nav-item" onclick="switchTab('projects', this)">]]>🚀<![CDATA[ Projects &amp; Milestones</li>
+            <li class="nav-item" onclick="switchTab('demands', this)">]]>💡<![CDATA[ Demand Intake &amp; Approval</li>
+            <li class="nav-item" onclick="switchTab('deployments', this)">]]>🛡<![CDATA[️ Four-Eyes Governance</li>
         </ul>
         <div style="padding: 16px; border-top: 1px solid var(--af-border); font-size: 0.75rem; color: #94a3b8;">
             <div>Physical Tables: <strong>10 Active</strong></div>
@@ -96,7 +96,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700;">🏭 Catalog Factory Studio (End-to-End Automation)</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700;">]]>🏭<![CDATA[ Catalog Factory Studio (End-to-End Automation)</h2>
             <div class="user-badge">
                 <span>Instance: <strong>dev280961</strong></span>
                 <span>•</span>
@@ -136,15 +136,15 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                 <!-- AI Prompt to Catalog Box -->
                 <div class="card" style="background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border-color: #38bdf8;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h4 style="color: #38bdf8; font-size: 0.95rem; font-weight: 700;">🤖 AI Natural Language Catalog Architect</h4>
+                        <h4 style="color: #38bdf8; font-size: 0.95rem; font-weight: 700;">]]>🤖<![CDATA[ AI Natural Language Catalog Architect</h4>
                         <span class="badge badge-info">AppForge AI Engine Active</span>
                     </div>
                     <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 12px;">Type any business requirement in plain English or select a sample prompt to auto-populate the specification below:</p>
                     <div style="margin-bottom: 10px;">
                         <span class="prompt-pill" onclick="applySamplePrompt('cloud')">☁️ AWS Cloud Access with IAM Role</span>
-                        <span class="prompt-pill" onclick="applySamplePrompt('laptop')">💻 MacBook Pro Hardware Provisioning</span>
-                        <span class="prompt-pill" onclick="applySamplePrompt('vpn')">🔒 Zero Trust VPN Access</span>
-                        <span class="prompt-pill" onclick="applySamplePrompt('onboard')">👤 Enterprise Employee Onboarding</span>
+                        <span class="prompt-pill" onclick="applySamplePrompt('laptop')">]]>💻<![CDATA[ MacBook Pro Hardware Provisioning</span>
+                        <span class="prompt-pill" onclick="applySamplePrompt('vpn')">]]>🔒<![CDATA[ Zero Trust VPN Access</span>
+                        <span class="prompt-pill" onclick="applySamplePrompt('onboard')">]]>👤<![CDATA[ Enterprise Employee Onboarding</span>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <input type="text" id="ai-prompt-input" class="input-control" placeholder="E.g. I need an AWS Cloud Access catalog item with IAM role selection, manager approval, and Standard Change trigger for Prod." value="I need an AWS Cloud Access catalog item with IAM role selection, manager approval, and Standard Change trigger for Prod." />
@@ -160,8 +160,8 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <p style="font-size: 0.8rem; color: #94a3b8;">Fill the specification below to synthesize sc_cat_item, variables, variable sets, approvals, and fulfillment tasks in 1 click.</p>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-secondary" onclick="openBulkImportModal()">📂 Bulk Excel/JSON Import</button>
-                            <button class="btn btn-primary" onclick="executeDryRun()">🔍 Dry Run &amp; Validate</button>
+                            <button class="btn btn-secondary" onclick="openBulkImportModal()">]]>📂<![CDATA[ Bulk Excel/JSON Import</button>
+                            <button class="btn btn-primary" onclick="executeDryRun()">]]>🔍<![CDATA[ Dry Run &amp; Validate</button>
                         </div>
                     </div>
 
@@ -188,7 +188,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <!-- Dynamic Variable Builder -->
                     <div style="background: #0f172a; border: 1px solid var(--af-border); border-radius: 8px; padding: 16px; margin-bottom: 18px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <h4 style="font-size: 0.9rem; font-weight: 700; color: #f8fafc;">📋 Dynamic Variables (item_option_new)</h4>
+                            <h4 style="font-size: 0.9rem; font-weight: 700; color: #f8fafc;">]]>📋<![CDATA[ Dynamic Variables (item_option_new)</h4>
                             <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="addVariableRow()">+ Add Variable</button>
                         </div>
                         <table>
@@ -242,14 +242,14 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <!-- Approval & Fulfillment Sequence -->
                     <div class="grid-2" style="margin-bottom: 16px;">
                         <div style="background: #0f172a; border: 1px solid var(--af-border); border-radius: 8px; padding: 16px;">
-                            <h4 style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">🛡️ Approval Chain</h4>
+                            <h4 style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">]]>🛡<![CDATA[️ Approval Chain</h4>
                             <div style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6;" id="approval-chain-summary">
                                 <div>1. <strong>Manager Approval</strong> (Requested For $\rightarrow$ Manager)</div>
                                 <div>2. <strong>Security Group Approval</strong> (Security Ops Gate)</div>
                             </div>
                         </div>
                         <div style="background: #0f172a; border: 1px solid var(--af-border); border-radius: 8px; padding: 16px;">
-                            <h4 style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">📦 Fulfillment Tasks &amp; ITSM Routing</h4>
+                            <h4 style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">]]>📦<![CDATA[ Fulfillment Tasks &amp; ITSM Routing</h4>
                             <div style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6;" id="fulfillment-tasks-summary">
                                 <div>• <strong>Task 1:</strong> Provision AD &amp; Okta Credentials (IAM Group)</div>
                                 <div>• <strong>Task 2:</strong> Configure Hardware &amp; Ship Laptop (Logistics)</div>
@@ -259,7 +259,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                        <button class="btn btn-success" style="padding: 10px 24px; font-size: 0.95rem;" onclick="createAndPublishCatalog()">Create &amp; Publish Catalog Item 🚀</button>
+                        <button class="btn btn-success" style="padding: 10px 24px; font-size: 0.95rem;" onclick="createAndPublishCatalog()">Create &amp; Publish Catalog Item ]]>🚀<![CDATA[</button>
                     </div>
                 </div>
 
@@ -455,7 +455,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                                 <td><span class="badge badge-success">2 (Low)</span></td>
                                 <td>$600,000</td>
                                 <td><span class="badge badge-warning" id="demand-badge-101">PENDING_APPROVAL</span></td>
-                                <td><button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="approveDemand('DMN-2026-101', 'AI Automated Code Review Pipeline', 600000)">1-Click Approve &amp; Convert 🚀</button></td>
+                                <td><button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="approveDemand('DMN-2026-101', 'AI Automated Code Review Pipeline', 600000)">1-Click Approve &amp; Convert ]]>🚀<![CDATA[</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -480,7 +480,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                         • Policy: <strong>POL-SEC-006 (Separation of Duties Enforced)</strong><br/>
                         • State: <strong>PRODUCTION_DEPLOYED (Cryptographically Immutable)</strong>
                     </div>
-                    <button class="btn btn-secondary" onclick="simulateFourEyesVerification()">🔄 Re-Verify Four-Eyes Signature Audit</button>
+                    <button class="btn btn-secondary" onclick="simulateFourEyesVerification()">]]>🔄<![CDATA[ Re-Verify Four-Eyes Signature Audit</button>
                 </div>
             </section>
 
@@ -491,7 +491,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 <!-- Bulk Import Modal -->
 <div id="modal-bulk" class="modal-overlay">
     <div class="modal-box">
-        <h3 style="margin-bottom: 8px; color: #38bdf8;">📂 Bulk Catalog Importer (Excel / JSON)</h3>
+        <h3 style="margin-bottom: 8px; color: #38bdf8;">]]>📂<![CDATA[ Bulk Catalog Importer (Excel / JSON)</h3>
         <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 14px;">Paste JSON template or batch configuration to create multiple Catalog Items in 1 click.</p>
         <textarea id="bulk-json-input" class="input-control" style="height: 180px; font-family: monospace; font-size: 0.8rem;" placeholder="[ { 'name': 'Laptop Request', 'category': 'Hardware', 'variables': [...] } ]">[
   { "name": "Standard Laptop Request", "category": "Hardware", "variables": [{"name": "model", "type": "Select Box"}] },
@@ -500,7 +500,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 ]</textarea>
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
             <button class="btn btn-secondary" onclick="closeBulkImportModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="executeBulkImport()">Synthesize Batch (3 Items) 🚀</button>
+            <button class="btn btn-primary" onclick="executeBulkImport()">Synthesize Batch (3 Items) ]]>🚀<![CDATA[</button>
         </div>
     </div>
 </div>
@@ -580,13 +580,13 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     function executeDryRun() {
         var name = document.getElementById('cf-item-name').value;
         var varCount = document.getElementById('cf-variables-tbody').children.length;
-        alert('🔍 DRY RUN DIAGNOSTIC REPORT:\n\n' +
+        alert(']]>🔍<![CDATA[ DRY RUN DIAGNOSTIC REPORT:\n\n' +
             '• Catalog Item: "' + name + '" -> VALIDATED\n' +
             '• Dynamic Variables: ' + varCount + ' valid fields\n' +
             '• Approvals: Manager + Security Gates configured\n' +
             '• Fulfillment Tasks: 2 tasks mapped\n' +
             '• Schema Check: 0 Errors, 0 Warnings\n\n' +
-            'Result: 100% READY TO PUBLISH 🚀');
+            'Result: 100% READY TO PUBLISH ]]>🚀<![CDATA[');
     }
 
     function createAndPublishCatalog() {
@@ -605,7 +605,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             '<td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="cloneCatalogItem(\'' + name + '\')">Clone</button></td>';
         tbody.prepend(tr);
 
-        alert('🎉 CATALOG FACTORY AUTOMATION EXECUTED!\n\n' +
+        alert(']]>🎉<![CDATA[ CATALOG FACTORY AUTOMATION EXECUTED!\n\n' +
             '1. Created Catalog Item "' + name + '" in sc_cat_item.\n' +
             '2. Generated ' + varCount + ' Variables in item_option_new.\n' +
             '3. Configured 2-Tier Approval Flow.\n' +
@@ -615,7 +615,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function cloneCatalogItem(name) {
         document.getElementById('cf-item-name').value = name + ' (Clone)';
-        alert('📋 Cloned "' + name + '". You can modify any variables and click Create & Publish.');
+        alert(']]>📋<![CDATA[ Cloned "' + name + '". You can modify any variables and click Create & Publish.');
     }
 
     function openBulkImportModal() { document.getElementById('modal-bulk').style.display = 'flex'; }
@@ -623,7 +623,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function executeBulkImport() {
         closeBulkImportModal();
-        alert('🎉 BULK IMPORT COMPLETED!\n\n' +
+        alert(']]>🎉<![CDATA[ BULK IMPORT COMPLETED!\n\n' +
             '• Processed: 3 Catalog Items\n' +
             '• Created: 3 Items, 12 Variables, 6 Tasks\n' +
             '• Status: 100% SUCCESS (Published to Service Catalog)');
@@ -650,7 +650,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     }
 
     function simulateFourEyesVerification() {
-        alert('🛡️ FOUR-EYES AUDIT AUDIT RE-VERIFIED:\n\n' +
+        alert(']]>🛡<![CDATA[️ FOUR-EYES AUDIT AUDIT RE-VERIFIED:\n\n' +
             '• Policy: POL-SEC-006 (Separation of Duties)\n' +
             '• Authorizer: sarah.security [sec_approver]\n' +
             '• HMAC-SHA256 Signature: VALID\n' +

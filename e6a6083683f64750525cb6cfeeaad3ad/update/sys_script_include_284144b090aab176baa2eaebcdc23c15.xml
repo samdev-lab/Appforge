@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeGitEventService</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeGitEventService</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeGitEventService
  * Central event processor, state manager, and repository mapping router for AppForge Git Events.

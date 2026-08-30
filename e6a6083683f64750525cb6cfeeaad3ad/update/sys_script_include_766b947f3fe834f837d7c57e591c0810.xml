@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeFactoryExecutor</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeFactoryExecutor</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeFactoryExecutor
  * Primary execution engine provisioning Applications, Modules, Schemas, Fields, and References

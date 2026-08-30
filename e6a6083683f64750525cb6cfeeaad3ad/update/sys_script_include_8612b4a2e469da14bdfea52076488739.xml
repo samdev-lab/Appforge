@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge automated test suite component: AppForgeExperienceTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeExperienceTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeExperienceTestSuite
  * Automated Test Runner for AppForge Experience Factory (Prompt 006).

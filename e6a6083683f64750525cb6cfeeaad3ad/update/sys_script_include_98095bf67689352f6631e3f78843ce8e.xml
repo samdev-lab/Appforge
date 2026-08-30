@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeLicenseProvider</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeLicenseProvider</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeLicenseProvider
  * Provider-neutral licensing interface and engine for application subscriptions.

@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeMarketplacePublisher</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeMarketplacePublisher</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeMarketplacePublisher
  * Coordinates multi-stage application publishing workflows into the Marketplace Catalog
