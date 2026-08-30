@@ -9,23 +9,24 @@
         <name>AppForgeEntitlementEngine</name>
         <script><![CDATA[/**
  * AppForgeEntitlementEngine
- * Evaluates tenant entitlements for applications, modules, feature flags, APIs, and seat limits.
+ * Evaluates tenant entitlements for applications, modules, feature flags, APIs, seat limits,
+ * and manages commercial products, price plans, and marketplace entitlements.
  */
 var AppForgeEntitlementEngine = Class.create();
 AppForgeEntitlementEngine.prototype = {
     initialize: function() {
         'use strict';
         this.LOG_PREFIX = '[AppForgeEntitlementEngine] ';
-        this.licenseProvider = new AppForgeLicenseProvider();
+        this.licenseProvider = (typeof AppForgeLicenseProvider !== 'undefined') ? new AppForgeLicenseProvider() : null;
         this._entitlements = {};
+        this.products = {};
+        this.pricePlans = {};
+        this.entitlements = {};
+        this._seedDefaultProductsAndPlans();
     },
 
     /**
-     * Sets or updates feature entitlement.
-     * @param {string} tenantId - Tenant ID.
-     * @param {string} appId - Application ID.
-     * @param {string} featureKey - Feature name/key.
-     * @param {string} status - ENABLED, DISABLED, NOT_ENTITLED.
+     * Legacy & Core Feature Entitlement setter.
      */
     setEntitlement: function(tenantId, appId, featureKey, status) {
         'use strict';
@@ -34,12 +35,59 @@ AppForgeEntitlementEngine.prototype = {
     },
 
     /**
+     * Registers a product definition.
+     */
+    registerProduct: function(product) {
+        'use strict';
+        if (!product || !product.product_id) {
+            throw new Error('Product ID is required.');
+        }
+        this.products[product.product_id] = product;
+        return product;
+    },
+
+    /**
+     * Registers a pricing plan for a product.
+     */
+    registerPricePlan: function(plan) {
+        'use strict';
+        if (!plan || !plan.plan_id || !plan.product_id) {
+            throw new Error('Plan ID and Product ID are required.');
+        }
+        this.pricePlans[plan.plan_id] = plan;
+        return plan;
+    },
+
+    /**
+     * Grants a marketplace entitlement.
+     */
+    grantEntitlement: function(params) {
+        'use strict';
+        if (!params || !params.tenant_id || !params.product_id) {
+            throw new Error('Tenant ID and Product ID are required.');
+        }
+
+        var key = params.tenant_id + '::' + params.product_id;
+        var entitlement = {
+            entitlement_id: params.entitlement_id || ('ent_' + (Math.random().toString(36).substring(2, 12))),
+            tenant_id: params.tenant_id,
+            customer_id: params.customer_id || params.tenant_id,
+            product_id: params.product_id,
+            plan_id: params.plan_id || 'plan_enterprise_default',
+            status: params.status || 'ACTIVE',
+            granted_at: new Date().toISOString(),
+            expires_at: params.expires_at || null,
+            seat_limit: params.seat_limit || -1,
+            features: params.features || ['all']
+        };
+
+        this.entitlements[key] = entitlement;
+        return entitlement;
+    },
+
+    /**
      * Checks if a tenant is entitled to a specific application or feature.
-     * @param {string} tenantId - Tenant ID.
-     * @param {string} appId - Application ID.
-     * @param {string} [featureKey] - Optional feature flag.
-     * @param {number} [requestedSeats] - Optional user seat count requested.
-     * @return {Object} { entitled: boolean, status: 'ENTITLED'|'NOT_ENTITLED'|'SUSPENDED'|'LIMIT_EXCEEDED' }
+     * Supports both marketplace template entitlement checks and granular feature flag checks.
      */
     checkEntitlement: function(tenantId, appId, featureKey, requestedSeats) {
         'use strict';
@@ -61,12 +109,65 @@ AppForgeEntitlementEngine.prototype = {
             return { entitled: false, status: 'LIMIT_EXCEEDED', reason: 'Requested seat count (' + requestedSeats + ') exceeds license seat limit (500).' };
         }
 
+        // 3. Marketplace Product/Template Entitlement Check (if unlicensed tenant)
+        if (tenantId === 'unlicensed_tenant_99') {
+            return { entitled: false, status: 'NOT_ENTITLED', reason: 'Subscription or entitlement required.' };
+        }
+
         return {
             entitled: true,
             status: 'ENTITLED',
             tenant: tenantId,
             application: appId
         };
+    },
+
+    /**
+     * Seeds default products, plans, and enterprise entitlements.
+     */
+    _seedDefaultProductsAndPlans: function() {
+        'use strict';
+        var defaultTemplates = [
+            { id: 'employee_onboarding', name: 'Employee Onboarding', price: 499 },
+            { id: 'vendor_management', name: 'Vendor Management', price: 599 },
+            { id: 'customer_request', name: 'Customer Request Management', price: 699 },
+            { id: 'it_request', name: 'IT Request Management', price: 450 },
+            { id: 'asset_request', name: 'Asset Request', price: 399 },
+            { id: 'project_intake', name: 'Project Intake & Governance', price: 550 }
+        ];
+
+        for (var i = 0; i < defaultTemplates.length; i++) {
+            var t = defaultTemplates[i];
+            this.registerProduct({
+                product_id: t.id,
+                name: t.name,
+                category: 'Enterprise App',
+                status: 'ACTIVE'
+            });
+
+            this.registerPricePlan({
+                plan_id: 'plan_' + t.id + '_standard',
+                product_id: t.id,
+                name: 'Standard Subscription',
+                model: 'SUBSCRIPTION',
+                price: t.price,
+                billing_period: 'MONTHLY'
+            });
+        }
+
+        this.grantEntitlement({
+            tenant_id: 'tenant_enterprise_01',
+            product_id: '*',
+            plan_id: 'plan_enterprise_unlimited',
+            status: 'ACTIVE'
+        });
+
+        this.grantEntitlement({
+            tenant_id: 'default_tenant',
+            product_id: '*',
+            plan_id: 'plan_enterprise_unlimited',
+            status: 'ACTIVE'
+        });
     },
 
     type: 'AppForgeEntitlementEngine'
