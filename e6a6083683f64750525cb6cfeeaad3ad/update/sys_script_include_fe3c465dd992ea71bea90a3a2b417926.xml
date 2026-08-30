@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeSimplicityUXTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeSimplicityUXTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeSimplicityUXTestSuite
  * Automated Test Suite certifying Simplicity, UX/UI Light Theme, Template-First Creation, One-Click Deployment, and CLI Automation.

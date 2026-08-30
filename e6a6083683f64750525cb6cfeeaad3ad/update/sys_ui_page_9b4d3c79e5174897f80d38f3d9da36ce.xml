@@ -70,9 +70,9 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('builder', this)">🛠️ Catalog Builder Studio</li>
-            <li class="nav-item" onclick="switchTab('items', this)">📦 Published Catalog Items</li>
-            <li class="nav-item" onclick="switchTab('requests', this)">📋 Requests &amp; Fulfillment</li>
+            <li class="nav-item active" onclick="switchTab('builder', this)">]]>🛠<![CDATA[️ Catalog Builder Studio</li>
+            <li class="nav-item" onclick="switchTab('items', this)">]]>📦<![CDATA[ Published Catalog Items</li>
+            <li class="nav-item" onclick="switchTab('requests', this)">]]>📋<![CDATA[ Requests &amp; Fulfillment</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
             <div>Instance: <strong>dev280961 (Production)</strong></div>
@@ -82,7 +82,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🛠️ Catalog Builder Studio</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">]]>🛠<![CDATA[️ Catalog Builder Studio</h2>
             <div class="user-badge">
                 <span class="badge badge-success">● LIVE ON PDI</span>
                 <span>•</span>
@@ -96,13 +96,13 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             <section id="tab-builder">
                 <!-- AI & Quick Prompt Bar -->
                 <div class="card" style="margin-bottom: 20px;">
-                    <div style="font-size: 0.88rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">🤖 AI Prompt Architect — Synthesize Catalog Item</div>
+                    <div style="font-size: 0.88rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">]]>🤖<![CDATA[ AI Prompt Architect — Synthesize Catalog Item</div>
                     <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px;">Type a business requirement or pick a quick pill to generate fields, forms, and fulfillment rules:</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
-                        <button class="pill-btn" onclick="applyPreset('laptop')">💻 Developer MacBook Pro Provisioning</button>
+                        <button class="pill-btn" onclick="applyPreset('laptop')">]]>💻<![CDATA[ Developer MacBook Pro Provisioning</button>
                         <button class="pill-btn" onclick="applyPreset('aws')">☁️ AWS Cloud Sandbox &amp; IAM Access</button>
-                        <button class="pill-btn" onclick="applyPreset('vpn')">🛡️ Corporate VPN &amp; Duo MFA Token</button>
-                        <button class="pill-btn" onclick="applyPreset('onboard')">👤 Standard Employee Onboarding</button>
+                        <button class="pill-btn" onclick="applyPreset('vpn')">]]>🛡<![CDATA[️ Corporate VPN &amp; Duo MFA Token</button>
+                        <button class="pill-btn" onclick="applyPreset('onboard')">]]>👤<![CDATA[ Standard Employee Onboarding</button>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <input type="text" id="ai-prompt-input" class="input-control" placeholder="Describe the catalog item you want to build (e.g. Developer Laptop order with model choices, shipping address, and manager approval)..." />
@@ -151,8 +151,8 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="alert('Preflight verification passed. 0 schema collisions.')">🔍 Dry Run &amp; Validate</button>
-                        <button class="btn btn-primary" onclick="createAndPublishItem()">Create &amp; Publish Catalog Item 🚀</button>
+                        <button class="btn btn-secondary" onclick="alert('Preflight verification passed. 0 schema collisions.')">]]>🔍<![CDATA[ Dry Run &amp; Validate</button>
+                        <button class="btn btn-primary" onclick="createAndPublishItem()">Create &amp; Publish Catalog Item ]]>🚀<![CDATA[</button>
                     </div>
                 </div>
             </section>
@@ -305,7 +305,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function createAndPublishItem() {
         var name = document.getElementById('cfg-name').value;
-        alert('🎉 CATALOG ITEM PUBLISHED LIVE TO SERVICENOW!\n\n• Item Name: ' + name + '\n• Table: sc_cat_item\n• Status: Active & Orderable\n• Available in Service Portal & Catalog Builder!');
+        alert(']]>🎉<![CDATA[ CATALOG ITEM PUBLISHED LIVE TO SERVICENOW!\n\n• Item Name: ' + name + '\n• Table: sc_cat_item\n• Status: Active & Orderable\n• Available in Service Portal & Catalog Builder!');
         switchTab('items', document.querySelectorAll('.nav-item')[1]);
     }
 </script>

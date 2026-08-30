@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeTargetHealthChecker</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeTargetHealthChecker</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeTargetHealthChecker
  * Validates instance reachability, service account authentication, AppForge version compatibility,

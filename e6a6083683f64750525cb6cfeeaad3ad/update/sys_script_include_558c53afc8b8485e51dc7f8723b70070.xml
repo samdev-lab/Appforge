@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeExperienceValidator</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeExperienceValidator</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeExperienceValidator
  * Server-side service validating experience definitions (Forms, Lists, Views, Related Lists, Navigation),

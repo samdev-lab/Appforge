@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge automated test suite component: AppForgeCommercialTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeCommercialTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeCommercialTestSuite
  * Automated Test Suite certifying Commercial SaaS features: AI Prompt-to-Catalog Architect, ATF Test Generator, and Instance Health Diagnostics.
