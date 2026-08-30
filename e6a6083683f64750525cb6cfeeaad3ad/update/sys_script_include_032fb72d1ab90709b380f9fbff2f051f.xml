@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge automated test suite component: AppForgeDeploymentPipelineTestSuite</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeDeploymentPipelineTestSuite</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeDeploymentPipelineTestSuite
  * Automated test suite for Prompt 024: Enterprise Release Engineering, ServiceNow Deployment Pipeline & Production Promotion Control.

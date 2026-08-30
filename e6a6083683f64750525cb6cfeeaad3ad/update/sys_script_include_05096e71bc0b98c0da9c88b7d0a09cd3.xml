@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeModuleRegistry</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeModuleRegistry</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeModuleRegistry
  * Authoritative Server-Side Service for managing AppForge Modules with composite application uniqueness constraints.

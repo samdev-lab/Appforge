@@ -4,6 +4,7 @@
         <can_delegate>true</can_delegate>
         <description>AppForge Release Manager for lifecycle promotion and deployment package compilation</description>
         <elevated_privilege>false</elevated_privilege>
+        <federated_id>CSBTqi8+XNGLdl2vFqibd9V1++RhizrcyYSDZykrK2w=</federated_id>
         <grantable>true</grantable>
         <includes_roles/>
         <name>x_1805046_app_fo_0.release_mgr</name>
@@ -18,6 +19,7 @@
         <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
         <sys_policy/>
         <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_user_role_4ccdf98fab1454ca52639a86d67b677e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
     </sys_user_role>

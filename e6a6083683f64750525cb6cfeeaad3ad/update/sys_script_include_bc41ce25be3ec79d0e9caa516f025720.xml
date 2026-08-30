@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgePushProcessor</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgePushProcessor</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgePushProcessor
  * Dedicated processor for GitHub 'push' webhook events.

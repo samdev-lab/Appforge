@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgePackageSigner</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgePackageSigner</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgePackageSigner
  * Cryptographic signer and signature verifier for application packages.

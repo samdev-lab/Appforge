@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeSchemaRegistry</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeSchemaRegistry</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeSchemaRegistry
  * Authoritative Server-Side Service for managing Schema Metadata linking logical entities to physical ServiceNow tables.
