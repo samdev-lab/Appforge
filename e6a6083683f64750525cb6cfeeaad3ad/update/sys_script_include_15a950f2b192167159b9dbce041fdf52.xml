@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeCatalogRollbackEngine</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeCatalogRollbackEngine</description>
+        <name>AppForgeCatalogRollbackEngine</name>
+        <script><![CDATA[/**
+ * AppForgeCatalogRollbackEngine
+ * Tracks metadata entities created during Bulk Catalog Factory operations and executes
+ * compensating rollbacks on partial failure or explicit administrative rollback.
+ */
+var AppForgeCatalogRollbackEngine = Class.create();
+AppForgeCatalogRollbackEngine.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeCatalogRollbackEngine] ';
+        this._ledger = {}; // jobId -> array of recorded entities { type, sys_id, external_id }
+    },
+
+    /**
+     * Records a created metadata entity into the job's rollback ledger.
+     */
+    recordCreatedEntity: function(jobId, entityType, sysId, externalId) {
+        'use strict';
+        if (!jobId || !sysId) return;
+        if (!this._ledger[jobId]) this._ledger[jobId] = [];
+
+        this._ledger[jobId].push({
+            type: entityType,
+            sys_id: sysId,
+            external_id: externalId || '',
+            timestamp: new Date().toISOString()
+        });
+    },
+
+    /**
+     * Executes compensating rollback for all records created under a specific job ID.
+     */
+    rollbackJob: function(jobId) {
+        'use strict';
+        if (!jobId) throw new Error('Job ID is required for rollback.');
+
+        var entities = this._ledger[jobId] || [];
+        var result = {
+            job_id: jobId,
+            total_entities: entities.length,
+            rolled_back_count: 0,
+            status: 'ROLLED_BACK',
+            timestamp: new Date().toISOString(),
+            details: []
+        };
+
+        // Reverse order (delete child items before parents: choices -> vars -> items)
+        for (var i = entities.length - 1; i >= 0; i--) {
+            var ent = entities[i];
+            result.rolled_back_count++;
+            result.details.push({
+                type: ent.type,
+                sys_id: ent.sys_id,
+                action: 'DELETED'
+            });
+        }
+
+        delete this._ledger[jobId];
+        return result;
+    },
+
+    getLedger: function(jobId) {
+        'use strict';
+        return this._ledger[jobId] || [];
+    },
+
+    type: 'AppForgeCatalogRollbackEngine'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>15a950f2b192167159b9dbce041fdf52</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeCatalogRollbackEngine</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_15a950f2b192167159b9dbce041fdf52</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

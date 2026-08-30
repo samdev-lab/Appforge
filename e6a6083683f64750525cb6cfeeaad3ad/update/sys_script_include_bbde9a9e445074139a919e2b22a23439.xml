@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeCatalogValidator</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeCatalogValidator</description>
+        <name>AppForgeCatalogValidator</name>
+        <script><![CDATA[/**
+ * AppForgeCatalogValidator
+ * Validates Catalog Items, Variables, Choices, Variable Sets, UI Policies, and Fulfillment configurations
+ * against enterprise standards and security guardrails.
+ */
+var AppForgeCatalogValidator = Class.create();
+AppForgeCatalogValidator.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeCatalogValidator] ';
+
+        this.SUPPORTED_VARIABLE_TYPES = [
+            'Single Line Text',
+            'Multi Line Text',
+            'Select Box',
+            'Lookup Select Box',
+            'Reference',
+            'Checkbox',
+            'Yes/No',
+            'Date',
+            'Date/Time',
+            'Duration',
+            'List Collector',
+            'Attachment',
+            'Requested For',
+            'Choice',
+            'String',
+            'Integer'
+        ];
+
+        this.SUPPORTED_ACTION_TYPES = [
+            'RITM',
+            'TASK',
+            'INCIDENT',
+            'PROBLEM',
+            'CHANGE',
+            'APPROVAL',
+            'SUBFLOW',
+            'FLOW',
+            'NOTIFICATION'
+        ];
+
+        this.DANGEROUS_PATTERNS = [
+            /eval\s*\(/i,
+            /new\s+Function\s*\(/i,
+            /GlideDBConnection/i,
+            /java\.lang\.Runtime/i,
+            /java\.lang\.ProcessBuilder/i,
+            /JDBC/i,
+            /;\s*DROP\s+TABLE/i,
+            /;\s*DELETE\s+FROM/i,
+            /password\s*[:=]\s*['"][^'"]+['"]/i,
+            /client_secret\s*[:=]\s*['"][^'"]+['"]/i
+        ];
+    },
+
+    /**
+     * Comprehensive validation of parsed workbook bundle.
+     * @param {Object} bundle - Parsed 7-sheet catalog bundle from AppForgeCatalogExcelParser.
+     * @return {Object} Validation report { valid: boolean, errors: [], warnings: [], summary: {} }
+     */
+    validateBundle: function(bundle) {
+        'use strict';
+        var errors = [];
+        var warnings = [];
+        var summary = {
+            total_items: 0,
+            total_variables: 0,
+            total_choices: 0,
+            total_policies: 0,
+            total_fulfillments: 0
+        };
+
+        if (!bundle || !bundle.catalog_items) {
+            errors.push({ code: 'CAT-VAL-001', message: 'Missing catalog_items sheet or empty bundle.' });
+            return { valid: false, errors: errors, warnings: warnings, summary: summary };
+        }
+
+        var items = bundle.catalog_items || [];
+        summary.total_items = items.length;
+        var extIdMap = {};
+
+        for (var i = 0; i < items.length; i++) {
+            var itm = items[i];
+            var extId = itm.external_id;
+
+            // 1. External ID Validation
+            if (!extId) {
+                errors.push({ code: 'CAT-VAL-002', item_index: i + 1, message: 'Missing mandatory external_id for catalog item #' + (i + 1) });
+            } else if (extIdMap[extId]) {
+                errors.push({ code: 'CAT-VAL-003', external_id: extId, message: 'Duplicate external_id detected: ' + extId });
+            } else {
+                extIdMap[extId] = true;
+            }
+
+            // 2. Name & Category Validation
+            if (!itm.catalog_item_name && !itm.name) {
+                errors.push({ code: 'CAT-VAL-004', external_id: extId, message: 'Missing catalog item name.' });
+            }
+            if (!itm.category) {
+                warnings.push({ code: 'CAT-WARN-001', external_id: extId, message: 'No category specified. Defaulting to General.' });
+            }
+
+            // 3. Security Scan on description and fields
+            this._scanSecurity(itm.description, 'Item Description (' + extId + ')', errors);
+            this._scanSecurity(itm.short_description, 'Item Short Description (' + extId + ')', errors);
+        }
+
+        // 4. Variables Validation
+        var vars = bundle.variables || [];
+        summary.total_variables = vars.length;
+        var varNameMap = {};
+
+        for (var v = 0; v < vars.length; v++) {
+            var vr = vars[v];
+            var vCatId = vr.catalog_external_id;
+            var vName = vr.name;
+
+            if (!vCatId || !extIdMap[vCatId]) {
+                errors.push({ code: 'CAT-VAL-005', variable_name: vName, message: 'Variable references non-existent catalog_external_id: ' + vCatId });
+            }
+
+            if (!vName) {
+                errors.push({ code: 'CAT-VAL-006', variable_index: v + 1, message: 'Missing variable name.' });
+            } else {
+                var vKey = vCatId + ':' + vName;
+                if (varNameMap[vKey]) {
+                    errors.push({ code: 'CAT-VAL-007', variable_name: vName, message: 'Duplicate variable name in catalog item: ' + vName });
+                } else {
+                    varNameMap[vKey] = true;
+                }
+            }
+
+            if (vr.type && this.SUPPORTED_VARIABLE_TYPES.indexOf(vr.type) === -1) {
+                warnings.push({ code: 'CAT-WARN-002', variable_name: vName, message: 'Variable type "' + vr.type + '" not in standard list. Coercing to Single Line Text.' });
+            }
+
+            this._scanSecurity(vr.default_value, 'Variable Default Value (' + vName + ')', errors);
+            this._scanSecurity(vr.help_text, 'Variable Help Text (' + vName + ')', errors);
+        }
+
+        // 5. Fulfillment Validation
+        var fuls = bundle.fulfillment || [];
+        summary.total_fulfillments = fuls.length;
+
+        for (var f = 0; f < fuls.length; f++) {
+            var ful = fuls[f];
+            var fCatId = ful.catalog_external_id;
+            var actionType = (ful.action_type || 'RITM').toUpperCase();
+
+            if (!fCatId || !extIdMap[fCatId]) {
+                errors.push({ code: 'CAT-VAL-008', action_type: actionType, message: 'Fulfillment step references non-existent catalog_external_id: ' + fCatId });
+            }
+
+            if (this.SUPPORTED_ACTION_TYPES.indexOf(actionType) === -1) {
+                errors.push({ code: 'CAT-VAL-009', action_type: actionType, message: 'Unsupported fulfillment action_type: ' + actionType });
+            }
+
+            if (ful.approval_required && !ful.approval_group && !ful.approval_user) {
+                warnings.push({ code: 'CAT-WARN-003', catalog_external_id: fCatId, message: 'Approval is enabled but neither approval_group nor approval_user is specified.' });
+            }
+
+            this._scanSecurity(ful.condition, 'Fulfillment Condition (' + fCatId + ')', errors);
+        }
+
+        return {
+            valid: errors.length === 0,
+            errors: errors,
+            warnings: warnings,
+            summary: summary
+        };
+    },
+
+    /**
+     * Security pattern scanner.
+     */
+    _scanSecurity: function(content, context, errors) {
+        'use strict';
+        if (!content || typeof content !== 'string') return;
+
+        for (var p = 0; p < this.DANGEROUS_PATTERNS.length; p++) {
+            if (this.DANGEROUS_PATTERNS[p].test(content)) {
+                errors.push({
+                    code: 'CAT-SEC-001',
+                    context: context,
+                    message: 'Security policy violation: Dangerous execution pattern or secret injection detected in ' + context
+                });
+                break;
+            }
+        }
+    },
+
+    type: 'AppForgeCatalogValidator'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>bbde9a9e445074139a919e2b22a23439</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeCatalogValidator</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_bbde9a9e445074139a919e2b22a23439</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

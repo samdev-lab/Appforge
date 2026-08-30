@@ -1,0 +1,424 @@
+/**
+ * AppForgeCatalogExcelParser
+ * Parses standardized 7-sheet Excel, CSV, or structured JSON workbooks for Bulk Catalog Factory imports.
+ *
+ * Supported Sheets:
+ *  1. catalog_items
+ *  2. variables
+ *  3. choices
+ *  4. variable_sets
+ *  5. ui_policies
+ *  6. ui_policy_actions
+ *  7. fulfillment
+ */
+var AppForgeCatalogExcelParser = Class.create();
+AppForgeCatalogExcelParser.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeCatalogExcelParser] ';
+    },
+
+    /**
+     * Parses an Excel workbook object or JSON structure into normalized catalog definition entities.
+     * @param {Object|string} workbookInput - Raw workbook JSON or multi-sheet object.
+     * @return {Object} Normalized 7-sheet catalog bundle.
+     */
+    parse: function(workbookInput) {
+        'use strict';
+        if (!workbookInput) {
+            throw new Error('Workbook input is required.');
+        }
+
+        var raw = workbookInput;
+        if (typeof workbookInput === 'string') {
+            try {
+                raw = JSON.parse(workbookInput);
+            } catch (e) {
+                // If it's a CSV string or custom text, normalize as single catalog item or raw rows
+                throw new Error('Invalid workbook JSON format: ' + e.message);
+            }
+        }
+
+        var bundle = {
+            catalog_items: this._parseSheet(raw.catalog_items || raw['Sheet 1 - Catalog Items'] || raw.items || []),
+            variables: this._parseSheet(raw.variables || raw['Sheet 2 - Variables'] || []),
+            choices: this._parseSheet(raw.choices || raw['Sheet 3 - Choices'] || []),
+            variable_sets: this._parseSheet(raw.variable_sets || raw['Sheet 4 - Variable Sets'] || []),
+            ui_policies: this._parseSheet(raw.ui_policies || raw['Sheet 5 - UI Policies'] || []),
+            ui_policy_actions: this._parseSheet(raw.ui_policy_actions || raw['Sheet 6 - UI Policy Actions'] || []),
+            fulfillment: this._parseSheet(raw.fulfillment || raw['Sheet 7 - Fulfillment'] || [])
+        };
+
+        // Normalize catalog items and link child relations
+        bundle.normalized_items = this._buildNormalizedTree(bundle);
+        return bundle;
+    },
+
+    /**
+     * Normalizes sheet rows into standard dictionary arrays.
+     */
+    _parseSheet: function(sheetData) {
+        'use strict';
+        if (!sheetData) return [];
+        if (Array.isArray(sheetData)) return sheetData;
+        if (typeof sheetData === 'object') return [sheetData];
+        return [];
+    },
+
+    /**
+     * Builds hierarchical item trees linking variables, choices, policies, and fulfillment to their external_id.
+     */
+    _buildNormalizedTree: function(bundle) {
+        'use strict';
+        var tree = [];
+        var items = bundle.catalog_items || [];
+        var vars = bundle.variables || [];
+        var choices = bundle.choices || [];
+        var varSets = bundle.variable_sets || [];
+        var policies = bundle.ui_policies || [];
+        var policyActions = bundle.ui_policy_actions || [];
+        var fulfillments = bundle.fulfillment || [];
+
+        // Index choices by variable_external_id
+        var choiceIndex = {};
+        for (var c = 0; c < choices.length; c++) {
+            var ch = choices[c];
+            var vExtId = ch.variable_external_id || ch.variable_id;
+            if (vExtId) {
+                if (!choiceIndex[vExtId]) choiceIndex[vExtId] = [];
+                choiceIndex[vExtId].push({
+                    choice_external_id: ch.choice_external_id || ('CHOICE-' + (c + 1)),
+                    label: ch.label || ch.name || '',
+                    value: ch.value || ch.label || '',
+                    order: parseInt(ch.order, 10) || ((c + 1) * 100),
+                    inactive: ch.inactive === true || ch.inactive === 'true'
+                });
+            }
+        }
+
+        // Index policy actions by policy_external_id
+        var actionIndex = {};
+        for (var pa = 0; pa < policyActions.length; pa++) {
+            var act = policyActions[pa];
+            var pExtId = act.policy_external_id || act.policy_id;
+            if (pExtId) {
+                if (!actionIndex[pExtId]) actionIndex[pExtId] = [];
+                actionIndex[pExtId].push({
+                    variable_external_id: act.variable_external_id || '',
+                    visible: act.visible !== false && act.visible !== 'false',
+                    mandatory: act.mandatory === true || act.mandatory === 'true',
+                    disabled: act.disabled === true || act.disabled === 'true'
+                });
+            }
+        }
+
+        // Index variables by catalog_external_id
+        var varIndex = {};
+        for (var v = 0; v < vars.length; v++) {
+            var vr = vars[v];
+            var catId = vr.catalog_external_id || vr.catalog_id;
+            if (catId) {
+                if (!varIndex[catId]) varIndex[catId] = [];
+                var vId = vr.variable_external_id || vr.name || ('VAR-' + (v + 1));
+                varIndex[catId].push({
+                    variable_external_id: vId,
+                    name: vr.name || vr.variable_name || vId,
+                    question: vr.question || vr.label || vr.name,
+                    type: vr.type || 'Single Line Text',
+                    order: parseInt(vr.order, 10) || ((v + 1) * 100),
+                    mandatory: vr.mandatory === true || vr.mandatory === 'true',
+                    default_value: vr.default_value || '',
+                    help_text: vr.help_text || '',
+                    reference_table: vr.reference_table || '',
+                    reference_qualifier: vr.reference_qualifier || '',
+                    lookup_label: vr.lookup_label || '',
+                    lookup_value: vr.lookup_value || '',
+                    active: vr.active !== false && vr.active !== 'false',
+                    choices: choiceIndex[vId] || []
+                });
+            }
+        }
+
+        // Index policies by catalog_external_id
+        var polIndex = {};
+        for (var p = 0; p < policies.length; p++) {
+            var pol = policies[p];
+            var pCatId = pol.catalog_external_id || pol.catalog_id;
+            if (pCatId) {
+                if (!polIndex[pCatId]) polIndex[pCatId] = [];
+                var polId = pol.policy_external_id || ('POL-' + (p + 1));
+                polIndex[pCatId].push({
+                    policy_external_id: polId,
+                    name: pol.name || pol.short_description || polId,
+                    short_description: pol.short_description || pol.name || '',
+                    condition: pol.condition || '',
+                    reverse_if_false: pol.reverse_if_false !== false && pol.reverse_if_false !== 'false',
+                    on_load: pol.on_load !== false && pol.on_load !== 'false',
+                    on_change: pol.on_change !== false && pol.on_change !== 'false',
+                    on_submit: pol.on_submit === true || pol.on_submit === 'true',
+                    active: pol.active !== false && pol.active !== 'false',
+                    actions: actionIndex[polId] || []
+                });
+            }
+        }
+
+        // Index fulfillments by catalog_external_id
+        var fulIndex = {};
+        for (var f = 0; f < fulfillments.length; f++) {
+            var ful = fulfillments[f];
+            var fCatId = ful.catalog_external_id || ful.catalog_id;
+            if (fCatId) {
+                if (!fulIndex[fCatId]) fulIndex[fCatId] = [];
+                fulIndex[fCatId].push({
+                    action_type: (ful.action_type || 'RITM').toUpperCase(),
+                    sequence: parseInt(ful.sequence, 10) || ((f + 1) * 10),
+                    enabled: ful.enabled !== false && ful.enabled !== 'false',
+                    assignment_group: ful.assignment_group || 'Service Desk',
+                    assigned_to: ful.assigned_to || '',
+                    approval_required: ful.approval_required === true || ful.approval_required === 'true',
+                    approval_group: ful.approval_group || '',
+                    approval_user: ful.approval_user || '',
+                    short_description: ful.short_description || 'Fulfillment Step',
+                    description: ful.description || '',
+                    priority: ful.priority || '3',
+                    impact: ful.impact || '3',
+                    urgency: ful.urgency || '3',
+                    target_table: ful.target_table || 'sc_task',
+                    condition: ful.condition || ''
+                });
+            }
+        }
+
+        // Build composite item objects
+        for (var i = 0; i < items.length; i++) {
+            var itm = items[i];
+            var extId = itm.external_id || itm.id || ('CAT-ITEM-' + (i + 1));
+            tree.push({
+                external_id: extId,
+                catalog_item_name: itm.catalog_item_name || itm.name || ('Catalog Item ' + (i + 1)),
+                short_description: itm.short_description || itm.catalog_item_name || '',
+                description: itm.description || '',
+                catalog: itm.catalog || 'Service Catalog',
+                category: itm.category || 'General',
+                active: itm.active !== false && itm.active !== 'false',
+                price: parseFloat(itm.price) || 0,
+                picture: itm.picture || '',
+                icon: itm.icon || '',
+                requested_for: itm.requested_for || 'opened_by',
+                no_cart: itm.no_cart === true || itm.no_cart === 'true',
+                no_quantity: itm.no_quantity === true || itm.no_quantity === 'true',
+                availability: itm.availability || 'desktop_and_mobile',
+                owner: itm.owner || 'admin',
+                template: itm.template || '',
+                publish: itm.publish !== false && itm.publish !== 'false',
+                variables: varIndex[extId] || [],
+                ui_policies: polIndex[extId] || [],
+                fulfillment: fulIndex[extId] || [],
+                variable_sets: varSets
+            });
+        }
+
+        return tree;
+    },
+
+    /**
+     * Generates a starter multi-sheet Excel template structure.
+     */
+    generateExcelTemplate: function() {
+        'use strict';
+        return {
+            catalog_items: [
+                {
+                    external_id: 'CAT-HR-001',
+                    catalog_item_name: 'New Employee Laptop Request',
+                    short_description: 'Request a standard laptop for a new employee hire',
+                    description: 'Standard laptop provisioning workflow with manager approval and IT hardware fulfillment.',
+                    catalog: 'Service Catalog',
+                    category: 'Hardware',
+                    active: true,
+                    price: 1800,
+                    picture: 'laptop.png',
+                    icon: 'laptop',
+                    requested_for: 'opened_by',
+                    no_cart: true,
+                    no_quantity: true,
+                    availability: 'desktop_and_mobile',
+                    owner: 'admin',
+                    template: 'standard_hardware',
+                    publish: true
+                }
+            ],
+            variables: [
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_external_id: 'VAR-EMP-NAME',
+                    name: 'employee_name',
+                    question: 'Employee Full Name',
+                    type: 'Single Line Text',
+                    order: 100,
+                    mandatory: true,
+                    default_value: '',
+                    help_text: 'Enter the legal full name of the new hire.',
+                    reference_table: '',
+                    reference_qualifier: '',
+                    lookup_label: '',
+                    lookup_value: '',
+                    active: true
+                },
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_external_id: 'VAR-LAPTOP-TYPE',
+                    name: 'laptop_model',
+                    question: 'Laptop Model Selection',
+                    type: 'Select Box',
+                    order: 200,
+                    mandatory: true,
+                    default_value: 'macbook_pro_16',
+                    help_text: 'Select preferred developer or business workstation model.',
+                    reference_table: '',
+                    reference_qualifier: '',
+                    lookup_label: '',
+                    lookup_value: '',
+                    active: true
+                },
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_external_id: 'VAR-SHIP-ADDR',
+                    name: 'shipping_address',
+                    question: 'Shipping Address',
+                    type: 'Multi Line Text',
+                    order: 300,
+                    mandatory: true,
+                    default_value: '',
+                    help_text: 'Office location or residential remote address.',
+                    reference_table: '',
+                    reference_qualifier: '',
+                    lookup_label: '',
+                    lookup_value: '',
+                    active: true
+                }
+            ],
+            choices: [
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_external_id: 'VAR-LAPTOP-TYPE',
+                    choice_external_id: 'CHOICE-MBP-16',
+                    label: 'MacBook Pro 16-inch M3 Max (36GB RAM)',
+                    value: 'macbook_pro_16',
+                    order: 100,
+                    inactive: false
+                },
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_external_id: 'VAR-LAPTOP-TYPE',
+                    choice_external_id: 'CHOICE-DELL-15',
+                    label: 'Dell XPS 15 (32GB RAM, 1TB SSD)',
+                    value: 'dell_xps_15',
+                    order: 200,
+                    inactive: false
+                },
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_external_id: 'VAR-LAPTOP-TYPE',
+                    choice_external_id: 'CHOICE-LENOVO-X1',
+                    label: 'Lenovo ThinkPad X1 Carbon (32GB RAM)',
+                    value: 'lenovo_x1_carbon',
+                    order: 300,
+                    inactive: false
+                }
+            ],
+            variable_sets: [
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    variable_set_external_id: 'VSET-COMMON-REQUESTER',
+                    name: 'common_requester_details',
+                    title: 'Requester Contact Information',
+                    description: 'Reusable requester contact phone and location set',
+                    order: 50,
+                    type: 'Single'
+                }
+            ],
+            ui_policies: [
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    policy_external_id: 'POL-MANDATORY-ADDRESS',
+                    name: 'Make Shipping Address Mandatory When Selected',
+                    short_description: 'Enforces shipping address requirement',
+                    condition: 'laptop_modelISNOTEMPTY',
+                    reverse_if_false: true,
+                    on_load: true,
+                    on_change: true,
+                    on_submit: true,
+                    active: true
+                }
+            ],
+            ui_policy_actions: [
+                {
+                    policy_external_id: 'POL-MANDATORY-ADDRESS',
+                    variable_external_id: 'VAR-SHIP-ADDR',
+                    visible: true,
+                    mandatory: true,
+                    disabled: false
+                }
+            ],
+            fulfillment: [
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    action_type: 'RITM',
+                    sequence: 10,
+                    enabled: true,
+                    assignment_group: 'Service Desk',
+                    assigned_to: '',
+                    approval_required: true,
+                    approval_group: 'IT Managers',
+                    approval_user: '',
+                    short_description: 'RITM for New Employee Laptop',
+                    description: 'Automatically initiated Service Catalog Request Item',
+                    priority: '3',
+                    impact: '3',
+                    urgency: '3',
+                    target_table: 'sc_req_item',
+                    condition: ''
+                },
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    action_type: 'TASK',
+                    sequence: 20,
+                    enabled: true,
+                    assignment_group: 'Hardware EUC Team',
+                    assigned_to: '',
+                    approval_required: false,
+                    approval_group: '',
+                    approval_user: '',
+                    short_description: 'Configure and Asset Tag Laptop',
+                    description: 'ITEU EUC team prepares standard image and assigns asset bar-code',
+                    priority: '3',
+                    impact: '3',
+                    urgency: '3',
+                    target_table: 'sc_task',
+                    condition: ''
+                },
+                {
+                    catalog_external_id: 'CAT-HR-001',
+                    action_type: 'TASK',
+                    sequence: 30,
+                    enabled: true,
+                    assignment_group: 'Logistics & Shipping',
+                    assigned_to: '',
+                    approval_required: false,
+                    approval_group: '',
+                    approval_user: '',
+                    short_description: 'Ship Laptop to Employee Address',
+                    description: 'Generate courier shipping label and dispatch hardware',
+                    priority: '3',
+                    impact: '3',
+                    urgency: '3',
+                    target_table: 'sc_task',
+                    condition: ''
+                }
+            ]
+        };
+    },
+
+    type: 'AppForgeCatalogExcelParser'
+};

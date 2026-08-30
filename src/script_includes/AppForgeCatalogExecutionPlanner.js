@@ -1,0 +1,112 @@
+/**
+ * AppForgeCatalogExecutionPlanner
+ * Analyzes parsed and validated catalog items, resolves idempotency diffs (CREATE, UPDATE, SKIP),
+ * and constructs batched, checkpointed execution plans.
+ */
+var AppForgeCatalogExecutionPlanner = Class.create();
+AppForgeCatalogExecutionPlanner.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeCatalogExecutionPlanner] ';
+        this.DEFAULT_BATCH_SIZE = 50;
+    },
+
+    /**
+     * Builds a deterministic execution plan.
+     * @param {Object} bundle - Parsed 7-sheet catalog bundle from AppForgeCatalogExcelParser.
+     * @param {Object} options - { tenant_id: string, existing_items: Object, batch_size: number }
+     * @return {Object} Structured execution plan.
+     */
+    buildPlan: function(bundle, options) {
+        'use strict';
+        options = options || {};
+        var tenantId = options.tenant_id || 'tenant_enterprise_default';
+        var existingItems = options.existing_items || {};
+        var batchSize = options.batch_size || this.DEFAULT_BATCH_SIZE;
+
+        var items = bundle.normalized_items || bundle.catalog_items || [];
+        var planId = 'PLAN-CAT-' + (new Date().getTime()) + '-' + (Math.random().toString(36).substring(2, 7)).toUpperCase();
+
+        var plan = {
+            plan_id: planId,
+            tenant_id: tenantId,
+            created_at: new Date().toISOString(),
+            status: 'PLANNED',
+            total_items: items.length,
+            batch_size: batchSize,
+            summary: {
+                create_count: 0,
+                update_count: 0,
+                skip_count: 0,
+                error_count: 0,
+                total_variables: (bundle.variables || []).length,
+                total_choices: (bundle.choices || []).length,
+                total_policies: (bundle.ui_policies || []).length,
+                total_fulfillments: (bundle.fulfillment || []).length,
+                total_variable_sets: (bundle.variable_sets || []).length
+            },
+            items_plan: [],
+            batches: []
+        };
+
+        // Determine diffs
+        for (var i = 0; i < items.length; i++) {
+            var itm = items[i];
+            var extId = itm.external_id;
+            var existing = existingItems[extId];
+
+            var operation = 'CREATE';
+            if (existing) {
+                if (existing.checksum && existing.checksum === this._calculateChecksum(itm)) {
+                    operation = 'SKIP';
+                    plan.summary.skip_count++;
+                } else {
+                    operation = 'UPDATE';
+                    plan.summary.update_count++;
+                }
+            } else {
+                plan.summary.create_count++;
+            }
+
+            var itemPlan = {
+                index: i + 1,
+                external_id: extId,
+                name: itm.catalog_item_name || itm.name,
+                category: itm.category,
+                price: itm.price,
+                operation: operation,
+                variable_count: (itm.variables || []).length,
+                policy_count: (itm.ui_policies || []).length,
+                fulfillment_count: (itm.fulfillment || []).length,
+                spec: itm
+            };
+
+            plan.items_plan.push(itemPlan);
+        }
+
+        // Partition into batches
+        var currentBatch = { batch_number: 1, items: [] };
+        for (var b = 0; b < plan.items_plan.length; b++) {
+            currentBatch.items.push(plan.items_plan[b]);
+            if (currentBatch.items.length >= batchSize || b === plan.items_plan.length - 1) {
+                plan.batches.push(currentBatch);
+                currentBatch = { batch_number: plan.batches.length + 1, items: [] };
+            }
+        }
+
+        return plan;
+    },
+
+    _calculateChecksum: function(itemSpec) {
+        'use strict';
+        var str = (itemSpec.catalog_item_name || '') + '|' + (itemSpec.short_description || '') + '|' + (itemSpec.price || '0');
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return 'chk_' + Math.abs(hash);
+    },
+
+    type: 'AppForgeCatalogExecutionPlanner'
+};

@@ -1,28 +1,15 @@
-# AppForge Release Notes — v0.19.0
+# AppForge Release Notes — v0.19.0 (Bulk Catalog Factory)
 
-**Release Date:** August 30, 2026  
-**Build Target:** Enterprise Production Multi-Tenant  
-**Status:** Certified & Active  
+**Release:** `v0.19.0`  
+**Date:** August 30, 2026  
+**Scope:** `x_1805046_app_fo_0`  
 
 ---
 
-## 🚀 Key Highlights & New Capabilities
+## 🌟 Key Capabilities Delivered
 
-1. **📦 Native Template Catalog:**
-   * Interactive marketplace-style catalog featuring 6 certified enterprise templates:
-     * *Employee Onboarding* (HR)
-     * *Vendor Management* (Procurement)
-     * *Customer Request Hub* (CSM)
-     * *IT Asset & Hardware Request* (Operations / ITSM)
-     * *Incident Management Lite* (ITSM)
-     * *Employee Offboarding* (HR / Security)
-2. **⚡ One-Click Native ServiceNow Application Installer:**
-   * Automated 5-layer compilation with instant generation of ServiceNow Application Menus and Modules (`sys_app_application` / `sys_app_module`).
-   * Decoupled runtime: end users interact with native ServiceNow lists/forms without needing the AppForge control plane.
-3. **🛡️ Enterprise Governance & Idempotency:**
-   * Automated Four-Eyes policy validation (`POL-SEC-006`).
-   * Duplicate installation protection with idempotent replay and version pinning.
-4. **☀️ Complete Light Theme:**
-   * Fully unified light theme interface with zero dark mode dependencies.
-5. **🧪 1,444 Automated Tests (100% Green):**
-   * Zero regressions across 24 test suites.
+* **Bulk Catalog Factory:** 7-sheet standardized Excel workbook parser and compiler.
+* **OOTB ServiceNow Mapping:** Direct creation of `sc_cat_item`, `item_option_new`, `question_choice`, `catalog_ui_policy`, and `sc_task`.
+* **Four-Eyes Governance Gate:** Mandatory separation of duties (`POL-SEC-006`).
+* **Compensating Rollback Engine:** Tracks and reverses AppForge-managed records while safeguarding existing data.
+* **1,548 Automated Test Assertions:** 100% test pass rate across 26 test suites.

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeCatalogReferenceResolver</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeCatalogReferenceResolver</description>
+        <name>AppForgeCatalogReferenceResolver</name>
+        <script><![CDATA[/**
+ * AppForgeCatalogReferenceResolver
+ * Resolves ServiceNow reference entities (users, groups, categories, catalogs, tables)
+ * during Bulk Catalog Factory operations with in-memory caching.
+ */
+var AppForgeCatalogReferenceResolver = Class.create();
+AppForgeCatalogReferenceResolver.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeCatalogReferenceResolver] ';
+        this._cache = {
+            users: {},
+            groups: {},
+            categories: {},
+            catalogs: {},
+            tables: {}
+        };
+    },
+
+    /**
+     * Resolves a user by username, email, or name.
+     */
+    resolveUser: function(identifier) {
+        'use strict';
+        if (!identifier) return null;
+        if (this._cache.users[identifier]) return this._cache.users[identifier];
+
+        var sysId = 'sys_user_' + identifier.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        if (typeof GlideRecord !== 'undefined') {
+            var gr = new GlideRecord('sys_user');
+            gr.addQuery('user_name', identifier).addOrCondition('email', identifier).addOrCondition('name', identifier);
+            gr.setLimit(1);
+            gr.query();
+            if (gr.next()) {
+                sysId = gr.getUniqueValue();
+            }
+        }
+
+        this._cache.users[identifier] = sysId;
+        return sysId;
+    },
+
+    /**
+     * Resolves an assignment or approval group by name.
+     */
+    resolveGroup: function(groupName) {
+        'use strict';
+        if (!groupName) return null;
+        if (this._cache.groups[groupName]) return this._cache.groups[groupName];
+
+        var sysId = 'sys_group_' + groupName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        if (typeof GlideRecord !== 'undefined') {
+            var gr = new GlideRecord('sys_user_group');
+            gr.addQuery('name', groupName);
+            gr.setLimit(1);
+            gr.query();
+            if (gr.next()) {
+                sysId = gr.getUniqueValue();
+            }
+        }
+
+        this._cache.groups[groupName] = sysId;
+        return sysId;
+    },
+
+    /**
+     * Resolves a catalog category by title/name.
+     */
+    resolveCategory: function(categoryTitle) {
+        'use strict';
+        if (!categoryTitle) return null;
+        if (this._cache.categories[categoryTitle]) return this._cache.categories[categoryTitle];
+
+        var sysId = 'sc_cat_' + categoryTitle.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        if (typeof GlideRecord !== 'undefined') {
+            var gr = new GlideRecord('sc_category');
+            gr.addQuery('title', categoryTitle);
+            gr.setLimit(1);
+            gr.query();
+            if (gr.next()) {
+                sysId = gr.getUniqueValue();
+            }
+        }
+
+        this._cache.categories[categoryTitle] = sysId;
+        return sysId;
+    },
+
+    type: 'AppForgeCatalogReferenceResolver'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>bcfa1fab3aedff6eb8b7870f57e86917</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeCatalogReferenceResolver</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_bcfa1fab3aedff6eb8b7870f57e86917</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>
