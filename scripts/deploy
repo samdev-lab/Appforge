@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+/**
+ * AppForge Deployment CLI
+ * Usage: ./scripts/deploy
+ */
+
+const { execSync } = require('child_process');
+
+console.log('========================================================================');
+console.log('🚀 DEPLOYING APPFORGE TO SERVICENOW TARGET INSTANCE');
+console.log('========================================================================\n');
+
+try {
+    execSync('node scratch/sync_servicenow_xml.js', { stdio: 'inherit' });
+    execSync('node scripts/install', { stdio: 'inherit' });
+    console.log('\n✅ Deployment complete.');
+} catch (e) {
+    console.error('❌ Deployment failed:', e.message);
+    process.exit(1);
+}

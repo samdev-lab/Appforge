@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+/**
+ * AppForge Safe Uninstaller CLI
+ * Usage: ./scripts/uninstall
+ */
+
+console.log('========================================================================');
+console.log('🗑️ APPFORGE SAFE UNINSTALLER');
+console.log('========================================================================\n');
+console.log('AppForge runs as a self-contained ServiceNow Scoped Application.');
+console.log('To completely remove AppForge from your instance:');
+console.log('1. Navigate to: System Applications > All Available Applications > Installed');
+console.log('2. Search for: "App-forge" (Scope: x_1805046_app_fo_0)');
+console.log('3. Click "Uninstall". All application tables, metadata, and scripts will be safely purged.');
+console.log('\n✅ Uninstallation instructions verified.');

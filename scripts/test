@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+/**
+ * AppForge Test Runner CLI
+ * Usage: ./scripts/test
+ */
+
+const { execSync } = require('child_process');
+
+console.log('========================================================================');
+console.log('🧪 RUNNING APPFORGE COMPLETE TEST HARNESS');
+console.log('========================================================================\n');
+
+try {
+    execSync('node scratch/test_runner.js', { stdio: 'inherit' });
+} catch (e) {
+    process.exit(1);
+}

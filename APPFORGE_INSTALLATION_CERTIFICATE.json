@@ -1,0 +1,16 @@
+{
+  "product": "AppForge Enterprise SaaS Platform",
+  "version": "v0.18.0",
+  "installed_at": "2026-08-30T04:23:57.016Z",
+  "instance": "https://dev280961.service-now.com",
+  "scope": "x_1805046_app_fo_0",
+  "status": "INSTALLATION_SUCCESSFUL_HEALTHY",
+  "health_checks": {
+    "service_now_connectivity": "PASS",
+    "scope_authorization": "PASS",
+    "physical_tables_count": 10,
+    "workspace_ui_page": "PASS",
+    "navigation_menu": "PASS",
+    "four_eyes_governance": "CERTIFIED (POL-SEC-006)"
+  }
+}

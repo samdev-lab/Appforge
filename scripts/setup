@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+/**
+ * AppForge Environment Setup CLI
+ * Usage: ./scripts/setup
+ */
+
+const { execSync } = require('child_process');
+const path = require('path');
+
+console.log('========================================================================');
+console.log('⚙️ APPFORGE ENVIRONMENT SETUP & COMPILATION');
+console.log('========================================================================\n');
+
+try {
+    console.log('1. Compiling consolidated XML Update Set...');
+    execSync('node scratch/sync_servicenow_xml.js', { stdio: 'inherit' });
+
+    console.log('\n2. Verifying automated test suite...');
+    execSync('node scratch/test_runner.js', { stdio: 'inherit' });
+
+    console.log('\n✅ Environment setup completed.');
+} catch (e) {
+    console.error('❌ Setup error:', e.message);
+    process.exit(1);
+}
