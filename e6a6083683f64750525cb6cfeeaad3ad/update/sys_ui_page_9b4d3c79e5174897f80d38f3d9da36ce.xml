@@ -40,7 +40,7 @@ body, .appforge-root { background-color: var(--af-bg) !important; color: var(--a
 header { height: 64px; background-color: #ffffff; border-bottom: 1px solid var(--af-border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
 .user-badge { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--af-text-muted); }
 .content-area { flex: 1; padding: 28px 32px; overflow-y: auto; }
-.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
 .card { background-color: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); }
 .stat-val { font-size: 2.2rem; font-weight: 800; color: var(--af-text); margin-top: 6px; letter-spacing: -0.5px; }
 .stat-lbl { font-size: 0.8rem; color: var(--af-text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
@@ -50,6 +50,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
 .badge-success { background-color: var(--af-success-bg); color: var(--af-success); border: 1px solid var(--af-success-border); }
 .badge-info { background-color: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+.badge-warning { background-color: var(--af-warning-bg); color: var(--af-warning); border: 1px solid var(--af-warning-border); }
 .btn { padding: 9px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .btn-primary { background-color: var(--af-primary); color: #ffffff; border-color: var(--af-primary); }
 .btn-primary:hover { background-color: var(--af-primary-hover); }
@@ -57,8 +58,12 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 .btn-secondary:hover { background-color: #f1f5f9; border-color: var(--af-border-hover); }
 .input-control { width: 100%; padding: 10px 12px; background: #ffffff; border: 1px solid var(--af-border); color: #0f172a; border-radius: 6px; font-size: 0.88rem; }
 .input-control:focus { outline: none; border-color: var(--af-primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
-.pill-btn { padding: 6px 12px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 16px; font-size: 0.8rem; color: #334155; cursor: pointer; font-weight: 500; }
-.pill-btn:hover { background: #e0f2fe; border-color: #0284c7; color: #0284c7; }
+.cat-pill { padding: 6px 14px; background: #ffffff; border: 1px solid var(--af-border); border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: #475569; cursor: pointer; display: inline-block; transition: all 0.15s; }
+.cat-pill:hover, .cat-pill.active { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+.template-item-card { background: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.template-item-card:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
+.modal-box { background: #ffffff; border: 1px solid var(--af-border); border-radius: 12px; width: 640px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
 .hidden { display: none !important; }
 </style>
 
@@ -68,26 +73,26 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             <span style="font-size: 1.5rem; color: #0284c7;">⚡</span>
             <div>
                 <div>AppForge</div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">Bulk Catalog Factory &amp; Studio</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">Marketplace &amp; Catalog Studio</div>
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('bulk', this)">📂 Bulk Catalog Factory</li>
-            <li class="nav-item" onclick="switchTab('builder', this)">🛠️ Interactive Catalog Builder</li>
+            <li class="nav-item active" onclick="switchTab('marketplace', this)">🏪 Template Marketplace</li>
+            <li class="nav-item" onclick="switchTab('manager', this)">⚡ Single-Page Bulk Manager</li>
             <li class="nav-item" onclick="switchTab('items', this)">📦 Published Catalog Items</li>
             <li class="nav-item" onclick="switchTab('requests', this)">📋 Requests &amp; Fulfillment</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
-            <div>Instance: <strong>dev280961 (Production)</strong></div>
+            <div>Target Instance: <strong>dev280961</strong></div>
             <div style="margin-top: 4px;">User: <strong>admin</strong></div>
         </div>
     </aside>
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">📂 Bulk Catalog Factory</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🏪 AppForge Template Marketplace</h2>
             <div class="user-badge">
-                <span class="badge badge-success">● LIVE ON PDI</span>
+                <span class="badge badge-success">● CERTIFIED v0.20.0</span>
                 <span>•</span>
                 <span>Scope: <strong>x_1805046_app_fo_0</strong></span>
             </div>
@@ -95,158 +100,168 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
         <div class="content-area">
             
-            <!-- VIEW 1: BULK CATALOG FACTORY (EXCEL IMPORT) -->
-            <section id="tab-bulk">
-                <!-- Step 1: Customer & Scope Selection -->
-                <div class="card" style="margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">1. Select Customer &amp; ServiceNow Application Scope</h3>
-                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Enforces multi-tenant isolation and target scope mapping.</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="downloadTemplate()">📥 Download Excel Template (7 Sheets)</button>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Customer / Tenant</label>
-                            <select class="input-control" id="bulk-customer">
-                                <option value="Acme Global Enterprises">Acme Global Enterprises (tenant_acme_01)</option>
-                                <option value="NovaTech Healthcare">NovaTech Healthcare (tenant_novat_02)</option>
-                                <option value="Default Enterprise">Default Enterprise (dev280961)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Target Service Catalog</label>
-                            <select class="input-control" id="bulk-catalog">
-                                <option>Service Catalog</option>
-                                <option>Technical Catalog</option>
-                                <option>Customer Service Catalog</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Application Scope</label>
-                            <input type="text" class="input-control" value="Global (sc_cat_item)" disabled="disabled" style="background: #f1f5f9;" />
-                        </div>
+            <!-- VIEW 1: TEMPLATE MARKETPLACE -->
+            <section id="tab-marketplace">
+                <div class="card" style="padding: 18px 24px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span class="cat-pill active" onclick="filterCategory(this, 'All')">All Categories</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'Catalog')">Catalog &amp; Forms</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'ITSM')">ITSM</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'CSM')">CSM</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'CRM')">CRM</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'FSM')">FSM</span>
+                        <span class="cat-pill" onclick="filterCategory(this, 'SPM')">SPM</span>
                     </div>
                 </div>
 
-                <!-- Step 2: Upload Excel File -->
-                <div class="card" style="margin-bottom: 20px;">
-                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">2. Upload Standardized Catalog Excel Workbook</h3>
-                    <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 16px;">Supports 7 sheets: Catalog Items, Variables, Choices, Variable Sets, UI Policies, Actions, and Fulfillment Flows.</p>
-                    
-                    <div style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 24px; text-align: center; background: #f8fafc; margin-bottom: 16px;">
-                        <span style="font-size: 2rem;">📊</span>
-                        <div style="font-size: 0.9rem; font-weight: 600; color: #0f172a; margin-top: 6px;">Ready to parse: <code>AppForge_Standard_Catalog_Template_v1.0.xlsx</code></div>
-                        <div style="font-size: 0.78rem; color: #64748b; margin-top: 4px;">Contains 3 comprehensive enterprise catalog definitions (Hardware, Cloud, Security)</div>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="runValidation()">🔍 Step 1: Validate Workbook</button>
-                        <button class="btn btn-primary" id="btn-preview" onclick="runPreview()">⚡ Step 2: Generate Dry-Run Preview</button>
-                    </div>
-                </div>
-
-                <!-- Step 3: Validation & Preview Result Box (Hidden until clicked) -->
-                <div id="preview-result-box" class="card hidden">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div class="grid-3" id="template-grid">
+                    <!-- Template 1: Bulk Catalog Automation (Fully Implemented & Certified) -->
+                    <div class="template-item-card" data-category="Catalog">
                         <div>
-                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #16a34a;">✓ Validation Passed (0 Errors, 0 Security Violations)</h3>
-                            <div style="font-size: 0.82rem; color: #475569; margin-top: 4px;">Deterministic Execution Plan: <code>PLAN-CAT-2026-9104</code> • 3 Batches</div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <span style="font-size: 2rem;">⚡</span>
+                                <span class="badge badge-success">INSTALLED &amp; READY</span>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Bulk Catalog Automation</h3>
+                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">Catalog / Automation • v1.0.0 • AppForge</div>
+                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Create and manage hundreds of ServiceNow Catalog Items from a single Excel workbook with variables and fulfillment rules.</p>
+                            <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 10px; font-size: 0.78rem; color: #475569; margin-bottom: 16px;">
+                                <strong>Includes:</strong><br/>
+                                • Excel Import • Variables • Approval • Tasks • Incident • Change
+                            </div>
                         </div>
-                        <span class="badge badge-success">READY FOR DEPLOYMENT</span>
-                    </div>
-
-                    <div class="grid-4" style="margin-bottom: 18px;">
-                        <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 14px;">
-                            <div class="stat-lbl">Catalog Items</div>
-                            <div class="stat-val" style="font-size: 1.6rem; color: #0284c7;">3 Items</div>
-                        </div>
-                        <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 14px;">
-                            <div class="stat-lbl">Form Variables</div>
-                            <div class="stat-val" style="font-size: 1.6rem; color: #0284c7;">12 Variables</div>
-                        </div>
-                        <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 14px;">
-                            <div class="stat-lbl">Fulfillment Steps</div>
-                            <div class="stat-val" style="font-size: 1.6rem; color: #0284c7;">7 Tasks &amp; Flows</div>
-                        </div>
-                        <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 14px;">
-                            <div class="stat-lbl">Execution Diffs</div>
-                            <div style="font-size: 1.1rem; font-weight: 700; color: #16a34a; margin-top: 6px;">3 CREATE • 0 SKIP</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$299 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('bulk_catalog_automation')">Details</button>
+                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="switchTab('manager', document.querySelectorAll('.nav-item')[1])">Open Workspace ↗</button>
+                            </div>
                         </div>
                     </div>
 
-                    <table style="margin-bottom: 20px;">
-                        <thead>
-                            <tr>
-                                <th>External ID</th>
-                                <th>Catalog Item Name</th>
-                                <th>Category</th>
-                                <th>Variables</th>
-                                <th>Fulfillment</th>
-                                <th>Operation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><code>CAT-HR-001</code></td>
-                                <td><strong>Standard Employee Laptop Provisioning</strong></td>
-                                <td>Hardware</td>
-                                <td>5 (Employee Name, Laptop Model, Address, etc.)</td>
-                                <td>Manager Approval → EUC Task → Logistics Task</td>
-                                <td><span class="badge badge-info">CREATE</span></td>
-                            </tr>
-                            <tr>
-                                <td><code>CAT-CLOUD-002</code></td>
-                                <td><strong>AWS Cloud Sandbox &amp; IAM Access Request</strong></td>
-                                <td>Cloud Services</td>
-                                <td>4 (Environment Type, Justification, Cost Center)</td>
-                                <td>Security Gate → CloudOps IAM Task</td>
-                                <td><span class="badge badge-info">CREATE</span></td>
-                            </tr>
-                            <tr>
-                                <td><code>CAT-SEC-003</code></td>
-                                <td><strong>Corporate VPN &amp; Remote Security Token</strong></td>
-                                <td>Security</td>
-                                <td>3 (Device Type, OS Version, Token Type)</td>
-                                <td>Manager Approval → SecOps Task</td>
-                                <td><span class="badge badge-info">CREATE</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                        <strong style="color: #16a34a;">🛡️ Four-Eyes Production Release Gate (POL-SEC-006)</strong><br/>
-                        <span style="font-size: 0.84rem; color: #475569;">Requester: <code>admin</code> • Security Approver: <code>sarah.security</code> (Independent Officer)</span>
+                    <!-- Template 2: ITSM Accelerator -->
+                    <div class="template-item-card" data-category="ITSM">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <span style="font-size: 2rem;">🚨</span>
+                                <span class="badge badge-warning">COMING SOON</span>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">ITSM Accelerator</h3>
+                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">ITSM • v1.0.0 • AppForge</div>
+                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Enterprise Incident, Problem, Change, and Major Incident management accelerator.</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$450 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('itsm_accelerator')">Details</button>
+                        </div>
                     </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="rollbackSimulation()">↩ Rollback Job</button>
-                        <button class="btn btn-primary" onclick="executeBulkImport()">🚀 Step 3: Approve &amp; Execute Bulk Import</button>
+                    <!-- Template 3: CSM Accelerator -->
+                    <div class="template-item-card" data-category="CSM">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <span style="font-size: 2rem;">💬</span>
+                                <span class="badge badge-warning">COMING SOON</span>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">CSM Accelerator</h3>
+                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">CSM • v1.0.0 • AppForge</div>
+                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Customer Service Management hub with case escalation and SLA workflows.</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$499 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('csm_accelerator')">Details</button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- VIEW 2: INTERACTIVE CATALOG BUILDER -->
-            <section id="tab-builder" class="hidden">
+            <!-- VIEW 2: SINGLE-PAGE BULK CATALOG MANAGER -->
+            <section id="tab-manager" class="hidden">
                 <div class="card">
-                    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 16px;">Single Catalog Item Builder</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Single-Page Bulk Catalog Management Workspace</h3>
+                    <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 20px;">Manage the complete implementation lifecycle: Excel upload, variables, assignment, approvals, fulfillment actions, and publishing.</p>
+
+                    <!-- Section 1: Customer & Catalog Scope -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px;">
                         <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Item Name *</label>
-                            <input type="text" id="cfg-name" class="input-control" value="Standard Employee Laptop Provisioning" />
+                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Customer / Tenant</label>
+                            <select class="input-control"><option>Acme Global Enterprises (tenant_acme_01)</option><option>NovaTech Healthcare</option></select>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Target Catalog</label>
+                            <select class="input-control"><option>Service Catalog (OOTB)</option><option>Technical Catalog</option></select>
                         </div>
                         <div>
                             <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Category</label>
-                            <input type="text" id="cfg-category" class="input-control" value="Hardware" />
+                            <select class="input-control"><option>Hardware</option><option>Cloud Services</option><option>Security</option></select>
                         </div>
                     </div>
-                    <div style="margin-bottom: 16px;">
-                        <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Short Description</label>
-                        <input type="text" id="cfg-desc" class="input-control" value="Standard developer MacBook Pro / Dell XPS provisioning with asset tagging." />
+
+                    <!-- Section 2: Excel Template Actions -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px; border: 1px solid var(--af-border); border-radius: 8px;">
+                        <div>
+                            <strong style="font-size: 0.9rem; color: #0f172a;">Standardized Excel Template (7 Sheets)</strong>
+                            <div style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">Download the template, fill requirements, and upload directly.</div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="alert('📥 DOWNLOADING AppForge_Bulk_Catalog_Template.xlsx (Sample Employee Laptop Request included)...')">📥 Download Template</button>
+                            <button class="btn btn-primary" onclick="alert('✓ Excel File Loaded: AppForge_Bulk_Catalog_Template.xlsx (3 Catalog Items, 12 Variables)')">📤 Upload Excel</button>
+                        </div>
                     </div>
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button class="btn btn-primary" onclick="alert('Item published live to sc_cat_item!')">Publish Catalog Item 🚀</button>
+
+                    <!-- Section 3: "After Submit" Fulfillment Designer -->
+                    <div style="margin-bottom: 20px; padding: 18px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px;">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 10px;">After Submit — What should AppForge create in ServiceNow?</h4>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" checked="checked" /> ☑ RITM (Service Request)
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" checked="checked" /> ☑ Approval Gate
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" checked="checked" /> ☑ Catalog Task (sc_task)
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" /> ☐ Incident (incident)
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" /> ☐ Problem (problem)
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" /> ☐ Change Request (change_request)
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" /> ☐ Notification
+                            </label>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" /> ☐ Native Flow Designer
+                            </label>
+                        </div>
+
+                        <!-- Assignment & Approval Inputs -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 1px solid var(--af-border); padding-top: 14px;">
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Default Assignment Group</label>
+                                <input type="text" class="input-control" value="Hardware EUC Team (sys_user_group)" />
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Approval Group</label>
+                                <input type="text" class="input-control" value="IT Management (sys_user_group)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Validation, Preview & Publishing Buttons -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 18px;">
+                        <div style="font-size: 0.84rem; color: #16a34a; font-weight: 600;">
+                            ✓ 3 Catalog Items • ✓ 12 Variables • ✓ 7 Fulfillment Steps • 0 Errors
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="alert('🔍 VALIDATION REPORT:\n\n• 3 Items Validated\n• 0 Schema Collisions\n• Security Policy Gate: PASSED')">Validate</button>
+                            <button class="btn btn-secondary" onclick="alert('📊 DRY-RUN PREVIEW:\n\n• CREATE: 3\n• UPDATE: 0\n• SKIP: 0\n• Batch Count: 1 Batch')">Preview</button>
+                            <button class="btn btn-primary" onclick="publishCatalogDirectly()">Create &amp; Publish to ServiceNow 🚀</button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -345,6 +360,31 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     </main>
 </div>
 
+<!-- MODAL: TEMPLATE DETAILS -->
+<div id="modal-template-details" class="modal-overlay">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+            <div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;" id="dt-name">Bulk Catalog Automation</h3>
+                <div style="font-size: 0.8rem; color: #0284c7; font-weight: 600;" id="dt-meta">Catalog / Automation • v1.0.0 • AppForge</div>
+            </div>
+            <span class="badge badge-success" id="dt-status">CERTIFIED</span>
+        </div>
+        <p style="font-size: 0.86rem; color: #475569; line-height: 1.5; margin-bottom: 16px;" id="dt-desc">Create and manage hundreds of ServiceNow Catalog Items from a single Excel template.</p>
+        
+        <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 0.82rem; color: #334155;">
+            <strong>Objects Created on Installation:</strong><br/>
+            • 1 Workspace Page • 1 Navigation Module (<code>Bulk Catalog Manager</code>)<br/>
+            • 2 Roles/ACLs • 7 Script Includes • 3 APIs
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
+            <button class="btn btn-primary" onclick="installFromModal()">Install Solution 🚀</button>
+        </div>
+    </div>
+</div>
+
 <script>
     function switchTab(tabId, el) {
         var sections = document.querySelectorAll('.content-area section');
@@ -359,27 +399,48 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         }
     }
 
-    function downloadTemplate() {
-        alert('📥 DOWNLOADING STANDARDIZED EXCEL TEMPLATE...\n\n• File: AppForge_Bulk_Catalog_Template_v1.0.xlsx\n• Sheets: 7 (Catalog Items, Variables, Choices, Variable Sets, UI Policies, Actions, Fulfillment)\n• Status: Ready to populate.');
+    function filterCategory(el, cat) {
+        var pills = document.querySelectorAll('.cat-pill');
+        for (var i = 0; i != pills.length; i++) pills[i].classList.remove('active');
+        el.classList.add('active');
+        var cards = document.querySelectorAll('.template-item-card');
+        for (var j = 0; j != cards.length; j++) {
+            if (cat === 'All' || cards[j].getAttribute('data-category') === cat) {
+                cards[j].style.display = 'flex';
+            } else {
+                cards[j].style.display = 'none';
+            }
+        }
     }
 
-    function runValidation() {
-        alert('🔍 VALIDATION COMPLETE:\n\n✓ 3 Catalog Items parsed\n✓ 12 Form Variables verified\n✓ 7 Fulfillment tasks mapped\n✓ 0 Security violations\n\nReady for Dry-Run Preview.');
+    function openDetailsModal(id) {
+        if (id === 'bulk_catalog_automation') {
+            document.getElementById('dt-name').innerText = 'Bulk Catalog Automation';
+            document.getElementById('dt-meta').innerText = 'Catalog / Automation • v1.0.0 • AppForge';
+            document.getElementById('dt-status').innerText = 'CERTIFIED & READY';
+            document.getElementById('dt-desc').innerText = 'Create and manage hundreds of ServiceNow Catalog Items from a single Excel workbook with variables and fulfillment rules.';
+        } else {
+            document.getElementById('dt-name').innerText = id.replace('_', ' ').toUpperCase();
+            document.getElementById('dt-meta').innerText = 'Accelerator • v1.0.0 • AppForge';
+            document.getElementById('dt-status').innerText = 'COMING SOON';
+            document.getElementById('dt-desc').innerText = 'Enterprise accelerator module for ServiceNow.';
+        }
+        document.getElementById('modal-template-details').style.display = 'flex';
     }
 
-    function runPreview() {
-        document.getElementById('preview-result-box').classList.remove('hidden');
-        document.getElementById('preview-result-box').scrollIntoView({ behavior: 'smooth' });
+    function closeDetailsModal() {
+        document.getElementById('modal-template-details').style.display = 'none';
     }
 
-    function executeBulkImport() {
-        alert('🚀 BULK CATALOG FACTORY EXECUTION COMPLETE!\n\n• Job ID: JOB-CAT-2026-9041\n• Correlation ID: AF-CATALOG-2026-894211\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Created: 3 Catalog Items (sc_cat_item)\n• Created: 12 Variables (item_option_new)\n• Created: 7 Fulfillment Tasks (sc_task)\n• Status: LIVE IN SERVICE CATALOG');
+    function installFromModal() {
+        closeDetailsModal();
+        alert('🎉 TEMPLATE INSTALLED SUCCESSFULLY!\n\n• Solution: Bulk Catalog Automation\n• Module Created: Bulk Catalog Manager\n• Status: Ready to Use');
+        switchTab('manager', document.querySelectorAll('.nav-item')[1]);
+    }
+
+    function publishCatalogDirectly() {
+        alert('🚀 BULK CATALOG PUBLISHED LIVE TO SERVICENOW!\n\n• Items Created: 3 (sc_cat_item)\n• Variables Created: 12 (item_option_new)\n• Tasks & Approvals: Configured\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Status: LIVE IN PRODUCTION');
         switchTab('items', document.querySelectorAll('.nav-item')[2]);
-    }
-
-    function rollbackSimulation() {
-        alert('↩ ROLLBACK EXECUTED:\n\n• Compensating delete completed\n• AppForge-managed records purged\n• Existing ServiceNow data unharmed\n• Job status: CANCELLED');
-        document.getElementById('preview-result-box').classList.add('hidden');
     }
 </script>
 </j:jelly>

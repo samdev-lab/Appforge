@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_1805046_app_fo_0.AppForgeTemplateDependencyResolver</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>AppForge core engine component: AppForgeTemplateDependencyResolver</description>
+        <name>AppForgeTemplateDependencyResolver</name>
+        <script><![CDATA[/**
+ * AppForgeTemplateDependencyResolver
+ * Validates prerequisite plugins, release compatibility, and solution dependencies
+ * prior to template installation.
+ */
+var AppForgeTemplateDependencyResolver = Class.create();
+AppForgeTemplateDependencyResolver.prototype = {
+    initialize: function() {
+        'use strict';
+        this.LOG_PREFIX = '[AppForgeTemplateDependencyResolver] ';
+    },
+
+    /**
+     * Checks if all dependencies for a template are satisfied.
+     */
+    resolve: function(templateId, currentRelease, installedPlugins) {
+        'use strict';
+        installedPlugins = installedPlugins || ['com.glide.service_catalog', 'com.glide.service_portal'];
+        currentRelease = currentRelease || 'Vancouver';
+
+        var result = {
+            template_id: templateId,
+            satisfied: true,
+            missing_plugins: [],
+            release_compatible: true
+        };
+
+        if (templateId === 'bulk_catalog_automation') {
+            if (installedPlugins.indexOf('com.glide.service_catalog') === -1) {
+                result.satisfied = false;
+                result.missing_plugins.push('com.glide.service_catalog');
+            }
+        }
+
+        return result;
+    },
+
+    type: 'AppForgeTemplateDependencyResolver'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-08-22 19:37:23</sys_created_on>
+        <sys_id>09e58d14d192764203ccb400563eef13</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppForgeTemplateDependencyResolver</sys_name>
+        <sys_package display_value="App-forge" source="x_1805046_app_fo_0">e6a6083683f64750525cb6cfeeaad3ad</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App-forge">e6a6083683f64750525cb6cfeeaad3ad</sys_scope>
+        <sys_update_name>sys_script_include_09e58d14d192764203ccb400563eef13</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-08-29 11:45:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

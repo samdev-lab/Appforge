@@ -1,0 +1,172 @@
+/**
+ * AppForgePrompt026MarketplaceTestSuite
+ * Dedicated Automated Test Suite certifying Prompt 026 requirements:
+ * Template Marketplace, Bulk Catalog Automation template installation, automated navigation module creation,
+ * Single-Page Bulk Catalog Manager, "After Submit" fulfillment, Four-Eyes governance, and OOTB mappings.
+ */
+var AppForgePrompt026MarketplaceTestSuite = Class.create();
+AppForgePrompt026MarketplaceTestSuite.prototype = {
+    initialize: function() {
+        'use strict';
+        this.marketplaceService = new AppForgeMarketplaceService();
+        this.depResolver = new AppForgeTemplateDependencyResolver();
+        this.bulkFactory = new AppForgeBulkCatalogFactory();
+
+        this.results = { passed: 0, failed: 0, total: 0, tests: [], details: [] };
+    },
+
+    assert: function(condition, testName, details) {
+        'use strict';
+        this.results.total++;
+        if (condition) {
+            this.results.passed++;
+            this.results.tests.push({ name: testName, status: 'PASSED' });
+            this.results.details.push({ name: testName, passed: true });
+        } else {
+            this.results.failed++;
+            this.results.tests.push({ name: testName, status: 'FAILED', details: details });
+            this.results.details.push({ name: testName, passed: false, details: details });
+            gs.error('[AppForgePrompt026MarketplaceTestSuite] FAILED: ' + testName + ' - ' + (details || ''));
+        }
+    },
+
+    runAllTests: function() {
+        'use strict';
+        gs.info('[AppForgePrompt026MarketplaceTestSuite] Starting test execution...');
+
+        this.testMarketplaceCatalogDiscovery();
+        this.testTemplateDetailsInspection();
+        this.testTemplateInstallation();
+        this.testComingSoonBlocking();
+        this.testDependencyResolution();
+        this.testAutomaticModuleCreation();
+        this.testAfterSubmitFulfillmentOptions();
+        this.testExcelTemplateAndSampleData();
+        this.testFourEyesProductionGovernance();
+        this.testCompensatingRollback();
+
+        gs.info('[AppForgePrompt026MarketplaceTestSuite] Completed: ' + this.results.passed + '/' + this.results.total + ' passed.');
+        return this.results;
+    },
+
+    testMarketplaceCatalogDiscovery: function() {
+        'use strict';
+        var list = this.marketplaceService.listTemplates();
+        this.assert(list.length >= 6, 'M1: Marketplace contains 6 initial templates');
+
+        var catList = this.marketplaceService.listTemplates({ category: 'Catalog' });
+        this.assert(catList.length === 1 && catList[0].template_id === 'bulk_catalog_automation', 'M2: Category filter Catalog returns Bulk Catalog Automation');
+
+        var searchRes = this.marketplaceService.listTemplates({ search: 'Catalog' });
+        this.assert(searchRes.length >= 1, 'M3: Keyword search for "Catalog" matches template');
+    },
+
+    testTemplateDetailsInspection: function() {
+        'use strict';
+        var det = this.marketplaceService.getTemplateDetails('bulk_catalog_automation');
+        this.assert(det !== null, 'D1: Template details retrieved');
+        this.assert(det.capabilities.length >= 5, 'D2: Capabilities list includes Excel, Variables, Fulfillment');
+        this.assert(det.navigation_created.indexOf('Bulk Catalog Manager') !== -1, 'D3: Navigation created list includes Bulk Catalog Manager');
+        this.assert(det.objects_created.script_includes >= 5, 'D4: Objects created summary is populated');
+    },
+
+    testTemplateInstallation: function() {
+        'use strict';
+        var instRes = this.marketplaceService.installTemplate({
+            template_id: 'bulk_catalog_automation',
+            tenant_id: 'tenant_test_01',
+            customer: 'Test Enterprise Corp',
+            approver: 'sarah.security'
+        });
+
+        this.assert(instRes.success === true, 'I1: Template installation succeeded');
+        this.assert(instRes.installation.status === 'INSTALLED', 'I2: Installation status is INSTALLED');
+        this.assert(instRes.installation.correlation_id.indexOf('AF-MKT-') === 0, 'I3: Correlation ID generated');
+
+        var installed = this.marketplaceService.listInstalledTemplates('tenant_test_01');
+        this.assert(installed.length >= 1, 'I4: Installed templates query returns active installation');
+    },
+
+    testComingSoonBlocking: function() {
+        'use strict';
+        var blocked = false;
+        try {
+            this.marketplaceService.installTemplate({
+                template_id: 'itsm_accelerator',
+                tenant_id: 'tenant_test_01'
+            });
+        } catch (e) {
+            blocked = true;
+        }
+        this.assert(blocked === true, 'CS1: Unfinished Coming Soon template installation blocked');
+    },
+
+    testDependencyResolution: function() {
+        'use strict';
+        var depRes1 = this.depResolver.resolve('bulk_catalog_automation', 'Vancouver', ['com.glide.service_catalog']);
+        this.assert(depRes1.satisfied === true, 'DEP1: Dependency satisfied when Service Catalog plugin present');
+
+        var depRes2 = this.depResolver.resolve('bulk_catalog_automation', 'Vancouver', []);
+        this.assert(depRes2.satisfied === false, 'DEP2: Dependency check flags missing plugin');
+        this.assert(depRes2.missing_plugins.indexOf('com.glide.service_catalog') !== -1, 'DEP3: Missing plugin identified');
+    },
+
+    testAutomaticModuleCreation: function() {
+        'use strict';
+        var det = this.marketplaceService.getTemplateDetails('bulk_catalog_automation');
+        var moduleName = det.navigation_created[0];
+        this.assert(moduleName === 'Bulk Catalog Manager', 'MOD1: Automatically targeted module is Bulk Catalog Manager');
+    },
+
+    testAfterSubmitFulfillmentOptions: function() {
+        'use strict';
+        var template = this.bulkFactory.parser.generateExcelTemplate();
+        this.assert(template.fulfillment.length >= 3, 'AS1: Multi-stage fulfillment defined');
+        this.assert(template.fulfillment[0].action_type === 'RITM', 'AS2: Step 1 initiates RITM');
+        this.assert(template.fulfillment[1].action_type === 'TASK', 'AS3: Step 2 creates Catalog Task');
+        this.assert(template.fulfillment[0].approval_required === true, 'AS4: Approval gate configured');
+    },
+
+    testExcelTemplateAndSampleData: function() {
+        'use strict';
+        var template = this.bulkFactory.parser.generateExcelTemplate();
+        this.assert(template.catalog_items[0].catalog_item_name === 'New Employee Laptop Request', 'EX1: Sample template contains Employee Laptop Request');
+        this.assert(template.variables.length >= 3, 'EX2: Sample variables populated');
+        this.assert(template.choices.length >= 3, 'EX3: Sample choices populated');
+    },
+
+    testFourEyesProductionGovernance: function() {
+        'use strict';
+        var template = this.bulkFactory.parser.generateExcelTemplate();
+        var job = this.bulkFactory.createImportJob(template, {
+            tenant_id: 'tenant_governance_01',
+            uploaded_by: 'dev_user'
+        });
+
+        // Self-approval must fail
+        var selfApprovalBlocked = false;
+        try {
+            this.bulkFactory.execute(job.job_id, 'dev_user');
+        } catch (e) {
+            selfApprovalBlocked = true;
+        }
+        this.assert(selfApprovalBlocked === true, 'FE1: POL-SEC-006 blocks requester self-approval');
+
+        // Approver succeeds
+        var res = this.bulkFactory.execute(job.job_id, 'sarah.security');
+        this.assert(res.success === true, 'FE2: Independent security officer approval executes job');
+    },
+
+    testCompensatingRollback: function() {
+        'use strict';
+        var template = this.bulkFactory.parser.generateExcelTemplate();
+        var job = this.bulkFactory.createImportJob(template, { uploaded_by: 'qa_user' });
+        this.bulkFactory.execute(job.job_id, 'sarah.security');
+
+        var rollRes = this.bulkFactory.rollback(job.job_id);
+        this.assert(rollRes.rolled_back_count >= 1, 'RB1: Rollback ledger executed compensating deletes');
+        this.assert(rollRes.status === 'ROLLED_BACK', 'RB2: Rollback status verified');
+    },
+
+    type: 'AppForgePrompt026MarketplaceTestSuite'
+};
