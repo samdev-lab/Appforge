@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeUpdateSetReverseEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeUpdateSetReverseEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeUpdateSetReverseEngine
  * Reverse-engineers ServiceNow Update Sets (sys_update_xml / sys_update_set records)

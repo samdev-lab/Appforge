@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeMigrationBatchProcessor</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeMigrationBatchProcessor</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeMigrationBatchProcessor
  * Executes high-volume data transformations in chunked batches with per-batch checkpointing,

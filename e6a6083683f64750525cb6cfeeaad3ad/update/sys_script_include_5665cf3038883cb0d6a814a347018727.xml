@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeFactoryPlanner</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeFactoryPlanner</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeFactoryPlanner
  * Dry-run planning engine calculating dependency-ordered execution plans,

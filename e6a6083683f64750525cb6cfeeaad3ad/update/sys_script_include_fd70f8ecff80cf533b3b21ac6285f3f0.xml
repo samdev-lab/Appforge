@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeTemplateRegistry</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeTemplateRegistry</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeTemplateRegistry
  * Manages the catalog of certified, declarative AppForge application templates.
@@ -110,7 +112,7 @@ AppForgeTemplateRegistry.prototype = {
             category: 'HR',
             version: '1.0.0',
             description: 'Automate new hire provisioning, hardware logistics, credential requests, and departmental tasks.',
-            icon: '👤',
+            icon: ']]>👤<![CDATA[',
             pricing_model: 'SUBSCRIPTION',
             price: 499,
             billing_period: 'MONTHLY',
@@ -152,7 +154,7 @@ AppForgeTemplateRegistry.prototype = {
             category: 'Vendor Management',
             version: '1.0.0',
             description: 'Manage third-party vendor contracts, security reviews, SLA compliance, and supplier performance.',
-            icon: '🏢',
+            icon: ']]>🏢<![CDATA[',
             pricing_model: 'SUBSCRIPTION',
             price: 599,
             billing_period: 'MONTHLY',
@@ -183,7 +185,7 @@ AppForgeTemplateRegistry.prototype = {
             category: 'CSM',
             version: '1.0.0',
             description: 'Enterprise customer intake, case escalation, SLA response tracking, and customer communications.',
-            icon: '💬',
+            icon: ']]>💬<![CDATA[',
             pricing_model: 'SUBSCRIPTION',
             price: 699,
             billing_period: 'MONTHLY',
@@ -209,7 +211,7 @@ AppForgeTemplateRegistry.prototype = {
             category: 'Operations',
             version: '1.0.0',
             description: 'Track hardware inventory requests, laptop allocations, mobile devices, and return logistics.',
-            icon: '💻',
+            icon: ']]>💻<![CDATA[',
             pricing_model: 'SUBSCRIPTION',
             price: 399,
             billing_period: 'MONTHLY',
@@ -234,7 +236,7 @@ AppForgeTemplateRegistry.prototype = {
             category: 'ITSM',
             version: '1.0.0',
             description: 'Streamlined incident intake, severity routing, assignment queues, and resolution tracking.',
-            icon: '🚨',
+            icon: ']]>🚨<![CDATA[',
             pricing_model: 'SUBSCRIPTION',
             price: 450,
             billing_period: 'MONTHLY',
@@ -259,7 +261,7 @@ AppForgeTemplateRegistry.prototype = {
             category: 'HR',
             version: '1.0.0',
             description: 'Automate account revocation, asset collection, exit interviews, and compliance sign-offs.',
-            icon: '🚪',
+            icon: ']]>🚪<![CDATA[',
             pricing_model: 'SUBSCRIPTION',
             price: 399,
             billing_period: 'MONTHLY',

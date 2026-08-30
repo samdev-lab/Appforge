@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeMigrationExecutor</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeMigrationExecutor</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeMigrationExecutor
  * Master coordinator for enterprise schema and high-volume data migrations.

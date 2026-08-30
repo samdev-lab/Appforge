@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeGovernanceExceptionManager</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeGovernanceExceptionManager</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeGovernanceExceptionManager
  * Manages time-bounded policy exceptions with Four-Eyes approval separation (requested_by != approved_by),

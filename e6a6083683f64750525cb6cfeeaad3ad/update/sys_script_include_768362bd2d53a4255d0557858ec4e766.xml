@@ -6,7 +6,9 @@
         <caller_access/>
         <client_callable>false</client_callable>
         <description>AppForge core engine component: AppForgeCatalogFulfillmentEngine</description>
+        <mobile_callable>false</mobile_callable>
         <name>AppForgeCatalogFulfillmentEngine</name>
+        <sandbox_callable>false</sandbox_callable>
         <script><![CDATA[/**
  * AppForgeCatalogFulfillmentEngine
  * Configures and orchestrates multi-stage fulfillment logic for Catalog Items.

@@ -83,13 +83,13 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('catalog', this)">📦 Template Marketplace</li>
-            <li class="nav-item" onclick="switchTab('dashboard', this)">🏠 Home Dashboard</li>
-            <li class="nav-item" onclick="switchTab('installed', this)">🏢 Installed Applications</li>
-            <li class="nav-item" onclick="switchTab('customers', this)">👥 Customers &amp; CRM</li>
-            <li class="nav-item" onclick="switchTab('deploy', this)">🚀 Deploy &amp; Release</li>
-            <li class="nav-item" onclick="switchTab('spm', this)">💼 Portfolios &amp; Demand</li>
-            <li class="nav-item" onclick="switchTab('health', this)">🩺 Health &amp; Admin</li>
+            <li class="nav-item active" onclick="switchTab('catalog', this)">]]>📦<![CDATA[ Template Marketplace</li>
+            <li class="nav-item" onclick="switchTab('dashboard', this)">]]>🏠<![CDATA[ Home Dashboard</li>
+            <li class="nav-item" onclick="switchTab('installed', this)">]]>🏢<![CDATA[ Installed Applications</li>
+            <li class="nav-item" onclick="switchTab('customers', this)">]]>👥<![CDATA[ Customers &amp; CRM</li>
+            <li class="nav-item" onclick="switchTab('deploy', this)">]]>🚀<![CDATA[ Deploy &amp; Release</li>
+            <li class="nav-item" onclick="switchTab('spm', this)">]]>💼<![CDATA[ Portfolios &amp; Demand</li>
+            <li class="nav-item" onclick="switchTab('health', this)">]]>🩺<![CDATA[ Health &amp; Admin</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
             <div>Target: <strong>dev280961 (Production)</strong></div>
@@ -99,7 +99,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">📦 AppForge Template Marketplace</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">]]>📦<![CDATA[ AppForge Template Marketplace</h2>
             <div class="user-badge">
                 <span class="badge badge-success">● CERTIFIED v0.19.0</span>
                 <span>•</span>
@@ -133,7 +133,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="template-item-card" data-category="HR" data-name="Employee Onboarding">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">👤</span>
+                                <span style="font-size: 2rem;">]]>👤<![CDATA[</span>
                                 <span class="badge badge-success">CERTIFIED</span>
                             </div>
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Employee Onboarding</h3>
@@ -148,7 +148,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$499 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
                             <div style="display: flex; gap: 6px;">
                                 <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openTemplateDetail('employee_onboarding', 'Employee Onboarding', 'HR', '1.0.0', 'Automate new hire intake, hardware logistics, credential requests, and departmental tasks.', ['Onboarding Requests', 'Employees', 'Tasks', 'Reports'], ['x_onboarding_request', 'x_onboarding_task'])">Details</button>
-                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="startInstallWizard('employee_onboarding', 'Employee Onboarding', '1.0.0', 2, 14)">Install 🚀</button>
+                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="startInstallWizard('employee_onboarding', 'Employee Onboarding', '1.0.0', 2, 14)">Install ]]>🚀<![CDATA[</button>
                             </div>
                         </div>
                     </div>
@@ -157,7 +157,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="template-item-card" data-category="Vendor Management" data-name="Vendor Management">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">🏢</span>
+                                <span style="font-size: 2rem;">]]>🏢<![CDATA[</span>
                                 <span class="badge badge-success">CERTIFIED</span>
                             </div>
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Vendor Management</h3>
@@ -172,7 +172,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$599 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
                             <div style="display: flex; gap: 6px;">
                                 <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openTemplateDetail('vendor_management', 'Vendor Management', 'Vendor Management', '1.0.0', 'Manage third-party vendor contracts, security reviews, SLA compliance, and supplier performance.', ['Vendor Directory', 'Contracts & SLAs', 'Risk Reviews'], ['x_vendor', 'x_vendor_contract'])">Details</button>
-                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="startInstallWizard('vendor_management', 'Vendor Management', '1.0.0', 2, 16)">Install 🚀</button>
+                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="startInstallWizard('vendor_management', 'Vendor Management', '1.0.0', 2, 16)">Install ]]>🚀<![CDATA[</button>
                             </div>
                         </div>
                     </div>
@@ -181,7 +181,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="template-item-card" data-category="CSM" data-name="Customer Request Management">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">💬</span>
+                                <span style="font-size: 2rem;">]]>💬<![CDATA[</span>
                                 <span class="badge badge-success">CERTIFIED</span>
                             </div>
                             <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Customer Request Hub</h3>
@@ -196,7 +196,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$699 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
                             <div style="display: flex; gap: 6px;">
                                 <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openTemplateDetail('customer_request', 'Customer Request Hub', 'CSM', '1.0.0', 'Enterprise customer intake, case escalation, SLA response tracking, and customer communications.', ['Customer Cases', 'Accounts', 'SLA Escalations'], ['x_csm_case'])">Details</button>
-                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="startInstallWizard('customer_request', 'Customer Request Hub', '1.0.0', 1, 8)">Install 🚀</button>
+                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="startInstallWizard('customer_request', 'Customer Request Hub', '1.0.0', 1, 8)">Install ]]>🚀<![CDATA[</button>
                             </div>
                         </div>
                     </div>
@@ -357,7 +357,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 <!-- MODAL: GOVERNED DECOMMISSIONING -->
 <div id="modal-decom" class="modal-overlay">
     <div class="modal-box">
-        <h3 style="font-size: 1.2rem; font-weight: 700; color: #dc2626; margin-bottom: 8px;">🛡️ Request Governed Decommissioning</h3>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #dc2626; margin-bottom: 8px;">]]>🛡<![CDATA[️ Request Governed Decommissioning</h3>
         <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 16px;">AppForge enforces strict Four-Eyes governance. Instant destructive deletion is prohibited.</p>
 
         <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; color: #991b1b;">
@@ -377,7 +377,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-secondary" onclick="closeDecomModal()">Cancel</button>
-            <button class="btn btn-danger" onclick="submitDecommission()">Submit for Security Approval 🛡️</button>
+            <button class="btn btn-danger" onclick="submitDecommission()">Submit for Security Approval ]]>🛡<![CDATA[️</button>
         </div>
     </div>
 </div>
@@ -395,7 +395,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <p style="font-size: 0.88rem; color: #475569; line-height: 1.5; margin-bottom: 16px;" id="modal-detail-desc"></p>
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-secondary" onclick="closeTemplateDetail()">Close</button>
-            <button class="btn btn-primary" id="modal-detail-install-btn">Install Template 🚀</button>
+            <button class="btn btn-primary" id="modal-detail-install-btn">Install Template ]]>🚀<![CDATA[</button>
         </div>
     </div>
 </div>
@@ -439,11 +439,11 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     }
 
     function startInstallWizard(id, name, version) {
-        alert('🎉 1-CLICK INSTALLATION COMPLETED!\n\n• Application: ' + name + '\n• Version: v' + version + '\n• 5-Layer Compilation: SUCCESS\n• Navigation Modules: CREATED\n• Status: LIVE IN PRODUCTION');
+        alert(']]>🎉<![CDATA[ 1-CLICK INSTALLATION COMPLETED!\n\n• Application: ' + name + '\n• Version: v' + version + '\n• 5-Layer Compilation: SUCCESS\n• Navigation Modules: CREATED\n• Status: LIVE IN PRODUCTION');
     }
 
     function executeUpgrade(name) {
-        alert('🚀 APPLICATION UPGRADE COMPLETED!\n\n• Application: ' + name + '\n• Target: v1.1.0\n• Policy POL-SEC-006: PASSED\n• Status: UPGRADED & SYNCHRONIZED');
+        alert(']]>🚀<![CDATA[ APPLICATION UPGRADE COMPLETED!\n\n• Application: ' + name + '\n• Target: v1.1.0\n• Policy POL-SEC-006: PASSED\n• Status: UPGRADED & SYNCHRONIZED');
     }
 
     function openDecommissionModal(id, name) {
@@ -458,7 +458,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 
     function submitDecommission() {
         closeDecomModal();
-        alert('🛡️ GOVERNED DECOMMISSION COMPLETED!\n\n• Application: ' + currentDecomApp + '\n• Backup Snapshot: CREATED\n• Four-Eyes Approver: sarah.security\n• Audit Certificate: CERT-DECOM-2026-9041\n• Status: SAFELY DECOMMISSIONED');
+        alert(']]>🛡<![CDATA[️ GOVERNED DECOMMISSION COMPLETED!\n\n• Application: ' + currentDecomApp + '\n• Backup Snapshot: CREATED\n• Four-Eyes Approver: sarah.security\n• Audit Certificate: CERT-DECOM-2026-9041\n• Status: SAFELY DECOMMISSIONED');
     }
 </script>
 </j:jelly>
