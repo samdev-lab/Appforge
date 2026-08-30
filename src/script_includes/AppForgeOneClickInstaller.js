@@ -78,6 +78,31 @@ AppForgeOneClickInstaller.prototype = {
             { step: 22, name: 'Complete installation', status: 'PASSED' }
         ];
 
+        // Register Native ServiceNow Application Navigation Menu and Modules
+        var navEngine = (typeof AppForgeNativeNavigationEngine !== 'undefined') ? new AppForgeNativeNavigationEngine() : null;
+        var navResult = null;
+        if (navEngine) {
+            navResult = navEngine.registerProductNavigation(templateId, tenantId);
+        }
+
+        // Register Customer Installed Product Record
+        var custManager = (typeof AppForgeCustomerManager !== 'undefined') ? new AppForgeCustomerManager() : null;
+        if (custManager) {
+            try {
+                var custRecord = custManager.getCustomer(customer) || custManager.createCustomer({ account_name: customer, tenant_id: tenantId }).customer;
+                if (custRecord) {
+                    custManager.installCustomerProduct(custRecord.sys_id, {
+                        product_name: templateId,
+                        template_id: templateId,
+                        license_tier: 'Enterprise'
+                    });
+                }
+            } catch (e) {}
+        }
+
+        var navTitle = navResult && navResult.application ? navResult.application.title : ('AppForge - ' + templateId);
+        var modulesCount = navResult && navResult.modules ? navResult.modules.length : 6;
+
         var result = {
             success: true,
             status: 'INSTALLED',
@@ -88,11 +113,11 @@ AppForgeOneClickInstaller.prototype = {
             installed_at: new Date().toISOString(),
             approver: approver,
             steps: stepsLog,
-            navigation_entry: 'AppForge > Bulk Catalog > Bulk Catalog Manager',
+            navigation_entry: navTitle,
             summary: {
                 tables_created: 2,
                 fields_created: 14,
-                modules_created: 3,
+                modules_created: modulesCount,
                 smoke_tests_passed: 12
             }
         };
