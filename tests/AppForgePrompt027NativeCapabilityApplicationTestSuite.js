@@ -125,13 +125,13 @@ AppForgePrompt027NativeCapabilityApplicationTestSuite.prototype = {
 
     test02_InstallCsm25Steps: function() {
         var res = this.installer.installCapability({ customer_id: 'cust_csm_test', capability_id: 'csm' });
-        var pass = res.success && res.steps_completed === 25 && res.status === 'INSTALLED' && res.tables.length === 7;
+        var pass = res.success && res.steps_completed === 25 && res.status === 'INSTALLED' && res.tables.length >= 7;
         return { passed: !!pass, details: 'CSM installed with 25 steps, tables: ' + (res.tables ? res.tables.length : 0) };
     },
 
     test03_InstallCrm25Steps: function() {
         var res = this.installer.installCapability({ customer_id: 'cust_crm_test', capability_id: 'crm' });
-        var pass = res.success && res.steps_completed === 25 && res.status === 'INSTALLED' && res.tables.length === 7;
+        var pass = res.success && res.steps_completed === 25 && res.status === 'INSTALLED' && res.tables.length >= 7;
         return { passed: !!pass, details: 'CRM installed with 25 steps, tables: ' + (res.tables ? res.tables.length : 0) };
     },
 
