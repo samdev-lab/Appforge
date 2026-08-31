@@ -3,7 +3,7 @@
  * Manages native ServiceNow Application Menus (sys_app_application)
  * and Navigation Modules (sys_app_module) for installed AppForge products.
  *
- * Ensures each product (Bulk Catalog, SPM, ITSM, CSM, AppForge Team)
+ * Ensures each product (Bulk Catalog, SPM, ITSM, CSM, CRM, FSM, Resource Management, AppForge Team)
  * has clean, isolated, and standard ServiceNow navigation.
  */
 var AppForgeNativeNavigationEngine = Class.create();
@@ -26,7 +26,7 @@ AppForgeNativeNavigationEngine.prototype = {
     /**
      * Registers a complete native ServiceNow Application Menu and its child Modules
      * for a given marketplace product template.
-     * @param {string} productId - Product identifier (e.g. 'bulk_catalog_manager', 'spm_accelerator', etc.)
+     * @param {string} productId - Product identifier (e.g. 'bulk_catalog', 'spm', etc.)
      * @param {string} [tenantId] - Optional tenant identifier.
      * @return {Object} Registered application navigation bundle.
      */
@@ -51,6 +51,7 @@ AppForgeNativeNavigationEngine.prototype = {
             order: navDef.order || 100,
             roles: navDef.roles || 'x_1805046_app_fo_0.admin,admin',
             tenant_id: tenantId || 'tenant_default',
+            product_id: productId.toLowerCase().replace(/[\s-]+/g, '_'),
             created_at: new Date().toISOString()
         };
 
@@ -140,6 +141,40 @@ AppForgeNativeNavigationEngine.prototype = {
     },
 
     /**
+     * Returns only the navigation menus that are visible to a specific customer
+     * based on their installed/subscribed capabilities.
+     * Enforces strict multi-customer left navigation visibility isolation (Section 17).
+     * @param {string} customerId
+     * @param {Array<string>} installedCapabilityIds
+     * @return {Array<Object>} List of visible navigation bundles.
+     */
+    getUserVisibleNavigation: function(customerId, installedCapabilityIds) {
+        'use strict';
+        if (!customerId) return [];
+        var allowedKeys = (installedCapabilityIds || []).map(function(k) {
+            return String(k).toLowerCase().replace(/[\s-]+/g, '_');
+        });
+
+        var visibleMenus = [];
+        for (var pId in this._store.applications) {
+            if (this._store.applications.hasOwnProperty(pId)) {
+                var normPid = pId.toLowerCase().replace(/[\s-]+/g, '_');
+                var isAllowed = false;
+                for (var j = 0; j < allowedKeys.length; j++) {
+                    if (normPid.indexOf(allowedKeys[j]) !== -1 || allowedKeys[j].indexOf(normPid) !== -1) {
+                        isAllowed = true;
+                        break;
+                    }
+                }
+                if (isAllowed) {
+                    visibleMenus.push(this.getNavigationMenu(pId));
+                }
+            }
+        }
+        return visibleMenus;
+    },
+
+    /**
      * Internal template catalog for native navigation menus.
      * @private
      */
@@ -185,13 +220,13 @@ AppForgeNativeNavigationEngine.prototype = {
                 name: 'appforge_spm',
                 order: 200,
                 modules: [
-                    { title: 'Portfolios', table_name: 'pm_portfolio', link_type: 'LIST' },
-                    { title: 'Programs', table_name: 'pm_program', link_type: 'LIST' },
-                    { title: 'Projects', table_name: 'pm_project', link_type: 'LIST' },
-                    { title: 'Project Tasks', table_name: 'pm_project_task', link_type: 'LIST' },
-                    { title: 'Demands', table_name: 'dmn_demand', link_type: 'LIST' },
-                    { title: 'Strategic Goals', table_name: 'x_appforge_spm_goal', link_type: 'LIST' },
-                    { title: 'Resource Plans', table_name: 'resource_plan', link_type: 'LIST' },
+                    { title: 'Portfolios', table_name: 'x_appforge_spm_portfolio', link_type: 'LIST' },
+                    { title: 'Programs', table_name: 'x_appforge_spm_program', link_type: 'LIST' },
+                    { title: 'Projects', table_name: 'x_appforge_spm_project', link_type: 'LIST' },
+                    { title: 'Project Tasks', table_name: 'x_appforge_spm_project_task', link_type: 'LIST' },
+                    { title: 'Demands', table_name: 'x_appforge_spm_demand', link_type: 'LIST' },
+                    { title: 'Strategic Goals', table_name: 'x_appforge_spm_strategic_goal', link_type: 'LIST' },
+                    { title: 'Resource Plans', table_name: 'x_appforge_spm_resource_plan', link_type: 'LIST' },
                     { title: 'Project Resources', table_name: 'x_appforge_spm_resource', link_type: 'LIST' },
                     { title: 'Financials', table_name: 'x_appforge_spm_financial', link_type: 'LIST' },
                     { title: 'Configuration', table_name: 'x_appforge_spm_config', link_type: 'FORM' }
@@ -252,13 +287,13 @@ AppForgeNativeNavigationEngine.prototype = {
                 name: 'appforge_csm',
                 order: 400,
                 modules: [
-                    { title: 'Accounts', table_name: 'customer_account', link_type: 'LIST' },
-                    { title: 'Contacts', table_name: 'customer_contact', link_type: 'LIST' },
-                    { title: 'Cases', table_name: 'sn_customerservice_case', link_type: 'LIST' },
-                    { title: 'Case Tasks', table_name: 'sn_customerservice_task', link_type: 'LIST' },
+                    { title: 'Accounts', table_name: 'x_appforge_csm_account', link_type: 'LIST' },
+                    { title: 'Contacts', table_name: 'x_appforge_csm_contact', link_type: 'LIST' },
+                    { title: 'Cases', table_name: 'x_appforge_csm_case', link_type: 'LIST' },
+                    { title: 'Case Tasks', table_name: 'x_appforge_csm_case_task', link_type: 'LIST' },
                     { title: 'Interactions', table_name: 'interaction', link_type: 'LIST' },
                     { title: 'Customer Health', table_name: 'x_appforge_csm_health', link_type: 'LIST' },
-                    { title: 'Entitlements', table_name: 'service_entitlement', link_type: 'LIST' },
+                    { title: 'Entitlements', table_name: 'x_appforge_csm_entitlement', link_type: 'LIST' },
                     { title: 'Configuration', table_name: 'x_appforge_csm_config', link_type: 'FORM' }
                 ]
             };
@@ -270,16 +305,16 @@ AppForgeNativeNavigationEngine.prototype = {
                 name: 'appforge_crm',
                 order: 450,
                 modules: [
-                    { title: 'Accounts', table_name: 'customer_account', link_type: 'LIST' },
-                    { title: 'Contacts', table_name: 'customer_contact', link_type: 'LIST' },
-                    { title: 'Leads', table_name: 'sn_sales_lead', link_type: 'LIST' },
-                    { title: 'Opportunities', table_name: 'sn_sales_opportunity', link_type: 'LIST' },
-                    { title: 'Activities', table_name: 'sn_sales_activity', link_type: 'LIST' },
-                    { title: 'Sales Tasks', table_name: 'sn_sales_task', link_type: 'LIST' },
-                    { title: 'Products', table_name: 'product_catalog_item', link_type: 'LIST' },
-                    { title: 'Quotes', table_name: 'sn_sales_quote', link_type: 'LIST' },
+                    { title: 'Accounts', table_name: 'x_appforge_crm_account', link_type: 'LIST' },
+                    { title: 'Contacts', table_name: 'x_appforge_crm_contact', link_type: 'LIST' },
+                    { title: 'Leads', table_name: 'x_appforge_crm_lead', link_type: 'LIST' },
+                    { title: 'Opportunities', table_name: 'x_appforge_crm_opportunity', link_type: 'LIST' },
+                    { title: 'Activities', table_name: 'x_appforge_crm_activity', link_type: 'LIST' },
                     { title: 'Pipeline', table_name: 'x_appforge_crm_pipeline', link_type: 'LIST' },
-                    { title: 'Interactions', table_name: 'interaction', link_type: 'LIST' }
+                    { title: 'Sales Tasks', table_name: 'x_appforge_crm_task', link_type: 'LIST' },
+                    { title: 'Products', table_name: 'x_appforge_crm_product', link_type: 'LIST' },
+                    { title: 'Quotes', table_name: 'x_appforge_crm_quote', link_type: 'LIST' },
+                    { title: 'Configuration', table_name: 'x_appforge_crm_config', link_type: 'FORM' }
                 ]
             };
         }
@@ -290,15 +325,15 @@ AppForgeNativeNavigationEngine.prototype = {
                 name: 'appforge_fsm',
                 order: 470,
                 modules: [
-                    { title: 'Work Orders', table_name: 'wm_order', link_type: 'LIST' },
-                    { title: 'Work Order Tasks', table_name: 'wm_task', link_type: 'LIST' },
-                    { title: 'Field Agents', table_name: 'sys_user', link_type: 'LIST' },
-                    { title: 'Skills', table_name: 'cmn_skill', link_type: 'LIST' },
-                    { title: 'Locations', table_name: 'cmn_location', link_type: 'LIST' },
-                    { title: 'Assignment Groups', table_name: 'sys_user_group', link_type: 'LIST' },
-                    { title: 'Dispatch', table_name: 'wm_dispatch', link_type: 'LIST' },
+                    { title: 'Work Orders', table_name: 'x_appforge_fsm_work_order', link_type: 'LIST' },
+                    { title: 'Work Order Tasks', table_name: 'x_appforge_fsm_work_order_task', link_type: 'LIST' },
+                    { title: 'Dispatch', table_name: 'x_appforge_fsm_dispatch', link_type: 'LIST' },
+                    { title: 'Technicians', table_name: 'x_appforge_fsm_technician', link_type: 'LIST' },
+                    { title: 'Locations', table_name: 'x_appforge_fsm_location', link_type: 'LIST' },
+                    { title: 'Assignments', table_name: 'x_appforge_fsm_assignment', link_type: 'LIST' },
                     { title: 'Territories', table_name: 'cmn_location_territory', link_type: 'LIST' },
-                    { title: 'Scheduling', table_name: 'x_appforge_fsm_schedule', link_type: 'LIST' }
+                    { title: 'Scheduling', table_name: 'x_appforge_fsm_schedule', link_type: 'LIST' },
+                    { title: 'Configuration', table_name: 'x_appforge_fsm_config', link_type: 'FORM' }
                 ]
             };
         }
@@ -309,14 +344,14 @@ AppForgeNativeNavigationEngine.prototype = {
                 name: 'appforge_resource_management',
                 order: 480,
                 modules: [
-                    { title: 'Resources', table_name: 'sys_user', link_type: 'LIST' },
+                    { title: 'Resources', table_name: 'x_appforge_rm_resource', link_type: 'LIST' },
+                    { title: 'Resource Plans', table_name: 'x_appforge_rm_resource_plan', link_type: 'LIST' },
+                    { title: 'Allocations', table_name: 'x_appforge_rm_allocation', link_type: 'LIST' },
+                    { title: 'Capacity', table_name: 'x_appforge_rm_capacity', link_type: 'LIST' },
+                    { title: 'Skills', table_name: 'x_appforge_rm_skill', link_type: 'LIST' },
                     { title: 'Resource Groups', table_name: 'sys_user_group', link_type: 'LIST' },
-                    { title: 'Skills', table_name: 'cmn_skill', link_type: 'LIST' },
-                    { title: 'Resource Plans', table_name: 'resource_plan', link_type: 'LIST' },
-                    { title: 'Allocations', table_name: 'resource_allocation', link_type: 'LIST' },
-                    { title: 'Availability', table_name: 'x_appforge_res_availability', link_type: 'LIST' },
-                    { title: 'Capacity', table_name: 'x_appforge_res_capacity', link_type: 'LIST' },
-                    { title: 'Resource Requests', table_name: 'x_appforge_res_request', link_type: 'LIST' }
+                    { title: 'Availability', table_name: 'x_appforge_rm_availability', link_type: 'LIST' },
+                    { title: 'Configuration', table_name: 'x_appforge_rm_config', link_type: 'FORM' }
                 ]
             };
         }

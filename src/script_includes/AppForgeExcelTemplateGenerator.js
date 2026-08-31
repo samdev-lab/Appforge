@@ -305,6 +305,12 @@ AppForgeExcelTemplateGenerator.prototype = {
                     image_name: 'macbook_hero.png',
                     image_reference: 'sys_attachment_macbook',
                     attachment_reference: 'spec_sheet.pdf'
+                },
+                {
+                    catalog_item: 'Cloud Sandbox Environment',
+                    image_name: 'cloud_icon.png',
+                    image_reference: 'sys_attachment_cloud',
+                    attachment_reference: 'cloud_guide.pdf'
                 }
             ]
         };
