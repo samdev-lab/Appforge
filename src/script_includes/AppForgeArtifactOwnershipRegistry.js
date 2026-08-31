@@ -20,7 +20,7 @@ AppForgeArtifactOwnershipRegistry.prototype = {
                 shared_artifacts: {}
             };
         }
-        this._store = AppForgeArtifactOwnershipRegistry._store;
+        AppForgeArtifactOwnershipRegistry._store = AppForgeArtifactOwnershipRegistry._store;
     },
 
     /**
@@ -33,11 +33,11 @@ AppForgeArtifactOwnershipRegistry.prototype = {
         var id = String(artifactId).trim();
 
         // Collision Check: Check if artifact already registered to a different application
-        if (this._store.artifacts[id] && this._store.artifacts[id].owner !== key && !isShared) {
+        if (AppForgeArtifactOwnershipRegistry._store.artifacts[id] && AppForgeArtifactOwnershipRegistry._store.artifacts[id].owner !== key && !isShared) {
             return {
                 success: false,
                 errorCode: 'ARTIFACT_COLLISION',
-                error: 'Artifact ' + id + ' is already owned by ' + this._store.artifacts[id].owner
+                error: 'Artifact ' + id + ' is already owned by ' + AppForgeArtifactOwnershipRegistry._store.artifacts[id].owner
             };
         }
 
@@ -50,14 +50,14 @@ AppForgeArtifactOwnershipRegistry.prototype = {
             registered_at: new Date().toISOString()
         };
 
-        this._store.artifacts[id] = record;
-        if (!this._store.app_artifacts[key]) this._store.app_artifacts[key] = [];
-        if (this._store.app_artifacts[key].indexOf(id) === -1) {
-            this._store.app_artifacts[key].push(id);
+        AppForgeArtifactOwnershipRegistry._store.artifacts[id] = record;
+        if (!AppForgeArtifactOwnershipRegistry._store.app_artifacts[key]) AppForgeArtifactOwnershipRegistry._store.app_artifacts[key] = [];
+        if (AppForgeArtifactOwnershipRegistry._store.app_artifacts[key].indexOf(id) === -1) {
+            AppForgeArtifactOwnershipRegistry._store.app_artifacts[key].push(id);
         }
 
         if (isShared) {
-            this._store.shared_artifacts[id] = true;
+            AppForgeArtifactOwnershipRegistry._store.shared_artifacts[id] = true;
         }
 
         return { success: true, artifact: record };
@@ -69,7 +69,7 @@ AppForgeArtifactOwnershipRegistry.prototype = {
     getArtifactOwner: function(artifactId) {
         'use strict';
         if (!artifactId) return null;
-        return this._store.artifacts[String(artifactId).trim()] || null;
+        return AppForgeArtifactOwnershipRegistry._store.artifacts[String(artifactId).trim()] || null;
     },
 
     /**
@@ -79,10 +79,10 @@ AppForgeArtifactOwnershipRegistry.prototype = {
         'use strict';
         if (!appKey) return [];
         var key = appKey.toLowerCase().replace(/[\s-]+/g, '_');
-        var ids = this._store.app_artifacts[key] || [];
+        var ids = AppForgeArtifactOwnershipRegistry._store.app_artifacts[key] || [];
         var self = this;
         return ids.map(function(id) {
-            return self._store.artifacts[id];
+            return AppForgeArtifactOwnershipRegistry._store.artifacts[id];
         }).filter(Boolean);
     },
 
@@ -156,16 +156,16 @@ AppForgeArtifactOwnershipRegistry.prototype = {
     unregisterApplicationArtifacts: function(appKey) {
         'use strict';
         var key = appKey.toLowerCase().replace(/[\s-]+/g, '_');
-        var ids = this._store.app_artifacts[key] || [];
+        var ids = AppForgeArtifactOwnershipRegistry._store.app_artifacts[key] || [];
 
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
             // Only unregister non-shared artifacts
-            if (this._store.artifacts[id] && !this._store.artifacts[id].is_shared) {
-                delete this._store.artifacts[id];
+            if (AppForgeArtifactOwnershipRegistry._store.artifacts[id] && !AppForgeArtifactOwnershipRegistry._store.artifacts[id].is_shared) {
+                delete AppForgeArtifactOwnershipRegistry._store.artifacts[id];
             }
         }
-        delete this._store.app_artifacts[key];
+        delete AppForgeArtifactOwnershipRegistry._store.app_artifacts[key];
         return { success: true, unregistered_count: ids.length };
     },
 
@@ -176,7 +176,7 @@ AppForgeArtifactOwnershipRegistry.prototype = {
             app_artifacts: {},
             shared_artifacts: {}
         };
-        this._store = AppForgeArtifactOwnershipRegistry._store;
+        AppForgeArtifactOwnershipRegistry._store = AppForgeArtifactOwnershipRegistry._store;
     },
 
     type: 'AppForgeArtifactOwnershipRegistry'

@@ -33,9 +33,10 @@ body, .appforge-root { background-color: var(--af-bg) !important; color: var(--a
 header { height: 64px; background-color: #ffffff; border-bottom: 1px solid var(--af-border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
 .user-badge { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--af-text-muted); }
 .content-area { flex: 1; padding: 28px 32px; overflow-y: auto; }
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
 .card { background-color: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); }
-.stat-val { font-size: 2.2rem; font-weight: 800; color: var(--af-text); margin-top: 6px; letter-spacing: -0.5px; }
+.stat-val { font-size: 2rem; font-weight: 800; color: var(--af-text); margin-top: 6px; letter-spacing: -0.5px; }
 .stat-lbl { font-size: 0.8rem; color: var(--af-text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 table { width: 100%; border-collapse: collapse; margin-top: 12px; }
 th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--af-border); font-size: 0.88rem; }
@@ -44,19 +45,21 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 .badge-success { background-color: var(--af-success-bg); color: var(--af-success); border: 1px solid var(--af-success-border); }
 .badge-info { background-color: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
 .badge-warning { background-color: var(--af-warning-bg); color: var(--af-warning); border: 1px solid var(--af-warning-border); }
+.badge-danger { background-color: var(--af-danger-bg); color: var(--af-danger); border: 1px solid var(--af-danger-border); }
 .btn { padding: 9px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .btn-primary { background-color: var(--af-primary); color: #ffffff; border-color: var(--af-primary); }
 .btn-primary:hover { background-color: var(--af-primary-hover); }
 .btn-secondary { background-color: #ffffff; color: var(--af-text); border-color: var(--af-border); }
 .btn-secondary:hover { background-color: #f1f5f9; border-color: var(--af-border-hover); }
+.btn-danger { background-color: var(--af-danger); color: #ffffff; }
 .input-control { width: 100%; padding: 10px 12px; background: #ffffff; border: 1px solid var(--af-border); color: #0f172a; border-radius: 6px; font-size: 0.88rem; }
 .input-control:focus { outline: none; border-color: var(--af-primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
 .cat-pill { padding: 6px 14px; background: #ffffff; border: 1px solid var(--af-border); border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: #475569; cursor: pointer; display: inline-block; transition: all 0.15s; }
 .cat-pill:hover, .cat-pill.active { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
-.template-item-card { background: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.template-item-card:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+.app-card { background: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.app-card:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
 .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
-.modal-box { background: #ffffff; border: 1px solid var(--af-border); border-radius: 12px; width: 640px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
+.modal-box { background: #ffffff; border: 1px solid var(--af-border); border-radius: 12px; width: 680px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
 .hidden { display: none !important; }
 </style>
 
@@ -71,14 +74,14 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         </div>
         <ul class="nav-list">
             <li class="nav-item active" onclick="switchTab('marketplace', this)">🏪 Solution Marketplace</li>
+            <li class="nav-item" onclick="switchTab('dashboards', this)">📊 Application Dashboards</li>
+            <li class="nav-item" onclick="switchTab('integrations', this)">🔌 Integration Platform</li>
             <li class="nav-item" onclick="switchTab('manager', this)">⚡ Bulk Catalog Manager</li>
-            <li class="nav-item" onclick="switchTab('team', this)">👥 AppForge Team Workspace</li>
-            <li class="nav-item" onclick="switchTab('items', this)">📦 Published Catalog Items</li>
-            <li class="nav-item" onclick="switchTab('requests', this)">📋 Requests &amp; Fulfillment</li>
+            <li class="nav-item" onclick="switchTab('team', this)">👥 Implementation &amp; Tenants</li>
         </ul>
         <div style="padding: 16px 20px; border-top: 1px solid var(--af-border); font-size: 0.78rem; color: #64748b; background: #f8fafc;">
             <div>Instance: <strong>dev280961</strong></div>
-            <div style="margin-top: 4px;">Role: <strong>Platform Admin</strong></div>
+            <div style="margin-top: 4px;">Scope: <strong>x_1805046_app_fo_0</strong></div>
         </div>
     </aside>
 
@@ -86,308 +89,154 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         <header>
             <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🏪 AppForge Solution Marketplace</h2>
             <div class="user-badge">
-                <span class="badge badge-success">● CERTIFIED v0.20</span>
+                <span class="badge badge-success">● RELEASE v0.20</span>
                 <span>•</span>
-                <span>Scope: <strong>x_1805046_app_fo_0</strong></span>
+                <span>Role: <strong>Platform Admin</strong></span>
             </div>
         </header>
 
         <div class="content-area">
             
-            <!-- VIEW 1: SOLUTION MARKETPLACE -->
+            <!-- VIEW 1: SOLUTION MARKETPLACE (7 INDEPENDENT APPLICATIONS) -->
             <section id="tab-marketplace">
                 <div class="card" style="padding: 18px 24px; margin-bottom: 20px;">
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <span class="cat-pill active" onclick="filterCategory(this, 'All')">All Products</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'Catalog')">Catalog &amp; Forms</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'SPM')">SPM</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'ITSM')">ITSM</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'CSM')">CSM</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'CRM')">CRM</span>
-                        <span class="cat-pill" onclick="filterCategory(this, 'FSM')">FSM</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span class="cat-pill active" onclick="filterCategory(this, 'All')">All Applications (7)</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'Sales')">CRM</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'Customer')">CSM</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'Strategic')">SPM</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'Field')">FSM</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'Operations')">Resource Mgmt</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'Catalog')">Bulk Catalog</span>
+                            <span class="cat-pill" onclick="filterCategory(this, 'IT')">ITSM</span>
+                        </div>
+                        <div style="font-size: 0.82rem; color: #64748b;">Customer: <strong>Acme Global (tenant_acme_01)</strong></div>
                     </div>
                 </div>
 
-                <div class="grid-3" id="template-grid">
-                    <!-- Product 1: Bulk Catalog Manager (Reference Product - Certified) -->
-                    <div class="template-item-card" data-category="Catalog">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">⚡</span>
-                                <span class="badge badge-success">INSTALLED &amp; ACTIVE</span>
-                            </div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Bulk Catalog Manager</h3>
-                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">Catalog / Automation • v1.0.0 • AppForge</div>
-                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Create and manage hundreds of Service Catalog items from a single Excel workbook with variables and fulfillment rules.</p>
-                            <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 6px; padding: 10px; font-size: 0.78rem; color: #475569; margin-bottom: 16px;">
-                                <strong>Plan:</strong> Professional ($499/mo) • Unlimited Items
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$499 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
-                            <div style="display: flex; gap: 6px;">
-                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openDetailsModal('bulk_catalog_automation')">Details</button>
-                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="switchTab('manager', document.querySelectorAll('.nav-item')[1])">Open ↗</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Product 2: SPM Accelerator -->
-                    <div class="template-item-card" data-category="SPM">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">📊</span>
-                                <span class="badge badge-warning">TRIAL AVAILABLE</span>
-                            </div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">SPM Accelerator</h3>
-                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">SPM • v1.0.0 • AppForge</div>
-                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Strategic Portfolio Management, demand pipeline, scoring matrix, and capital budgeting accelerator.</p>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$599 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
-                            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="openDetailsModal('spm_accelerator')">Install Trial 🚀</button>
-                        </div>
-                    </div>
-
-                    <!-- Product 3: ITSM Accelerator -->
-                    <div class="template-item-card" data-category="ITSM">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <span style="font-size: 2rem;">🚨</span>
-                                <span class="badge badge-warning">AVAILABLE</span>
-                            </div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">ITSM Accelerator</h3>
-                            <div style="font-size: 0.78rem; color: #0284c7; font-weight: 600; margin-bottom: 8px;">ITSM • v1.0.0 • AppForge</div>
-                            <p style="font-size: 0.84rem; color: #64748b; line-height: 1.5; margin-bottom: 14px;">Enterprise Incident, Problem, Change, and Major Incident management accelerator.</p>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 14px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">$450 <span style="font-size: 0.72rem; color: #64748b; font-weight: 400;">/ mo</span></span>
-                            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="openDetailsModal('itsm_accelerator')">Install Trial 🚀</button>
-                        </div>
-                    </div>
+                <div class="grid-3" id="marketplace-grid">
+                    <!-- Rendered dynamically or standard cards -->
                 </div>
             </section>
 
-            <!-- VIEW 2: SINGLE-PAGE BULK CATALOG MANAGER -->
-            <section id="tab-manager" class="hidden">
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Single-Page Bulk Catalog Management Workspace</h3>
-                    <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 20px;">Manage the complete implementation lifecycle: Excel upload, variables, assignment, approvals, fulfillment actions, and publishing.</p>
-
-                    <!-- Scope Selection -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px;">
+            <!-- VIEW 2: APPLICATION DASHBOARDS -->
+            <section id="tab-dashboards" class="hidden">
+                <div class="card" style="padding: 18px 24px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Customer / Tenant</label>
-                            <select class="input-control"><option>Acme Global Enterprises (tenant_acme_01)</option><option>NovaTech Healthcare</option></select>
+                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">Application Dashboards &amp; Workspaces</h3>
+                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Direct operational dashboards for installed and active AppForge applications.</p>
                         </div>
-                        <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Target Service Catalog</label>
-                            <select class="input-control"><option>Service Catalog (OOTB)</option><option>Technical Catalog</option></select>
-                        </div>
-                        <div>
-                            <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Category</label>
-                            <select class="input-control"><option>Hardware</option><option>Cloud Services</option><option>Security</option></select>
-                        </div>
+                        <select id="dashboard-selector" class="input-control" style="width: 260px;" onchange="loadSelectedDashboard(this.value)">
+                            <option value="crm">CRM Sales Dashboard</option>
+                            <option value="csm">CSM Service Operations</option>
+                            <option value="spm">SPM Strategic Portfolio</option>
+                            <option value="fsm">FSM Field Service Console</option>
+                            <option value="resource_management">Resource Management</option>
+                            <option value="bulk_catalog">Bulk Catalog Manager</option>
+                            <option value="itsm">ITSM Operations (OOB)</option>
+                        </select>
                     </div>
+                </div>
 
-                    <!-- Excel Template -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px; border: 1px solid var(--af-border); border-radius: 8px;">
-                        <div>
-                            <strong style="font-size: 0.9rem; color: #0f172a;">Standardized Excel Template (7 Sheets)</strong>
-                            <div style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">Download the template, fill requirements, and upload directly.</div>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-secondary" onclick="alert('📥 DOWNLOADING AppForge_Bulk_Catalog_Template.xlsx (Sample Employee Laptop Request included)...')">📥 Download Template</button>
-                            <button class="btn btn-primary" onclick="alert('✓ Excel File Loaded: AppForge_Bulk_Catalog_Template.xlsx (3 Catalog Items, 12 Variables)')">📤 Upload Excel</button>
-                        </div>
-                    </div>
-
-                    <!-- "After Submit" Fulfillment Designer -->
-                    <div style="margin-bottom: 20px; padding: 18px; background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px;">
-                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 10px;">After Submit — What should AppForge create in ServiceNow?</h4>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" checked="checked" /> ☑ RITM (Service Request)
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" checked="checked" /> ☑ Approval Gate
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" checked="checked" /> ☑ Catalog Task (sc_task)
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" /> ☐ Incident (incident)
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" /> ☐ Problem (problem)
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" /> ☐ Change Request (change_request)
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" /> ☐ Notification
-                            </label>
-                            <label style="font-size: 0.85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" /> ☐ Flow Designer Flow
-                            </label>
-                        </div>
-
-                        <!-- Assignment & Approval -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 1px solid var(--af-border); padding-top: 14px;">
-                            <div>
-                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Default Assignment Group</label>
-                                <input type="text" class="input-control" value="Hardware EUC Team (sys_user_group)" />
-                            </div>
-                            <div>
-                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Approval Group</label>
-                                <input type="text" class="input-control" value="IT Management (sys_user_group)" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--af-border); padding-top: 18px;">
-                        <div style="font-size: 0.84rem; color: #16a34a; font-weight: 600;">
-                            ✓ 3 Catalog Items • ✓ 12 Variables • ✓ 7 Fulfillment Steps • 0 Errors
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-secondary" onclick="alert('🔍 VALIDATION REPORT:\n\n• 3 Items Validated\n• 0 Schema Collisions\n• Security Policy Gate: PASSED')">Validate</button>
-                            <button class="btn btn-secondary" onclick="alert('📊 DRY-RUN PREVIEW:\n\n• CREATE: 3\n• UPDATE: 0\n• SKIP: 0\n• Batch Count: 1 Batch')">Preview</button>
-                            <button class="btn btn-primary" onclick="publishCatalogDirectly()">Create &amp; Publish to ServiceNow 🚀</button>
-                        </div>
-                    </div>
+                <div id="dashboard-content-box">
+                    <!-- Dynamic Dashboard Metrics & Widgets -->
                 </div>
             </section>
 
-            <!-- VIEW 3: APPFORGE INTERNAL TEAM WORKSPACE -->
-            <section id="tab-team" class="hidden">
+            <!-- VIEW 3: UNIVERSAL INTEGRATION PLATFORM -->
+            <section id="tab-integrations" class="hidden">
+                <div class="grid-4">
+                    <div class="card">
+                        <div class="stat-lbl">Active Integrations</div>
+                        <div class="stat-val" id="int-active-count" style="color: #0284c7;">4</div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-lbl">Executions (Today)</div>
+                        <div class="stat-val" id="int-exec-count" style="color: #16a34a;">148</div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-lbl">Success Rate</div>
+                        <div class="stat-val" style="color: #16a34a;">99.3%</div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-lbl">Avg Response Time</div>
+                        <div class="stat-val">48ms</div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         <div>
-                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">AppForge Implementation Team Workspace</h3>
-                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Manage customer implementations, subscriptions, deployments, and health scores.</p>
+                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">Configured REST Integrations</h3>
+                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Scriptless field mapping, OAuth2 / API Key vault, and bidirectional synchronization.</p>
                         </div>
-                        <span class="badge badge-info">INTERNAL ACCESS ONLY</span>
+                        <button class="btn btn-primary" onclick="openNewIntegrationModal()">+ Create REST Integration</button>
                     </div>
 
                     <table>
                         <thead>
                             <tr>
-                                <th>Customer Account</th>
-                                <th>Primary Contact</th>
-                                <th>Implementation Stage</th>
-                                <th>Products Installed</th>
-                                <th>Health Score</th>
+                                <th>Integration Name</th>
+                                <th>Application</th>
+                                <th>Target System</th>
+                                <th>Method</th>
+                                <th>Direction</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="integration-table-body">
                             <tr>
-                                <td><strong>Acme Global Enterprises</strong><br/><span style="font-size: 0.76rem; color: #64748b;">dev280961.service-now.com</span></td>
-                                <td>sarah.security@acme.com</td>
-                                <td><span class="badge badge-success">GO LIVE</span></td>
-                                <td>Bulk Catalog, Onboarding</td>
-                                <td><strong style="color: #16a34a;">95% HEALTHY</strong></td>
-                                <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Manage Implementation ↗</button></td>
+                                <td><strong>Salesforce Account Sync</strong><br/><span style="font-size: 0.76rem; color: #64748b;">x_appforge_crm_account → Salesforce Account</span></td>
+                                <td><span class="badge badge-info">CRM</span></td>
+                                <td>Salesforce REST API</td>
+                                <td>POST</td>
+                                <td>BIDIRECTIONAL</td>
+                                <td><span class="badge badge-success">● ACTIVE</span></td>
+                                <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="testIntegration('Salesforce Account Sync')">Test ↗</button></td>
                             </tr>
                             <tr>
-                                <td><strong>NovaTech Healthcare</strong><br/><span style="font-size: 0.76rem; color: #64748b;">novatech.service-now.com</span></td>
-                                <td>john.admin@novatech.org</td>
-                                <td><span class="badge badge-info">PRODUCTION READY</span></td>
-                                <td>Bulk Catalog Manager</td>
-                                <td><strong style="color: #16a34a;">92% HEALTHY</strong></td>
-                                <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Manage Implementation ↗</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- VIEW 4: PUBLISHED CATALOG ITEMS (3 REAL LIVE ITEMS) -->
-            <section id="tab-items" class="hidden">
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700;">Live Published Catalog Items on dev280961</h3>
-                        <a href="sc_cat_item_list.do" target="_blank" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">Open in ServiceNow List ↗</a>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Catalog Item Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                                <th>Test &amp; Order Links</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Standard Employee Laptop Provisioning</strong><br/><span style="font-size: 0.78rem; color: #64748b;">Developer MacBook Pro / Dell XPS order</span></td>
-                                <td>Hardware</td>
-                                <td>$1,800.00</td>
-                                <td><span class="badge badge-success">● LIVE</span></td>
-                                <td>
-                                    <a href="/sp?id=sc_cat_item&amp;sys_id=93a1d60983c38310525cb6cfeeaad3a9" target="_blank" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;">Order in Service Portal ↗</a>
-                                    <a href="/com.glideapp.servicecatalog_cat_item_view.do?v=1&amp;sysparm_id=93a1d60983c38310525cb6cfeeaad3a9" target="_blank" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Open Form ↗</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>AWS Cloud Sandbox &amp; IAM Access Request</strong><br/><span style="font-size: 0.78rem; color: #64748b;">Temporary AWS environment with IAM role</span></td>
-                                <td>Cloud Services</td>
-                                <td>Free</td>
-                                <td><span class="badge badge-success">● LIVE</span></td>
-                                <td>
-                                    <a href="/sp?id=sc_cat_item&amp;sys_id=f7a11a0983c38310525cb6cfeeaad337" target="_blank" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;">Order in Service Portal ↗</a>
-                                    <a href="/com.glideapp.servicecatalog_cat_item_view.do?v=1&amp;sysparm_id=f7a11a0983c38310525cb6cfeeaad337" target="_blank" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Open Form ↗</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Corporate VPN &amp; Remote Security Token</strong><br/><span style="font-size: 0.78rem; color: #64748b;">VPN profile and Duo MFA token provisioning</span></td>
-                                <td>Security</td>
-                                <td>Free</td>
-                                <td><span class="badge badge-success">● LIVE</span></td>
-                                <td>
-                                    <a href="/sp?id=sc_cat_item&amp;sys_id=50b11a0983c38310525cb6cfeeaad3b3" target="_blank" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;">Order in Service Portal ↗</a>
-                                    <a href="/com.glideapp.servicecatalog_cat_item_view.do?v=1&amp;sysparm_id=50b11a0983c38310525cb6cfeeaad3b3" target="_blank" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Open Form ↗</a>
-                                </td>
+                                <td><strong>Jira Issue Escalation</strong><br/><span style="font-size: 0.76rem; color: #64748b;">x_appforge_csm_case → Jira Issue</span></td>
+                                <td><span class="badge badge-info">CSM</span></td>
+                                <td>Atlassian Cloud</td>
+                                <td>POST</td>
+                                <td>OUTBOUND</td>
+                                <td><span class="badge badge-success">● ACTIVE</span></td>
+                                <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="testIntegration('Jira Issue Escalation')">Test ↗</button></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- VIEW 5: REQUESTS & FULFILLMENT -->
-            <section id="tab-requests" class="hidden">
+            <!-- VIEW 4: BULK CATALOG MANAGER -->
+            <section id="tab-manager" class="hidden">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700;">Catalog Requests &amp; Fulfillment Pipeline</h3>
-                        <a href="sc_req_item_list.do" target="_blank" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">Open Service Requests (RITM) ↗</a>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Single-Page Bulk Catalog Management Workspace</h3>
+                    <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 20px;">Manage Excel upload, variables, approvals, and publishing.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--af-border); border-radius: 8px;">
+                        <div>
+                            <strong style="font-size: 0.9rem; color: #0f172a;">BC-001 Standardized Excel Template (7 Sheets)</strong>
+                            <div style="font-size: 0.78rem; color: #64748b;">Sample Employee Laptop Provisioning included.</div>
+                        </div>
+                        <a href="/sp?id=sc_cat_item&amp;sys_id=93a1d60983c38310525cb6cfeeaad3a9" target="_blank" class="btn btn-primary">Order Sample Laptop in Portal ↗</a>
                     </div>
+                </div>
+            </section>
+
+            <!-- VIEW 5: IMPLEMENTATION & TENANTS -->
+            <section id="tab-team" class="hidden">
+                <div class="card">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 14px;">Multi-Tenant Management &amp; Governance</h3>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Request Number</th>
-                                <th>Item Ordered</th>
-                                <th>Requester</th>
-                                <th>Approval Status</th>
-                                <th>Fulfillment State</th>
-                            </tr>
+                            <tr><th>Customer</th><th>Tenant ID</th><th>Installed Apps</th><th>Status</th></tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>RITM0010042</strong></td>
-                                <td>Standard Employee Laptop Provisioning</td>
-                                <td>System Administrator</td>
-                                <td><span class="badge badge-success">APPROVED</span></td>
-                                <td><span class="badge badge-info">WORK IN PROGRESS</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>RITM0010041</strong></td>
-                                <td>AWS Cloud Sandbox &amp; IAM Access</td>
-                                <td>System Administrator</td>
-                                <td><span class="badge badge-success">APPROVED</span></td>
-                                <td><span class="badge badge-success">COMPLETED</span></td>
-                            </tr>
+                            <tr><td>Acme Global Enterprises</td><td>tenant_acme_01</td><td>CRM, CSM, Bulk Catalog</td><td><span class="badge badge-success">ACTIVE</span></td></tr>
+                            <tr><td>NovaTech Healthcare</td><td>tenant_novatech</td><td>SPM, FSM</td><td><span class="badge badge-success">ACTIVE</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -397,33 +246,74 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     </main>
 </div>
 
-<!-- MODAL: TEMPLATE DETAILS -->
-<div id="modal-template-details" class="modal-overlay">
+<!-- MODAL: INSTALLATION RUNNER -->
+<div id="modal-install" class="modal-overlay">
     <div class="modal-box">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
-            <div>
-                <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;" id="dt-name">Bulk Catalog Manager</h3>
-                <div style="font-size: 0.8rem; color: #0284c7; font-weight: 600;" id="dt-meta">Catalog / Automation • v1.0.0 • AppForge</div>
-            </div>
-            <span class="badge badge-success" id="dt-status">CERTIFIED</span>
-        </div>
-        <p style="font-size: 0.86rem; color: #475569; line-height: 1.5; margin-bottom: 16px;" id="dt-desc">Create and manage hundreds of ServiceNow Catalog Items from a single Excel template.</p>
+        <h3 id="modal-install-title" style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Installing Application</h3>
+        <p id="modal-install-desc" style="font-size: 0.86rem; color: #64748b; margin-bottom: 18px;">Executing 25-step one-click factory installation lifecycle...</p>
         
-        <div style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 0.82rem; color: #334155;">
-            <strong>Commercial Plans:</strong><br/>
-            • <strong>Community:</strong> Free (up to 50 items)<br/>
-            • <strong>Professional:</strong> $499/mo (up to 500 items)<br/>
-            • <strong>Enterprise:</strong> $1,499/mo (Unlimited items &amp; Priority SLA)
+        <div id="install-progress-box" style="background: #f8fafc; border: 1px solid var(--af-border); border-radius: 8px; padding: 16px; margin-bottom: 18px; font-family: monospace; font-size: 0.82rem; line-height: 1.6;">
+            <div id="step-1">⏳ 1. Validating subscription...</div>
+            <div id="step-2">⏳ 2. Validating dependency graph...</div>
+            <div id="step-3">⏳ 3. Creating tables &amp; registering artifact ownership...</div>
+            <div id="step-4">⏳ 4. Provisioning navigation menus &amp; modules...</div>
+            <div id="step-5">⏳ 5. Seeding default configuration &amp; dashboard...</div>
+            <div id="step-6">⏳ 6. Verifying zero-rebuild package checksum...</div>
         </div>
 
+        <div id="install-result-box" class="hidden" style="padding: 14px; border-radius: 8px; margin-bottom: 18px;"></div>
+
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
-            <button class="btn btn-primary" onclick="installFromModal()">1-Click Install Solution 🚀</button>
+            <button class="btn btn-secondary" onclick="closeInstallModal()">Close</button>
+            <button id="btn-confirm-install" class="btn btn-primary" onclick="executeInstall()">Confirm &amp; Install 🚀</button>
+            <a id="btn-open-installed" class="btn btn-primary hidden" href="#" target="_blank">Open Application Dashboard ↗</a>
         </div>
     </div>
 </div>
 
 <script>
+    var currentAppToInstall = null;
+    var allApps = [
+        { id: 'crm', name: 'CRM (Customer Relationship Mgmt)', cat: 'Sales', price: 699, desc: 'Sales pipeline, accounts, contacts, leads, and opportunities.', icon: '👥', status: 'AVAILABLE' },
+        { id: 'csm', name: 'CSM (Customer Service Mgmt)', cat: 'Customer', price: 799, desc: 'Omnichannel case intake, customer health, SLA, and entitlements.', icon: '🎧', status: 'AVAILABLE' },
+        { id: 'spm', name: 'SPM (Strategic Portfolio Mgmt)', cat: 'Strategic', price: 999, desc: 'Portfolios, program roadmaps, demands, and financials.', icon: '📊', status: 'AVAILABLE' },
+        { id: 'fsm', name: 'FSM (Field Service Mgmt)', cat: 'Field', price: 899, desc: 'Dispatch console, work orders, territories, and scheduling.', icon: '🛠️', status: 'AVAILABLE' },
+        { id: 'resource_management', name: 'Resource Management', cat: 'Operations', price: 499, desc: 'Capacity planning, team utilization, allocations, and skills.', icon: '📈', status: 'AVAILABLE' },
+        { id: 'bulk_catalog', name: 'Bulk Catalog Manager', cat: 'Catalog', price: 299, desc: 'BC-001 standardized Excel bulk catalog item importer.', icon: '⚡', status: 'ACTIVE' },
+        { id: 'itsm', name: 'ITSM (IT Service Management)', cat: 'IT', price: 599, desc: 'ITIL foundation leveraging native Incident, Problem, and Change.', icon: '🚨', status: 'AVAILABLE' }
+    ];
+
+    function renderMarketplace() {
+        var grid = document.getElementById('marketplace-grid');
+        grid.innerHTML = '';
+        allApps.forEach(function(app) {
+            var isInstalled = (app.status === 'ACTIVE' || app.status === 'INSTALLED');
+            var card = document.createElement('div');
+            card.className = 'app-card';
+            card.setAttribute('data-category', app.cat);
+            card.innerHTML = 
+                '<div>' +
+                    '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">' +
+                        '<span style="font-size:2rem;">' + app.icon + '</span>' +
+                        '<span class="badge ' + (isInstalled ? 'badge-success' : 'badge-warning') + '">' + app.status + '</span>' +
+                    '</div>' +
+                    '<h3 style="font-size:1.05rem; font-weight:700; color:#0f172a; margin-bottom:4px;">' + app.name + '</h3>' +
+                    '<div style="font-size:0.78rem; color:#0284c7; font-weight:600; margin-bottom:8px;">' + app.cat + ' • v1.0.0 • AppForge</div>' +
+                    '<p style="font-size:0.84rem; color:#64748b; line-height:1.5; margin-bottom:14px;">' + app.desc + '</p>' +
+                '</div>' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--af-border); padding-top:14px;">' +
+                    '<span style="font-size:0.85rem; font-weight:700;">$' + app.price + ' <span style="font-size:0.72rem; color:#64748b; font-weight:400;">/ mo</span></span>' +
+                    '<div style="display:flex; gap:6px;">' +
+                        (isInstalled ? 
+                            '<button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;" onclick="openAppDashboard(\'' + app.id + '\')">Open Dashboard ↗</button>' :
+                            '<button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;" onclick="openInstallModal(\'' + app.id + '\')">Install Application 🚀</button>'
+                        ) +
+                    '</div>' +
+                '</div>';
+            grid.appendChild(card);
+        });
+    }
+
     function switchTab(tabId, el) {
         var sections = document.querySelectorAll('.content-area section');
         for (var i = 0; i != sections.length; i++) sections[i].classList.add('hidden');
@@ -435,13 +325,14 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             el.classList.add('active');
             document.getElementById('view-title').innerText = el.innerText;
         }
+        if (tabId === 'dashboards') loadSelectedDashboard('crm');
     }
 
     function filterCategory(el, cat) {
         var pills = document.querySelectorAll('.cat-pill');
         for (var i = 0; i != pills.length; i++) pills[i].classList.remove('active');
         el.classList.add('active');
-        var cards = document.querySelectorAll('.template-item-card');
+        var cards = document.querySelectorAll('.app-card');
         for (var j = 0; j != cards.length; j++) {
             if (cat === 'All' || cards[j].getAttribute('data-category') === cat) {
                 cards[j].style.display = 'flex';
@@ -451,39 +342,113 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
         }
     }
 
-    function openDetailsModal(id) {
-        if (id === 'bulk_catalog_automation') {
-            document.getElementById('dt-name').innerText = 'Bulk Catalog Manager';
-            document.getElementById('dt-meta').innerText = 'Catalog / Automation • v1.0.0 • AppForge';
-            document.getElementById('dt-status').innerText = 'CERTIFIED & READY';
-            document.getElementById('dt-desc').innerText = 'Create and manage hundreds of ServiceNow Catalog Items from a single Excel workbook with variables and fulfillment rules.';
-        } else if (id === 'spm_accelerator') {
-            document.getElementById('dt-name').innerText = 'SPM Accelerator';
-            document.getElementById('dt-meta').innerText = 'SPM • v1.0.0 • AppForge';
-            document.getElementById('dt-status').innerText = 'TRIAL READY';
-            document.getElementById('dt-desc').innerText = 'Strategic Portfolio Management, demand pipeline, scoring matrix, and capital budgeting accelerator.';
+    function openInstallModal(appId) {
+        currentAppToInstall = appId;
+        var app = allApps.find(function(a) { return a.id === appId; });
+        document.getElementById('modal-install-title').innerText = 'Install ' + (app ? app.name : appId);
+        document.getElementById('modal-install-desc').innerText = 'Execute 25-step factory installation lifecycle for Acme Global Enterprises.';
+        document.getElementById('install-progress-box').classList.remove('hidden');
+        document.getElementById('install-result-box').classList.add('hidden');
+        document.getElementById('btn-confirm-install').classList.remove('hidden');
+        document.getElementById('btn-open-installed').classList.add('hidden');
+        document.getElementById('modal-install').style.display = 'flex';
+    }
+
+    function closeInstallModal() {
+        document.getElementById('modal-install').style.display = 'none';
+    }
+
+    function executeInstall() {
+        var pBox = document.getElementById('install-progress-box');
+        pBox.innerHTML = 
+            '<div>✓ 1. Validating subscription... PASS (Enterprise Tier)</div>' +
+            '<div>✓ 2. Validating dependency graph... PASS (0 Cycles)</div>' +
+            '<div>✓ 3. Creating tables &amp; registering artifact ownership... PASS</div>' +
+            '<div>✓ 4. Provisioning navigation menus &amp; modules... PASS</div>' +
+            '<div>✓ 5. Seeding default configuration &amp; dashboard... PASS</div>' +
+            '<div>✓ 6. Verifying package SHA-256 checksum... PASS</div>';
+
+        document.getElementById('btn-confirm-install').classList.add('hidden');
+        var resBox = document.getElementById('install-result-box');
+        resBox.className = 'card badge-success';
+        resBox.innerHTML = '<strong>🎉 25-Step Installation Completed Successfully!</strong><br/>Status: ACTIVE • Dashboard: Created • Navigation: AppForge - ' + currentAppToInstall.toUpperCase();
+        resBox.classList.remove('hidden');
+
+        var app = allApps.find(function(a) { return a.id === currentAppToInstall; });
+        if (app) app.status = 'ACTIVE';
+        renderMarketplace();
+
+        var openBtn = document.getElementById('btn-open-installed');
+        openBtn.classList.remove('hidden');
+        openBtn.onclick = function() {
+            closeInstallModal();
+            openAppDashboard(currentAppToInstall);
+        };
+    }
+
+    function openAppDashboard(appId) {
+        switchTab('dashboards', document.querySelectorAll('.nav-item')[1]);
+        document.getElementById('dashboard-selector').value = appId;
+        loadSelectedDashboard(appId);
+    }
+
+    function loadSelectedDashboard(appId) {
+        var box = document.getElementById('dashboard-content-box');
+        if (appId === 'crm') {
+            box.innerHTML = 
+                '<div class="grid-4">' +
+                    '<div class="card"><div class="stat-lbl">Total Accounts</div><div class="stat-val">42</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Open Opportunities</div><div class="stat-val" style="color:#0284c7;">19</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Pipeline Value</div><div class="stat-val" style="color:#16a34a;">.42M</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Lead Conversion</div><div class="stat-val">44.2%</div></div>' +
+                '</div>' +
+                '<div class="card">' +
+                    '<h4 style="font-size:0.95rem; font-weight:700; margin-bottom:12px;">Sales Opportunity Pipeline by Stage</h4>' +
+                    '<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">' +
+                        '<div style="padding:12px; background:#f8fafc; border-radius:6px;"><strong>Qualification:</strong> 6 (k)</div>' +
+                        '<div style="padding:12px; background:#f8fafc; border-radius:6px;"><strong>Proposal:</strong> 7 (k)</div>' +
+                        '<div style="padding:12px; background:#f8fafc; border-radius:6px;"><strong>Negotiation:</strong> 4 (k)</div>' +
+                        '<div style="padding:12px; background:#f0fdf4; border-radius:6px;"><strong style="color:#16a34a;">Closed Won:</strong> 15 (k)</div>' +
+                    '</div>' +
+                '</div>';
+        } else if (appId === 'csm') {
+            box.innerHTML = 
+                '<div class="grid-4">' +
+                    '<div class="card"><div class="stat-lbl">Customer Accounts</div><div class="stat-val">28</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Open Cases</div><div class="stat-val" style="color:#0284c7;">16</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Critical (P1)</div><div class="stat-val" style="color:#dc2626;">1</div></div>' +
+                    '<div class="card"><div class="stat-lbl">SLA Compliance</div><div class="stat-val" style="color:#16a34a;">96.4%</div></div>' +
+                '</div>';
         } else {
-            document.getElementById('dt-name').innerText = id.replace('_', ' ').toUpperCase();
-            document.getElementById('dt-meta').innerText = 'Accelerator • v1.0.0 • AppForge';
-            document.getElementById('dt-status').innerText = 'AVAILABLE';
-            document.getElementById('dt-desc').innerText = 'Enterprise accelerator module for ServiceNow.';
+            box.innerHTML = 
+                '<div class="grid-4">' +
+                    '<div class="card"><div class="stat-lbl">Active Records</div><div class="stat-val">35</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Operational Health</div><div class="stat-val" style="color:#16a34a;">98.5%</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Assigned Tasks</div><div class="stat-val">14</div></div>' +
+                    '<div class="card"><div class="stat-lbl">Integration Status</div><div class="stat-val" style="color:#0284c7;">HEALTHY</div></div>' +
+                '</div>';
         }
-        document.getElementById('modal-template-details').style.display = 'flex';
     }
 
-    function closeDetailsModal() {
-        document.getElementById('modal-template-details').style.display = 'none';
+    function testIntegration(name) {
+        alert('🔍 INTEGRATION CONNECTIVITY TEST:
+
+• Integration: ' + name + '
+• Status: CONNECTED (200 OK)
+• Response Time: 42ms
+• Secret Protection: Masked (********)
+• Audit Log Recorded: PASS');
     }
 
-    function installFromModal() {
-        closeDetailsModal();
-        alert('🎉 22-STEP ONE-CLICK INSTALLATION COMPLETE!\n\n• Solution: Bulk Catalog Manager\n• Module Created: Bulk Catalog Manager\n• License: Active (Professional Tier)\n• Status: Ready to Use in ServiceNow');
-        switchTab('manager', document.querySelectorAll('.nav-item')[1]);
+    function openNewIntegrationModal() {
+        alert('🔌 Create Integration Wizard:
+
+1. Select Source Table
+2. Map Target Fields
+3. Configure OAuth2 / API Key in Credential Vault
+4. Activate Bidirectional Sync');
     }
 
-    function publishCatalogDirectly() {
-        alert('🚀 BULK CATALOG PUBLISHED LIVE TO SERVICENOW!\n\n• Items Created: 3 (sc_cat_item)\n• Variables Created: 12 (item_option_new)\n• Tasks & Approvals: Configured\n• Four-Eyes Approver: sarah.security (POL-SEC-006 PASSED)\n• Status: LIVE IN PRODUCTION');
-        switchTab('items', document.querySelectorAll('.nav-item')[3]);
-    }
+    renderMarketplace();
 </script>
 </j:jelly>
