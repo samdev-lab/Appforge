@@ -153,18 +153,11 @@ AppForgeSchemaRegistry.prototype = {
         } catch (ex) {}
 
         for (var k in this._store) {
-            if (this._store.hasOwnProperty(k) && this._store[k] && this._store[k].schema_id && this._store[k].application) {
+            if (this._store.hasOwnProperty(k) && this._store[k] && this._store[k].sys_id) {
                 var sRec = this._store[k];
-                var uKey = sRec.schema_id + '_' + sRec.application;
-                if (!seen[uKey]) {
-                    var match = !applicationSysId ||
-                                sRec.application === applicationSysId ||
-                                (sRec.application && applicationSysId && (
-                                    sRec.application.indexOf(applicationSysId) !== -1 ||
-                                    applicationSysId.indexOf(sRec.application) !== -1
-                                ));
-                    if (match) {
-                        seen[uKey] = true;
+                if (!seen[sRec.sys_id]) {
+                    seen[sRec.sys_id] = true;
+                    if (!applicationSysId || sRec.application === applicationSysId) {
                         results.push(sRec);
                     }
                 }

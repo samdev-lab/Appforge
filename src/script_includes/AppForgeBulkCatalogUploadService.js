@@ -80,7 +80,12 @@ AppForgeBulkCatalogUploadService.prototype = {
 
         this._store.imports[record.sys_id] = record;
         gs.info(this.LOG_PREFIX + 'Created bulk upload record: ' + record.upload_name + ' with Action: ' + record.after_submit_action);
-        return { success: true, sys_id: record.sys_id, upload_record: record };
+        return { success: true, sys_id: record.sys_id, record: record, upload_record: record };
+    },
+
+    createBulkUploadRecord: function(data) {
+        'use strict';
+        return this.createUploadRecord(data);
     },
 
     /**
@@ -120,6 +125,24 @@ AppForgeBulkCatalogUploadService.prototype = {
             validated_items: upload.validated_items,
             created_catalog_items: createdItems,
             action_configured: upload.after_submit_action
+        };
+    },
+
+    /**
+     * Validates raw upload payload structure and safety constraints.
+     */
+    validateUploadPayload: function(payload) {
+        'use strict';
+        if (!payload || typeof payload !== 'object') {
+            return { valid: false, errors: ['Upload payload is mandatory and must be an object.'] };
+        }
+        var errors = [];
+        if (!payload.catalog_items || !Array.isArray(payload.catalog_items) || payload.catalog_items.length === 0) {
+            errors.push('Workbook must contain at least one catalog item in catalog_items sheet.');
+        }
+        return {
+            valid: errors.length === 0,
+            errors: errors
         };
     },
 

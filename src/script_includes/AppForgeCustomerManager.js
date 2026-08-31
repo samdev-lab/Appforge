@@ -36,8 +36,35 @@ AppForgeCustomerManager.prototype = {
 
     createCustomerAccount: function(data) {
         'use strict';
-        var res = this.createCustomer(data);
+        var payload = data || {};
+        if (!payload.account_name && payload.name) {
+            payload.account_name = payload.name;
+        }
+        var res = this.createCustomer(payload);
         return res.customer || res;
+    },
+
+    /**
+     * Installs product helper with flexible arguments.
+     */
+    installProduct: function(customerId, productId, licenseTier, tenantId) {
+        'use strict';
+        var pData = (typeof productId === 'object') ? productId : {
+            product_name: productId,
+            template_id: productId,
+            license_tier: licenseTier || 'Enterprise',
+            tenant_id: tenantId
+        };
+        // Auto-create customer if missing
+        var cust = this.getCustomer(customerId);
+        if (!cust) {
+            var cRes = this.createCustomer({
+                account_name: customerId,
+                tenant_id: tenantId || 'tenant_default'
+            });
+            customerId = cRes.sys_id;
+        }
+        return this.installCustomerProduct(customerId, pData);
     },
 
     /**

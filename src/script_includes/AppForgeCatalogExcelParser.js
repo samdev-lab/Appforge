@@ -46,7 +46,10 @@ AppForgeCatalogExcelParser.prototype = {
             variable_sets: this._parseSheet(raw.variable_sets || raw['Sheet 4 - Variable Sets'] || []),
             ui_policies: this._parseSheet(raw.ui_policies || raw['Sheet 5 - UI Policies'] || []),
             ui_policy_actions: this._parseSheet(raw.ui_policy_actions || raw['Sheet 6 - UI Policy Actions'] || []),
-            fulfillment: this._parseSheet(raw.fulfillment || raw['Sheet 7 - Fulfillment'] || [])
+            assignment: this._parseSheet(raw.assignment || raw['Sheet 5 - Assignment'] || []),
+            after_submit: this._parseSheet(raw.after_submit || raw['Sheet 6 - After Submit'] || raw.fulfillment || raw['Sheet 7 - Fulfillment'] || []),
+            fulfillment: this._parseSheet(raw.fulfillment || raw['Sheet 7 - Fulfillment'] || raw.after_submit || []),
+            attachments: this._parseSheet(raw.attachments || raw['Sheet 7 - Attachments'] || [])
         };
 
         // Normalize catalog items and link child relations

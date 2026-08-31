@@ -29,15 +29,29 @@ AppForgeExcelTemplateGenerator.prototype = {
         return {
             template_name: 'AppForge_Bulk_Catalog_Sample_Template',
             version: '1.0.0',
+            schema_version: 'BC-001',
+            release_compatibility: 'WashingtonDC',
+            sheets: [
+                'catalog_items',
+                'variables',
+                'choices',
+                'ui_policies',
+                'assignment',
+                'after_submit',
+                'attachments'
+            ],
             catalog_items: [
                 {
                     name: 'Developer Laptop Request',
                     short_description: 'High performance MacBook Pro / ThinkPad for engineering staff',
                     description: 'Standard development machine with 32GB RAM, 1TB SSD, and developer toolchain pre-installed.',
                     category: 'Hardware',
+                    catalog: 'Service Catalog',
                     active: true,
                     price: 2499.00,
+                    currency: 'USD',
                     delivery_time: '3 Days',
+                    fulfillment_type: 'Flow Designer',
                     owner: 'Hardware Asset Management',
                     assignment_group: 'Service Desk',
                     assigned_to: 'John Developer',
@@ -48,9 +62,12 @@ AppForgeExcelTemplateGenerator.prototype = {
                     short_description: 'Self-service AWS/Azure isolated sandbox for R&D projects',
                     description: 'Provision an ephemeral sandbox cloud tenant with budget capping and automated teardown after 30 days.',
                     category: 'Cloud Services',
+                    catalog: 'Technical Catalog',
                     active: true,
                     price: 150.00,
+                    currency: 'USD',
                     delivery_time: '1 Hour',
+                    fulfillment_type: 'Automated Orchestration',
                     owner: 'Cloud Operations Team',
                     assignment_group: 'Cloud Platform Engineering',
                     assigned_to: 'Cloud Auto-Provisioner',
@@ -61,9 +78,12 @@ AppForgeExcelTemplateGenerator.prototype = {
                     short_description: 'Request commercial software license (Figma, JetBrains, Copilot)',
                     description: 'Request enterprise seat for productivity software with manager approval.',
                     category: 'Software',
+                    catalog: 'Software Catalog',
                     active: true,
                     price: 49.00,
+                    currency: 'USD',
                     delivery_time: '1 Day',
+                    fulfillment_type: 'Approval & Provision',
                     owner: 'IT Procurement',
                     assignment_group: 'Software Asset Management',
                     assigned_to: 'License Manager',
@@ -118,46 +138,115 @@ AppForgeExcelTemplateGenerator.prototype = {
                     type: 'string',
                     mandatory: true,
                     default_value: 'CC-ENG-9042',
-                    help_text: 'Internal cost center for monthly chargeback.',
+                    help_text: 'Engineering budget code for monthly billing chargeback.',
                     order: 200
                 }
             ],
             choices: [
-                { variable_name: 'device_model', label: 'Apple MacBook Pro 16" (M3 Max, 36GB)', value: 'macbook_pro_16', order: 10 },
-                { variable_name: 'device_model', label: 'Apple MacBook Pro 14" (M3 Pro, 32GB)', value: 'macbook_pro_14', order: 20 },
-                { variable_name: 'device_model', label: 'Lenovo ThinkPad P1 Gen 6 (Linux Ubuntu)', value: 'thinkpad_p1_linux', order: 30 },
-                { variable_name: 'device_model', label: 'Dell Precision 5680 (Windows 11 Enterprise)', value: 'dell_precision_win', order: 40 },
-                { variable_name: 'ram_size', label: '32 GB Unified Memory', value: '32gb', order: 10 },
-                { variable_name: 'ram_size', label: '64 GB Unified Memory', value: '64gb', order: 20 },
-                { variable_name: 'cloud_provider', label: 'Amazon Web Services (AWS)', value: 'aws', order: 10 },
-                { variable_name: 'cloud_provider', label: 'Microsoft Azure', value: 'azure', order: 20 }
+                {
+                    variable_name: 'device_model',
+                    label: 'Apple MacBook Pro 16" (M3 Max / 64GB)',
+                    value: 'macbook_pro_16',
+                    order: 10
+                },
+                {
+                    variable_name: 'device_model',
+                    label: 'Lenovo ThinkPad P1 Gen 6 (i9 / 64GB / Ubuntu)',
+                    value: 'thinkpad_p1_ubuntu',
+                    order: 20
+                },
+                {
+                    variable_name: 'ram_size',
+                    label: '32 GB Unified Memory',
+                    value: '32gb',
+                    order: 10
+                },
+                {
+                    variable_name: 'ram_size',
+                    label: '64 GB Unified Memory (+ Director Approval)',
+                    value: '64gb',
+                    order: 20
+                },
+                {
+                    variable_name: 'cloud_provider',
+                    label: 'Amazon Web Services (AWS)',
+                    value: 'aws',
+                    order: 10
+                },
+                {
+                    variable_name: 'cloud_provider',
+                    label: 'Microsoft Azure',
+                    value: 'azure',
+                    order: 20
+                }
             ],
             variable_sets: [
                 {
-                    name: 'Standard Hardware Delivery Information',
-                    order: 500,
-                    variables: [
-                        { name: 'shipping_address', label: 'Shipping Address', type: 'multi_line_text', mandatory: true, order: 10 },
-                        { name: 'contact_phone', label: 'Contact Phone Number', type: 'string', mandatory: true, order: 20 }
-                    ]
+                    name: 'Standard Hardware Delivery Address',
+                    internal_name: 'std_hw_delivery_addr',
+                    catalog_items: ['Developer Laptop Request'],
+                    order: 500
                 }
             ],
             ui_policies: [
                 {
                     catalog_item: 'Developer Laptop Request',
-                    short_description: 'Show justification details when 64GB is selected',
-                    condition: 'ram_size=64gb',
-                    reverse_if_false: true,
+                    name: 'Require Justification for 64GB RAM',
+                    short_description: 'Require Justification for 64GB RAM',
+                    conditions: 'ram_size=64gb',
+                    active: true,
                     order: 100
                 }
             ],
             ui_policy_actions: [
                 {
-                    ui_policy: 'Show justification details when 64GB is selected',
+                    policy_name: 'Require Justification for 64GB RAM',
                     variable_name: 'business_justification',
-                    mandatory: 'true',
-                    visible: 'true',
-                    disabled: 'false'
+                    mandatory: true,
+                    visible: true,
+                    disabled: false
+                }
+            ],
+            assignment: [
+                {
+                    catalog_item: 'Developer Laptop Request',
+                    assignment_group: 'Service Desk',
+                    assigned_to: 'John Developer'
+                },
+                {
+                    catalog_item: 'Cloud Sandbox Environment',
+                    assignment_group: 'Cloud Platform Engineering',
+                    assigned_to: 'Cloud Auto-Provisioner'
+                }
+            ],
+            after_submit: [
+                {
+                    catalog_item: 'Developer Laptop Request',
+                    sequence: 10,
+                    action_type: 'Approval',
+                    approval_type: 'Manager',
+                    approval_group: 'Engineering Management',
+                    approval_user: '',
+                    priority: '2 - High',
+                    description: 'Direct Manager Approval required for developer hardware request'
+                },
+                {
+                    catalog_item: 'Developer Laptop Request',
+                    sequence: 20,
+                    action_type: 'Task',
+                    assignment_group: 'IT Asset Provisioning',
+                    assigned_to: '',
+                    priority: '3 - Moderate',
+                    description: 'Stage device image, tag asset barcode, and prepare courier delivery package'
+                },
+                {
+                    catalog_item: 'Cloud Sandbox Environment',
+                    sequence: 10,
+                    action_type: 'Flow',
+                    assignment_group: 'Cloud Platform Engineering',
+                    assigned_to: '',
+                    priority: '2 - High',
+                    description: 'Automated terraform execution for cloud sandbox creation'
                 }
             ],
             fulfillment: [
@@ -166,26 +255,19 @@ AppForgeExcelTemplateGenerator.prototype = {
                     sequence: 10,
                     action_type: 'APPROVAL',
                     approval_type: 'Manager',
-                    approval_group: '',
+                    approval_group: 'Engineering Management',
                     approval_user: '',
-                    condition: 'price > 1000',
-                    description: 'Manager approval required for developer hardware exceeding $1,000'
+                    priority: '2 - High',
+                    description: 'Direct Manager Approval required for developer hardware request'
                 },
                 {
                     catalog_item: 'Developer Laptop Request',
                     sequence: 20,
                     action_type: 'TASK',
-                    assignment_group: 'Service Desk',
+                    assignment_group: 'IT Asset Provisioning',
                     assigned_to: '',
                     priority: '3 - Moderate',
-                    description: 'Provision laptop hardware, image OS, and package for shipment'
-                },
-                {
-                    catalog_item: 'Developer Laptop Request',
-                    sequence: 30,
-                    action_type: 'NOTIFICATION',
-                    recipient: 'Requested For',
-                    description: 'Send shipping tracking number and setup instructions to employee'
+                    description: 'Stage device image, tag asset barcode, and prepare courier delivery package'
                 },
                 {
                     catalog_item: 'Cloud Sandbox Environment',
@@ -194,7 +276,7 @@ AppForgeExcelTemplateGenerator.prototype = {
                     approval_type: 'Group',
                     approval_group: 'Cloud Architecture Reviewers',
                     approval_user: '',
-                    condition: '',
+                    priority: '2 - High',
                     description: 'Cloud team architecture review'
                 },
                 {
@@ -205,9 +287,32 @@ AppForgeExcelTemplateGenerator.prototype = {
                     assigned_to: '',
                     priority: '2 - High',
                     description: 'Automated terraform execution for cloud sandbox creation'
+                },
+                {
+                    catalog_item: 'Enterprise Software License',
+                    sequence: 10,
+                    action_type: 'APPROVAL',
+                    approval_type: 'Manager',
+                    approval_group: 'Procurement',
+                    approval_user: '',
+                    priority: '3 - Moderate',
+                    description: 'Software license manager signoff'
+                }
+            ],
+            attachments: [
+                {
+                    catalog_item: 'Developer Laptop Request',
+                    image_name: 'macbook_hero.png',
+                    image_reference: 'sys_attachment_macbook',
+                    attachment_reference: 'spec_sheet.pdf'
                 }
             ]
         };
+    },
+
+    generateSampleTemplate: function() {
+        'use strict';
+        return this.generateSampleWorkbook();
     },
 
     generateBlankTemplate: function() {
@@ -224,14 +329,16 @@ AppForgeExcelTemplateGenerator.prototype = {
         return {
             template_name: 'AppForge_Bulk_Catalog_Blank_Template',
             version: '1.0.0',
+            schema_version: 'BC-001',
+            release_compatibility: 'WashingtonDC',
             sheets: [
                 'catalog_items',
                 'variables',
                 'choices',
-                'variable_sets',
                 'ui_policies',
-                'ui_policy_actions',
-                'fulfillment'
+                'assignment',
+                'after_submit',
+                'attachments'
             ],
             catalog_items: [],
             variables: [],
@@ -239,7 +346,10 @@ AppForgeExcelTemplateGenerator.prototype = {
             variable_sets: [],
             ui_policies: [],
             ui_policy_actions: [],
-            fulfillment: []
+            assignment: [],
+            after_submit: [],
+            fulfillment: [],
+            attachments: []
         };
     },
 

@@ -21,6 +21,18 @@ AppForgeInstalledApplicationRegistry.prototype = {
     /**
      * Registers an installed application record with native ServiceNow application and menu linkage.
      */
+    registerInstallation: function(params) {
+        'use strict';
+        var p = params || {};
+        if (!p.template_id && (p.capability_id || p.product_id)) {
+            p.template_id = p.capability_id || p.product_id;
+        }
+        if (!p.tenant_id && p.customer_id) {
+            p.tenant_id = 'tenant_' + p.customer_id;
+        }
+        return this.registerInstalledApp(p);
+    },
+
     registerInstalledApp: function(params) {
         'use strict';
         if (!params || !params.tenant_id || !params.template_id) {
@@ -101,6 +113,15 @@ AppForgeInstalledApplicationRegistry.prototype = {
         }
         if (id.indexOf('csm') !== -1) {
             return '/customer_account_list.do';
+        }
+        if (id.indexOf('crm') !== -1) {
+            return '/customer_account_list.do';
+        }
+        if (id.indexOf('fsm') !== -1) {
+            return '/wm_order_list.do';
+        }
+        if (id.indexOf('resource') !== -1) {
+            return '/resource_plan_list.do';
         }
         return '/sc_cat_item_list.do';
     },
