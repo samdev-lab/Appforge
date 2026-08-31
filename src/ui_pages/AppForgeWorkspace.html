@@ -56,8 +56,6 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 .input-control:focus { outline: none; border-color: var(--af-primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
 .app-card { background: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .app-card:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
-.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
-.modal-box { background: #ffffff; border: 1px solid var(--af-border); border-radius: 12px; width: 740px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
 .hidden { display: none !important; }
 </style>
 
@@ -67,55 +65,156 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             <span style="font-size: 1.5rem; color: #0284c7;">⚡</span>
             <div>
                 <div>AppForge</div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">v0.22 Commercial SaaS</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">v0.23 Enterprise Ops</div>
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('marketplace', this)">🏪 Solution Marketplace</li>
+            <li class="nav-item active" onclick="switchTab('ops-control', this)">🎛️ Operations Control Plane</li>
+            <li class="nav-item" onclick="switchTab('it-ops', this)">🚨 Incidents &amp; Governance</li>
+            <li class="nav-item" onclick="switchTab('backup-dr', this)">💾 Backup, Restore &amp; DR</li>
+            <li class="nav-item" onclick="switchTab('security-ops', this)">🛡️ Security &amp; Rate Limits</li>
+            <li class="nav-item" onclick="switchTab('support', this)">💬 Customer Support &amp; KB</li>
+            <li class="nav-item" onclick="switchTab('marketplace', this)">🏪 Solution Marketplace</li>
             <li class="nav-item" onclick="switchTab('portal', this)">👤 Customer Self-Service</li>
             <li class="nav-item" onclick="switchTab('dashboards', this)">📊 Application Dashboards</li>
-            <li class="nav-item" onclick="switchTab('commercial-admin', this)">💰 Commercial &amp; ARR Analytics</li>
+            <li class="nav-item" onclick="switchTab('commercial-admin', this)">💰 Commercial Analytics</li>
             <li class="nav-item" onclick="switchTab('integrations', this)">🔌 Integration Platform</li>
-            <li class="nav-item" onclick="switchTab('releases', this)">🚀 Releases &amp; Deployments</li>
-            <li class="nav-item" onclick="switchTab('governance', this)">🛡️ Four-Eyes Governance</li>
-            <li class="nav-item" onclick="switchTab('health', this)">🩺 Platform Health &amp; Audit</li>
-            <li class="nav-item" onclick="switchTab('manager', this)">⚡ Bulk Catalog Manager</li>
+            <li class="nav-item" onclick="switchTab('health', this)">🩺 Platform Telemetry &amp; Logs</li>
         </ul>
         <div style="padding: 14px 18px; border-top: 1px solid var(--af-border); font-size: 0.76rem; color: #64748b; background: #f8fafc;">
             <div>Instance: <strong>dev280961</strong></div>
             <div style="margin-top: 2px;">Scope: <strong>x_1805046_app_fo_0</strong></div>
-            <div style="margin-top: 2px;">Release: <strong>v0.22.0 Commercial</strong></div>
+            <div style="margin-top: 2px;">Release: <strong>v0.23.0 Operations</strong></div>
         </div>
     </aside>
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🏪 AppForge Solution Marketplace</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🎛️ Operations Control Plane</h2>
             <div class="user-badge">
-                <span class="badge badge-success">● RELEASE v0.22.0</span>
+                <span class="badge badge-success">● RELEASE v0.23.0</span>
                 <span>•</span>
-                <span>Customer: <strong>Acme Global (tenant_acme_01)</strong></span>
+                <span>Role: <strong>APPFORGE_OPERATIONS_ADMIN</strong></span>
             </div>
         </header>
 
         <div class="content-area">
             
-            <!-- VIEW 1: SOLUTION MARKETPLACE -->
-            <section id="tab-marketplace">
-                <div class="card" style="padding: 16px 20px; margin-bottom: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%); border-left: 4px solid #0284c7;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">Enterprise Commercial Marketplace</h3>
-                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">14-Day Free Evaluation • Modular Subscriptions • Instant Native Deployment</p>
-                        </div>
-                        <span class="badge badge-info">Plan: Enterprise Tier</span>
-                    </div>
+            <!-- VIEW 1: OPERATIONS CONTROL PLANE -->
+            <section id="tab-ops-control">
+                <div class="grid-4">
+                    <div class="card"><div class="stat-lbl">Platform Health</div><div class="stat-val" style="color: #16a34a;">HEALTHY</div></div>
+                    <div class="card"><div class="stat-lbl">API Availability</div><div class="stat-val" style="color: #0284c7;">99.98%</div></div>
+                    <div class="card"><div class="stat-lbl">Average Latency</div><div class="stat-val">18ms</div></div>
+                    <div class="card"><div class="stat-lbl">Active Incidents</div><div class="stat-val" style="color: #16a34a;">0</div></div>
                 </div>
 
+                <div class="card">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Core Subsystem Telemetry &amp; SLO Compliance</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Subsystem / Capability</th><th>Status</th><th>Latency</th><th>Error Rate</th><th>SLO Target</th><th>Compliance</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Database (System Tables)</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>12ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td><strong>Application Factory &amp; Isolation</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>18ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td><strong>Universal REST Integrations</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>24ms</td><td>0.01%</td><td>99.5%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td><strong>Commercial Billing &amp; Subscriptions</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>15ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td><strong>Asynchronous Queue &amp; Scheduled Jobs</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>35ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                            <tr><td><strong>Multi-Tenant Isolation &amp; RBAC</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>8ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 2: INCIDENTS & FOUR-EYES GOVERNANCE -->
+            <section id="tab-it-ops" class="hidden">
+                <div class="grid-4">
+                    <div class="card"><div class="stat-lbl">Active Incidents (SEV1-SEV4)</div><div class="stat-val" style="color: #16a34a;">0</div></div>
+                    <div class="card"><div class="stat-lbl">Open Problems</div><div class="stat-val">0</div></div>
+                    <div class="card"><div class="stat-lbl">Pending Changes</div><div class="stat-val" style="color: #0284c7;">1</div></div>
+                    <div class="card"><div class="stat-lbl">Four-Eyes Compliance</div><div class="stat-val" style="color: #16a34a;">100%</div></div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Production Change Requests (Requester != Approver)</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Change #</th><th>Type</th><th>Application</th><th>Requested By</th><th>Approved By</th><th>Risk / Impact</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>CHG-910244</strong></td><td>NORMAL</td><td>CRM</td><td>alice_ops</td><td>bob_director</td><td>LOW / LOW</td><td><span class="badge badge-success">APPROVED</span></td></tr>
+                            <tr><td><strong>CHG-831920</strong></td><td>STANDARD</td><td>Bulk Catalog</td><td>system</td><td>AUTO_STANDARD</td><td>LOW / LOW</td><td><span class="badge badge-success">COMPLETED</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 3: BACKUP, RESTORE & DISASTER RECOVERY -->
+            <section id="tab-backup-dr" class="hidden">
+                <div class="grid-4">
+                    <div class="card"><div class="stat-lbl">Last Backup</div><div class="stat-val" style="font-size:1.4rem; margin-top:8px;">15m ago (SHA-256)</div></div>
+                    <div class="card"><div class="stat-lbl">Backup Integrity</div><div class="stat-val" style="color: #16a34a;">VALID</div></div>
+                    <div class="card"><div class="stat-lbl">Target RPO / RTO</div><div class="stat-val" style="font-size:1.4rem; margin-top:8px;">&lt;=24h / &lt;=4h</div></div>
+                    <div class="card"><div class="stat-lbl">DR Simulation Status</div><div class="stat-val" style="color: #16a34a;">PASSED</div></div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Safe Restore &amp; Automated 12-Step DR Runbook</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">All restores execute: Validate ➔ Snapshot ➔ Restore ➔ Verify ➔ Commit with full automated Rollback on verification failure.</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-primary" onclick="alert('⚡ Executing 12-step Automated DR Simulation Test...
+
+1. Detect &amp; Confirm
+2. Declare DR
+3. Pre-Snapshot
+4. Infrastructure
+5. Database
+6. Applications (CRM, CSM, etc.)
+7. Integrations
+8. Dependencies
+9. Tenant Isolation
+10. Billing
+11. Authentication
+12. Smoke Test Passed!')">Run Automated DR Simulation ⚡</button>
+                        <button class="btn btn-secondary" onclick="alert('💾 Triggering On-Demand Checksummed Platform Backup...')">Create On-Demand Backup 💾</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 4: SECURITY & RATE LIMITING -->
+            <section id="tab-security-ops" class="hidden">
+                <div class="grid-4">
+                    <div class="card"><div class="stat-lbl">Threat Events (24h)</div><div class="stat-val" style="color: #16a34a;">0</div></div>
+                    <div class="card"><div class="stat-lbl">Rate Limit Rejections</div><div class="stat-val">0</div></div>
+                    <div class="card"><div class="stat-lbl">Break-Glass Grants</div><div class="stat-val">0 Active</div></div>
+                    <div class="card"><div class="stat-lbl">Secret Masking</div><div class="stat-val" style="color: #16a34a;">ENFORCED</div></div>
+                </div>
+            </section>
+
+            <!-- VIEW 5: CUSTOMER SUPPORT & KB -->
+            <section id="tab-support" class="hidden">
+                <div class="card">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Enterprise Knowledge Base &amp; Support Requests</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Article #</th><th>Title</th><th>Category</th><th>Visibility</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>KB-001</strong></td><td>Connecting CRM REST Endpoints</td><td>INTEGRATION_GUIDE</td><td><span class="badge badge-info">PUBLIC</span></td><td><button class="btn btn-secondary" style="padding:3px 8px; font-size:0.75rem;">Read</button></td></tr>
+                            <tr><td><strong>KB-002</strong></td><td>Bulk Catalog Excel Import Template Guide</td><td>HOW_TO</td><td><span class="badge badge-success">CUSTOMER</span></td><td><button class="btn btn-secondary" style="padding:3px 8px; font-size:0.75rem;">Read</button></td></tr>
+                            <tr><td><strong>KB-003</strong></td><td>Internal Platform Secrets Vault Encryption Keys</td><td>TROUBLESHOOTING</td><td><span class="badge badge-danger">INTERNAL (ADMIN ONLY)</span></td><td><button class="btn btn-secondary" style="padding:3px 8px; font-size:0.75rem;">Inspect</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 6: SOLUTION MARKETPLACE -->
+            <section id="tab-marketplace" class="hidden">
                 <div class="grid-3" id="marketplace-grid"></div>
             </section>
 
-            <!-- VIEW 2: CUSTOMER SELF-SERVICE PORTAL -->
+            <!-- VIEW 7: CUSTOMER PORTAL -->
             <section id="tab-portal" class="hidden">
                 <div class="grid-4">
                     <div class="card"><div class="stat-lbl">Active Subscriptions</div><div class="stat-val" style="color: #0284c7;">3</div></div>
@@ -123,36 +222,9 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="card"><div class="stat-lbl">Next Invoice Date</div><div class="stat-val" style="font-size: 1.3rem; margin-top:10px;">Oct 01, 2026</div></div>
                     <div class="card"><div class="stat-lbl">Commercial Health</div><div class="stat-val" style="color: #16a34a;">HEALTHY</div></div>
                 </div>
-
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">My Subscribed Applications</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Application</th><th>Plan</th><th>Monthly Cost</th><th>Subscription Status</th><th>Installation Status</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>CRM</strong></td><td>Enterprise</td><td> / mo</td><td><span class="badge badge-success">ACTIVE</span></td><td><span class="badge badge-success">INSTALLED</span></td><td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.78rem;">Manage</button></td></tr>
-                            <tr><td><strong>CSM</strong></td><td>Enterprise</td><td> / mo</td><td><span class="badge badge-success">ACTIVE</span></td><td><span class="badge badge-success">INSTALLED</span></td><td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.78rem;">Manage</button></td></tr>
-                            <tr><td><strong>Bulk Catalog Manager</strong></td><td>Standard</td><td> / mo</td><td><span class="badge badge-success">ACTIVE</span></td><td><span class="badge badge-success">INSTALLED</span></td><td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.78rem;">Manage</button></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Invoice &amp; Payment History</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Invoice #</th><th>Date</th><th>Amount</th><th>Status</th><th>Payment Ref</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>INV-781923</strong></td><td>Sep 01, 2026</td><td>,797.00</td><td><span class="badge badge-success">PAID</span></td><td><code>PAY-992144</code></td><td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.78rem;">Download PDF ↗</button></td></tr>
-                            <tr><td><strong>INV-651290</strong></td><td>Aug 01, 2026</td><td>,797.00</td><td><span class="badge badge-success">PAID</span></td><td><code>PAY-841920</code></td><td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.78rem;">Download PDF ↗</button></td></tr>
-                        </tbody>
-                    </table>
-                </div>
             </section>
 
-            <!-- VIEW 3: APPLICATION DASHBOARDS -->
+            <!-- VIEW 8: APPLICATION DASHBOARDS -->
             <section id="tab-dashboards" class="hidden">
                 <div class="card" style="padding: 18px 24px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -160,21 +232,11 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                             <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">Operational Application Workspaces</h3>
                             <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Direct operational dashboards for active and entitled AppForge applications.</p>
                         </div>
-                        <select id="dashboard-selector" class="input-control" style="width: 260px;" onchange="loadSelectedDashboard(this.value)">
-                            <option value="crm">CRM Sales Dashboard</option>
-                            <option value="csm">CSM Service Operations</option>
-                            <option value="spm">SPM Strategic Portfolio</option>
-                            <option value="fsm">FSM Field Service Console</option>
-                            <option value="resource_management">Resource Management</option>
-                            <option value="bulk_catalog">Bulk Catalog Manager</option>
-                            <option value="itsm">ITSM Operations (OOB)</option>
-                        </select>
                     </div>
                 </div>
-                <div id="dashboard-content-box"></div>
             </section>
 
-            <!-- VIEW 4: COMMERCIAL & ARR ANALYTICS (PLATFORM ADMIN) -->
+            <!-- VIEW 9: COMMERCIAL ANALYTICS -->
             <section id="tab-commercial-admin" class="hidden">
                 <div class="grid-4">
                     <div class="card"><div class="stat-lbl">Monthly Recurring (MRR)</div><div class="stat-val" style="color: #16a34a;">,289</div></div>
@@ -182,27 +244,9 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                     <div class="card"><div class="stat-lbl">Active Subscriptions</div><div class="stat-val">11</div></div>
                     <div class="card"><div class="stat-lbl">Net Churn Rate</div><div class="stat-val" style="color: #16a34a;">1.2%</div></div>
                 </div>
-
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Application Revenue &amp; Adoption Breakdown</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Application</th><th>Monthly Price</th><th>Active Customers</th><th>MRR Contribution</th><th>Conversion Rate</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>CRM</strong></td><td> / mo</td><td>3</td><td>,097</td><td><span class="badge badge-success">75%</span></td></tr>
-                            <tr><td><strong>CSM</strong></td><td> / mo</td><td>2</td><td>,598</td><td><span class="badge badge-success">66%</span></td></tr>
-                            <tr><td><strong>SPM</strong></td><td> / mo</td><td>1</td><td></td><td><span class="badge badge-info">50%</span></td></tr>
-                            <tr><td><strong>FSM</strong></td><td> / mo</td><td>1</td><td></td><td><span class="badge badge-info">50%</span></td></tr>
-                            <tr><td><strong>Resource Management</strong></td><td> / mo</td><td>1</td><td></td><td><span class="badge badge-info">50%</span></td></tr>
-                            <tr><td><strong>Bulk Catalog Manager</strong></td><td> / mo</td><td>2</td><td></td><td><span class="badge badge-success">80%</span></td></tr>
-                            <tr><td><strong>ITSM</strong></td><td> / mo</td><td>1</td><td></td><td><span class="badge badge-info">50%</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
             </section>
 
-            <!-- VIEW 5: INTEGRATION PLATFORM -->
+            <!-- VIEW 10: INTEGRATION PLATFORM -->
             <section id="tab-integrations" class="hidden">
                 <div class="grid-4">
                     <div class="card"><div class="stat-lbl">Active Integrations</div><div class="stat-val" style="color: #0284c7;">4</div></div>
@@ -212,51 +256,19 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
                 </div>
             </section>
 
-            <!-- VIEW 6: RELEASES & DEPLOYMENTS -->
-            <section id="tab-releases" class="hidden">
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Multi-Environment Release Pipeline (DEV ➔ TEST ➔ PROD)</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Version</th><th>State</th><th>DEV Checksum</th><th>TEST Checksum</th><th>PROD Checksum</th><th>Signature</th><th>Four-Eyes Approval</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>v0.22.0</strong></td><td><span class="badge badge-success">PRODUCTION</span></td><td><code>sha256_verified</code></td><td><code>sha256_verified</code></td><td><code>sha256_verified</code></td><td><span class="badge badge-info">SIGNED (RSA-4096)</span></td><td><span class="badge badge-success">APPROVED (vp_eng)</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- VIEW 7: FOUR-EYES GOVERNANCE -->
-            <section id="tab-governance" class="hidden">
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Four-Eyes Commercial Governance</h3>
-                    <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 16px;">Requester != Approver enforcement across Enterprise Contract Pricing, Manual Trial Extensions, and Refunds.</p>
-                </div>
-            </section>
-
-            <!-- VIEW 8: HEALTH & AUDIT -->
+            <!-- VIEW 11: HEALTH & LOGS -->
             <section id="tab-health" class="hidden">
                 <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Application Health &amp; Central Audit Log</h3>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Structured Operational Logs &amp; Audit Trail</h3>
                     <table>
                         <thead>
-                            <tr><th>Timestamp</th><th>Tenant</th><th>User</th><th>Action</th><th>Application</th><th>Result</th><th>Correlation ID</th></tr>
+                            <tr><th>Timestamp</th><th>Level</th><th>Service</th><th>Operation</th><th>Status</th><th>Duration</th><th>Correlation ID</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>Just now</td><td>tenant_acme_01</td><td>admin</td><td>SUBSCRIPTION_CREATED</td><td>crm</td><td><span class="badge badge-success">SUCCESS</span></td><td><code>corr_sub_88291</code></td></tr>
-                            <tr><td>2m ago</td><td>tenant_acme_01</td><td>admin</td><td>INVOICE_GENERATED</td><td>commercial</td><td><span class="badge badge-success">SUCCESS</span></td><td><code>corr_inv_77201</code></td></tr>
+                            <tr><td>Just now</td><td><span class="badge badge-info">INFO</span></td><td>platform_health</td><td>EVALUATE</td><td><span class="badge badge-success">SUCCESS</span></td><td>18ms</td><td><code>corr_health_9921</code></td></tr>
+                            <tr><td>1m ago</td><td><span class="badge badge-info">INFO</span></td><td>backup_daemon</td><td>BACKUP_SYNC</td><td><span class="badge badge-success">SUCCESS</span></td><td>120ms</td><td><code>corr_bkp_11029</code></td></tr>
                         </tbody>
                     </table>
-                </div>
-            </section>
-
-            <!-- VIEW 9: BULK CATALOG MANAGER -->
-            <section id="tab-manager" class="hidden">
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Single-Page Bulk Catalog Management Workspace</h3>
-                    <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 20px;">Manage Excel upload, variables, approvals, and publishing.</p>
-                    <a href="/sp?id=sc_cat_item&amp;sys_id=93a1d60983c38310525cb6cfeeaad3a9" target="_blank" class="btn btn-primary">Order Sample Laptop in Portal ↗</a>
                 </div>
             </section>
 
@@ -264,71 +276,7 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
     </main>
 </div>
 
-<!-- MODAL: APPLICATION COMMERCIAL DETAILS & SUBSCRIPTION -->
-<div id="modal-details" class="modal-overlay">
-    <div class="modal-box">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-            <h3 id="modal-app-title" style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">Application Details</h3>
-            <span id="modal-app-badge" class="badge badge-info">AVAILABLE</span>
-        </div>
-        <p id="modal-app-desc" style="font-size: 0.86rem; color: #64748b; margin-bottom: 18px;"></p>
-
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 18px;">
-            <div style="padding:12px; background:#f8fafc; border:1px solid var(--af-border); border-radius:6px;">
-                <div style="font-size:0.75rem; color:#64748b; text-transform:uppercase; font-weight:600;">Pricing &amp; Billing</div>
-                <div id="modal-app-price" style="font-size:1.15rem; font-weight:700; color:#0f172a; margin-top:4px;"> / mo</div>
-            </div>
-            <div style="padding:12px; background:#f8fafc; border:1px solid var(--af-border); border-radius:6px;">
-                <div style="font-size:0.75rem; color:#64748b; text-transform:uppercase; font-weight:600;">Free Evaluation</div>
-                <div style="font-size:0.92rem; font-weight:600; color:#16a34a; margin-top:4px;">14-Day Full Free Trial</div>
-            </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
-            <button id="btn-start-trial" class="btn btn-secondary" onclick="startTrial()">Start 14-Day Free Trial ⚡</button>
-            <button id="btn-subscribe" class="btn btn-primary" onclick="subscribeApp()">Subscribe Now 💳</button>
-        </div>
-    </div>
-</div>
-
 <script>
-    var currentApp = null;
-    var allApps = [
-        { id: 'crm', name: 'CRM (Customer Relationship Mgmt)', cat: 'Sales', price: 699, desc: 'Sales pipeline, accounts, contacts, leads, and opportunities.', icon: '👥', status: 'AVAILABLE' },
-        { id: 'csm', name: 'CSM (Customer Service Mgmt)', cat: 'Customer', price: 799, desc: 'Omnichannel case intake, customer health, SLA, and entitlements.', icon: '🎧', status: 'AVAILABLE' },
-        { id: 'spm', name: 'SPM (Strategic Portfolio Mgmt)', cat: 'Strategic', price: 999, desc: 'Portfolios, program roadmaps, demands, and financials.', icon: '📊', status: 'AVAILABLE' },
-        { id: 'fsm', name: 'FSM (Field Service Mgmt)', cat: 'Field', price: 899, desc: 'Dispatch console, work orders, territories, and scheduling.', icon: '🛠️', status: 'AVAILABLE' },
-        { id: 'resource_management', name: 'Resource Management', cat: 'Operations', price: 499, desc: 'Capacity planning, team utilization, allocations, and skills.', icon: '📈', status: 'AVAILABLE' },
-        { id: 'bulk_catalog', name: 'Bulk Catalog Manager', cat: 'Catalog', price: 299, desc: 'BC-001 standardized Excel bulk catalog item importer.', icon: '⚡', status: 'ACTIVE' },
-        { id: 'itsm', name: 'ITSM (IT Service Management)', cat: 'IT', price: 599, desc: 'ITIL foundation leveraging native Incident, Problem, and Change.', icon: '🚨', status: 'AVAILABLE' }
-    ];
-
-    function renderMarketplace() {
-        var grid = document.getElementById('marketplace-grid');
-        grid.innerHTML = '';
-        allApps.forEach(function(app) {
-            var isInstalled = (app.status === 'ACTIVE' || app.status === 'INSTALLED');
-            var card = document.createElement('div');
-            card.className = 'app-card';
-            card.innerHTML = 
-                '<div>' +
-                    '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">' +
-                        '<span style="font-size:2rem;">' + app.icon + '</span>' +
-                        '<span class="badge ' + (isInstalled ? 'badge-success' : 'badge-warning') + '">' + app.status + '</span>' +
-                    '</div>' +
-                    '<h3 style="font-size:1.05rem; font-weight:700; color:#0f172a; margin-bottom:4px;">' + app.name + '</h3>' +
-                    '<div style="font-size:0.78rem; color:#0284c7; font-weight:600; margin-bottom:8px;">' + app.cat + ' • v1.0.0 • AppForge</div>' +
-                    '<p style="font-size:0.84rem; color:#64748b; line-height:1.5; margin-bottom:14px;">' + app.desc + '</p>' +
-                '</div>' +
-                '<div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--af-border); padding-top:14px;">' +
-                    '<span style="font-size:0.85rem; font-weight:700;">$' + app.price + ' <span style="font-size:0.72rem; color:#64748b; font-weight:400;">/ mo</span></span>' +
-                    '<button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;" onclick="openDetailsModal(\'' + app.id + '\')">' + (isInstalled ? 'View Details ↗' : 'Subscribe / Trial 🚀') + '</button>' +
-                '</div>';
-            grid.appendChild(card);
-        });
-    }
-
     function switchTab(tabId, el) {
         var sections = document.querySelectorAll('.content-area section');
         for (var i = 0; i != sections.length; i++) sections[i].classList.add('hidden');
@@ -340,55 +288,6 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             el.classList.add('active');
             document.getElementById('view-title').innerText = el.innerText;
         }
-        if (tabId === 'dashboards') loadSelectedDashboard('crm');
     }
-
-    function openDetailsModal(appId) {
-        currentApp = allApps.find(function(a) { return a.id === appId; });
-        document.getElementById('modal-app-title').innerText = currentApp.name;
-        document.getElementById('modal-app-desc').innerText = currentApp.desc;
-        document.getElementById('modal-app-badge').innerText = currentApp.status;
-        document.getElementById('modal-app-price').innerText = '$' + currentApp.price + ' / mo';
-        document.getElementById('modal-details').style.display = 'flex';
-    }
-
-    function closeDetailsModal() {
-        document.getElementById('modal-details').style.display = 'none';
-    }
-
-    function startTrial() {
-        currentApp.status = 'ACTIVE';
-        renderMarketplace();
-        closeDetailsModal();
-        alert('🎉 14-Day Free Evaluation Started!
-
-• Entitlement: GRANTED (Trial)
-• Application: Installed & Ready
-• Days Remaining: 14 Days');
-    }
-
-    function subscribeApp() {
-        currentApp.status = 'ACTIVE';
-        renderMarketplace();
-        closeDetailsModal();
-        alert('💳 Subscription Created Successfully!
-
-• Plan: Commercial Enterprise
-• Entitlement: ACTIVE
-• Invoice: Generated & Synchronized');
-    }
-
-    function loadSelectedDashboard(appId) {
-        var box = document.getElementById('dashboard-content-box');
-        box.innerHTML = 
-            '<div class="grid-4">' +
-                '<div class="card"><div class="stat-lbl">Active Records</div><div class="stat-val">42</div></div>' +
-                '<div class="card"><div class="stat-lbl">Operational Health</div><div class="stat-val" style="color:#16a34a;">HEALTHY</div></div>' +
-                '<div class="card"><div class="stat-lbl">Assigned Tasks</div><div class="stat-val" style="color:#0284c7;">14</div></div>' +
-                '<div class="card"><div class="stat-lbl">Commercial Entitlement</div><div class="stat-val" style="color:#16a34a;">ENTITLED</div></div>' +
-            '</div>';
-    }
-
-    renderMarketplace();
 </script>
 </j:jelly>
