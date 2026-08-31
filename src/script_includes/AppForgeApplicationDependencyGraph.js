@@ -207,6 +207,16 @@ AppForgeApplicationDependencyGraph.prototype = {
      * @param {Array<string>} installedAppKeys
      * @return {Object} Validation result { valid: boolean, missing: Array, conflicts: Array }
      */
+    validateDependencies: function(customerId, appKey) {
+        var installed = [];
+        if (AppForgeCapabilityInstaller && AppForgeCapabilityInstaller._store && AppForgeCapabilityInstaller._store.installations) {
+            for (var k in AppForgeCapabilityInstaller._store.installations) {
+                var inst = AppForgeCapabilityInstaller._store.installations[k];
+                if (inst.customer_id === customerId && inst.status === 'INSTALLED') installed.push(inst.capability_id);
+            }
+        }
+        return this.validateInstall(appKey, installed);
+    },
     validateInstall: function(appKey, installedAppKeys) {
         'use strict';
         var key = appKey.toLowerCase().replace(/[\s-]+/g, '_');

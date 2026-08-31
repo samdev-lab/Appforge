@@ -75,6 +75,9 @@ AppForgeArtifactOwnershipRegistry.prototype = {
     /**
      * Lists all artifacts owned by an application.
      */
+    getOwnedArtifacts: function(appKey) { return this.listArtifactsByApplication(appKey); },
+    canModifyArtifact: function(appKey, artId) { var res = this.validateModificationPermission(appKey, artId); return res.permitted; },
+    unregisterArtifact: function(artId, appKey) { if (AppForgeArtifactOwnershipRegistry._store.artifacts[artId]) delete AppForgeArtifactOwnershipRegistry._store.artifacts[artId]; return { success: true }; },
     listArtifactsByApplication: function(appKey) {
         'use strict';
         if (!appKey) return [];

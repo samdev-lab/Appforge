@@ -611,6 +611,14 @@ AppForgeCapabilityInstaller.prototype = {
     /**
      * Approves and executes governed decommissioning without data loss.
      */
+    approveDecommission: function(requestId, approvedBy, notes) {
+        var req = this._store.decommission_requests[requestId];
+        if (!req) return { success: false, error: 'Decommission request not found.' };
+        if (req.requested_by === approvedBy) {
+            return { success: false, errorCode: 'FOUR_EYES_APPROVAL_REQUIRED', error: 'Four-Eyes violation: Approver cannot be the requester.' };
+        }
+        return this.executeDecommission(requestId, approvedBy);
+    },
     executeDecommission: function(requestId, approvedBy) {
         'use strict';
         var req = this._store.decommission_requests[requestId];

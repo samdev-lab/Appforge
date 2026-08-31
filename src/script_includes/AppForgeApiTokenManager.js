@@ -153,6 +153,7 @@ AppForgeApiTokenManager.prototype = {
             if (!t) return null;
             return {
                 token_id: t.token_id,
+                token_hash: t.token_hash,
                 token_name: t.token_name,
                 tenant_id: t.tenant_id,
                 owner: t.owner,
