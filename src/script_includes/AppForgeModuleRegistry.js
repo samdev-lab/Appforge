@@ -139,25 +139,33 @@ AppForgeModuleRegistry.prototype = {
     list: function(applicationSysId) {
         'use strict';
         var results = [];
+        var seen = {};
         try {
             var gr = new GlideRecordSecure(this.TABLE_NAME);
             if (applicationSysId) gr.addQuery('application', applicationSysId);
             gr.query();
             while (gr.next()) {
-                results.push(this._mapRecord(gr));
+                var rec = this._mapRecord(gr);
+                if (rec && rec.sys_id) {
+                    seen[rec.sys_id] = true;
+                    results.push(rec);
+                }
             }
         } catch (ex) {}
 
-        if (results.length === 0) {
-            var seen = {};
-            for (var k in this._store) {
-                if (this._store.hasOwnProperty(k) && this._store[k].sys_id) {
-                    var rec = this._store[k];
-                    if (!seen[rec.sys_id]) {
-                        seen[rec.sys_id] = true;
-                        if (!applicationSysId || rec.application === applicationSysId) {
-                            results.push(rec);
-                        }
+        for (var k in this._store) {
+            if (this._store.hasOwnProperty(k) && this._store[k] && this._store[k].sys_id) {
+                var mRec = this._store[k];
+                if (!seen[mRec.sys_id]) {
+                    var match = !applicationSysId ||
+                                mRec.application === applicationSysId ||
+                                (mRec.application && applicationSysId && (
+                                    mRec.application.indexOf(applicationSysId) !== -1 ||
+                                    applicationSysId.indexOf(mRec.application) !== -1
+                                ));
+                    if (match) {
+                        seen[mRec.sys_id] = true;
+                        results.push(mRec);
                     }
                 }
             }

@@ -30,6 +30,11 @@ AppForgeNativeNavigationEngine.prototype = {
      * @param {string} [tenantId] - Optional tenant identifier.
      * @return {Object} Registered application navigation bundle.
      */
+    createProductNavigation: function(productId, tenantId) {
+        'use strict';
+        return this.registerProductNavigation(productId, tenantId);
+    },
+
     registerProductNavigation: function(productId, tenantId) {
         'use strict';
         if (!productId) throw new Error('Product ID is required.');
@@ -97,6 +102,8 @@ AppForgeNativeNavigationEngine.prototype = {
 
         gs.info(this.LOG_PREFIX + 'Created Application Menu: ' + appRecord.title + ' with ' + registeredModules.length + ' modules.');
         return {
+            application_menu: appRecord.title,
+            module_count: registeredModules.length,
             application: appRecord,
             modules: registeredModules
         };

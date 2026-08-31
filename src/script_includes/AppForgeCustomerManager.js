@@ -34,6 +34,12 @@ AppForgeCustomerManager.prototype = {
         this._store = AppForgeCustomerManager._memoryStore;
     },
 
+    createCustomerAccount: function(data) {
+        'use strict';
+        var res = this.createCustomer(data);
+        return res.customer || res;
+    },
+
     /**
      * Creates or registers a new Customer Account.
      * @param {Object} data - Customer payload.

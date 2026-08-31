@@ -210,6 +210,11 @@ AppForgeExcelTemplateGenerator.prototype = {
         };
     },
 
+    generateBlankTemplate: function() {
+        'use strict';
+        return this.generateBlankWorkbook();
+    },
+
     /**
      * Generates a Blank Workbook structure with clean columns and empty row arrays.
      * @return {Object} Structured blank workbook object.
@@ -219,6 +224,15 @@ AppForgeExcelTemplateGenerator.prototype = {
         return {
             template_name: 'AppForge_Bulk_Catalog_Blank_Template',
             version: '1.0.0',
+            sheets: [
+                'catalog_items',
+                'variables',
+                'choices',
+                'variable_sets',
+                'ui_policies',
+                'ui_policy_actions',
+                'fulfillment'
+            ],
             catalog_items: [],
             variables: [],
             choices: [],
