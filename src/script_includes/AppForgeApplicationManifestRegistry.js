@@ -4,7 +4,8 @@
  * AppForge capabilities: CRM, CSM, SPM, FSM, Resource Management, Bulk Catalog, and ITSM.
  *
  * Manifest defines:
- *  - application metadata (name, scope, version, price, dependencies, plugins)
+ *  - application metadata (application_key, scope, version, price, dependencies, conflicts)
+ *  - explicit dependencies: { required: [], optional: [] }
  *  - tables (OOB reuse for ITSM, custom tables for others)
  *  - fields, references, choices
  *  - forms, form sections, list layouts
@@ -12,6 +13,7 @@
  *  - UI Policies, Client Scripts, Business Rules, Flows
  *  - Application Menus and Navigation Modules
  *  - Configuration schema
+ *  - Isolation & Lifecycle contracts
  */
 var AppForgeApplicationManifestRegistry = Class.create();
 AppForgeApplicationManifestRegistry.prototype = {
@@ -49,7 +51,7 @@ AppForgeApplicationManifestRegistry.prototype = {
     },
 
     /**
-     * Builds declarative manifests for all 7 independent capabilities.
+     * Builds declarative manifests for all 7 independent capabilities with strict isolation contracts.
      * @private
      */
     _buildManifestCatalog: function() {
@@ -57,6 +59,7 @@ AppForgeApplicationManifestRegistry.prototype = {
         return {
             'crm': {
                 id: 'crm',
+                application_key: 'crm',
                 name: 'Customer Relationship Management (CRM)',
                 short_description: 'Manage sales pipeline, accounts, contacts, leads, and opportunities.',
                 scope: 'x_appforge_crm',
@@ -65,8 +68,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'Sales & Customer Management',
-                dependencies: [],
-                required_plugins: [],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: []
+                },
+                conflicts: [],
                 is_oob_table_reuse: false,
                 tables: [
                     'x_appforge_crm_account',
@@ -100,11 +106,24 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_crm_config', link_type: 'FORM', order: 1000 }
                 ],
                 configuration_table: 'x_appforge_crm_config',
+                isolation: {
+                    tables: ['x_appforge_crm_account', 'x_appforge_crm_contact', 'x_appforge_crm_lead', 'x_appforge_crm_opportunity'],
+                    roles: ['x_appforge_crm_user', 'x_appforge_crm_admin'],
+                    menus: ['appforge_crm']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['Lead Scoring', 'Opportunity Pipeline', 'Activity Tracking', 'Quote Generation', 'Territory Management']
             },
 
             'csm': {
                 id: 'csm',
+                application_key: 'csm',
                 name: 'Customer Service Management (CSM)',
                 short_description: 'Case management, customer accounts, contacts, assets, and service contracts.',
                 scope: 'x_appforge_csm',
@@ -113,8 +132,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'Customer Operations',
-                dependencies: [],
-                required_plugins: [],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: ['crm']
+                },
+                conflicts: [],
                 is_oob_table_reuse: false,
                 tables: [
                     'x_appforge_csm_account',
@@ -144,11 +166,24 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_csm_config', link_type: 'FORM', order: 800 }
                 ],
                 configuration_table: 'x_appforge_csm_config',
+                isolation: {
+                    tables: ['x_appforge_csm_account', 'x_appforge_csm_contact', 'x_appforge_csm_case', 'x_appforge_csm_entitlement'],
+                    roles: ['x_appforge_csm_user', 'x_appforge_csm_admin'],
+                    menus: ['appforge_csm']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['Omnichannel Case Intake', 'Entitlement Verification', 'SLA Tracking', 'Customer Asset Linkage']
             },
 
             'spm': {
                 id: 'spm',
+                application_key: 'spm',
                 name: 'Strategic Portfolio Management (SPM)',
                 short_description: 'Portfolio governance, program roadmaps, project execution, demands, and financials.',
                 scope: 'x_appforge_spm',
@@ -157,8 +192,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'Strategic Execution',
-                dependencies: [],
-                required_plugins: [],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: ['resource_management']
+                },
+                conflicts: [],
                 is_oob_table_reuse: false,
                 tables: [
                     'x_appforge_spm_portfolio',
@@ -190,11 +228,24 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_spm_config', link_type: 'FORM', order: 1000 }
                 ],
                 configuration_table: 'x_appforge_spm_config',
+                isolation: {
+                    tables: ['x_appforge_spm_portfolio', 'x_appforge_spm_program', 'x_appforge_spm_project', 'x_appforge_spm_demand'],
+                    roles: ['x_appforge_spm_user', 'x_appforge_spm_admin'],
+                    menus: ['appforge_spm']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['Portfolio Investment Planning', 'Demand Scoring Matrix', 'Project Gantt Hierarchy', 'Financial Tracking']
             },
 
             'fsm': {
                 id: 'fsm',
+                application_key: 'fsm',
                 name: 'Field Service Management (FSM)',
                 short_description: 'Dispatch console, work orders, field technicians, territories, and skill-based scheduling.',
                 scope: 'x_appforge_fsm',
@@ -203,8 +254,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'Field Operations',
-                dependencies: [],
-                required_plugins: [],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: ['csm']
+                },
+                conflicts: [],
                 is_oob_table_reuse: false,
                 tables: [
                     'x_appforge_fsm_work_order',
@@ -234,11 +288,24 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_fsm_config', link_type: 'FORM', order: 900 }
                 ],
                 configuration_table: 'x_appforge_fsm_config',
+                isolation: {
+                    tables: ['x_appforge_fsm_work_order', 'x_appforge_fsm_work_order_task', 'x_appforge_fsm_dispatch'],
+                    roles: ['x_appforge_fsm_user', 'x_appforge_fsm_admin'],
+                    menus: ['appforge_fsm']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['Intelligent Dispatch Routing', 'Technician Skill Matching', 'Geofenced Territories', 'Work Order SLA']
             },
 
             'resource_management': {
                 id: 'resource_management',
+                application_key: 'resource_management',
                 name: 'Resource Management',
                 short_description: 'Capacity planning, team utilization, allocations, availability, and skills inventory.',
                 scope: 'x_appforge_rm',
@@ -247,8 +314,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'Operations',
-                dependencies: [],
-                required_plugins: [],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: ['spm']
+                },
+                conflicts: [],
                 is_oob_table_reuse: false,
                 tables: [
                     'x_appforge_rm_resource',
@@ -276,11 +346,24 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_rm_config', link_type: 'FORM', order: 800 }
                 ],
                 configuration_table: 'x_appforge_rm_config',
+                isolation: {
+                    tables: ['x_appforge_rm_resource', 'x_appforge_rm_resource_plan', 'x_appforge_rm_allocation'],
+                    roles: ['x_appforge_rm_user', 'x_appforge_rm_admin'],
+                    menus: ['appforge_resource_management']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['Capacity vs Demand Analysis', 'Hard & Soft Allocations', 'Skill Gap Heatmaps', 'Utilization Rates']
             },
 
             'bulk_catalog': {
                 id: 'bulk_catalog',
+                application_key: 'bulk_catalog',
                 name: 'Bulk Catalog Manager',
                 short_description: 'Template-driven (BC-001) bulk catalog item importer with dynamic variable and workflow creation.',
                 scope: 'x_appforge_catalog',
@@ -289,8 +372,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'Catalog & Automation',
-                dependencies: [],
-                required_plugins: [],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: ['itsm']
+                },
+                conflicts: [],
                 is_oob_table_reuse: false,
                 tables: [
                     'x_appforge_catalog_import',
@@ -315,11 +401,24 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_catalog_config', link_type: 'FORM', order: 600 }
                 ],
                 configuration_table: 'x_appforge_catalog_config',
+                isolation: {
+                    tables: ['x_appforge_catalog_import', 'x_appforge_catalog_template', 'x_appforge_catalog_history'],
+                    roles: ['x_appforge_catalog_user', 'x_appforge_catalog_admin'],
+                    menus: ['appforge_bulk_catalog']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['7-Sheet Excel Generator', 'BC-001 Validator', '10 After-Submit Action Handlers', 'Rollback Engine']
             },
 
             'itsm': {
                 id: 'itsm',
+                application_key: 'itsm',
                 name: 'IT Service Management (ITSM)',
                 short_description: 'ITIL foundation leveraging native ServiceNow OOB Incident, Problem, Change, and Request tables.',
                 scope: 'x_appforge_itsm',
@@ -328,8 +427,11 @@ AppForgeApplicationManifestRegistry.prototype = {
                 billing_model: 'Monthly Subscription',
                 edition: 'Enterprise',
                 category: 'IT Operations',
-                dependencies: [],
-                required_plugins: ['com.snc.itsm'],
+                dependencies: {
+                    required: ['appforge_core'],
+                    optional: []
+                },
+                conflicts: [],
                 is_oob_table_reuse: true,
                 tables: [
                     'incident',
@@ -356,6 +458,18 @@ AppForgeApplicationManifestRegistry.prototype = {
                     { title: 'Configuration', table_name: 'x_appforge_itsm_config', link_type: 'FORM', order: 700 }
                 ],
                 configuration_table: 'x_appforge_itsm_config',
+                isolation: {
+                    tables: ['incident', 'problem', 'change_request', 'sc_req_item'],
+                    roles: ['itil', 'x_appforge_itsm_admin'],
+                    menus: ['appforge_itsm']
+                },
+                lifecycle: {
+                    install: true,
+                    upgrade: true,
+                    rollback: true,
+                    suspend: true,
+                    uninstall: true
+                },
                 features: ['OOB Table Re-use', 'Priority Matrix', 'Change Risk Engine', 'Major Incident Triggering']
             }
         };
