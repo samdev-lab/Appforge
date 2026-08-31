@@ -29,13 +29,21 @@ AppForgeCustomerSupportService.prototype = {
     /**
      * Submits a customer support request.
      */
-    createSupportRequest: function(opts) {
+    createSupportRequest: function(a1, a2, a3, a4, a5, a6) {
         'use strict';
-        var o = opts || {};
+        var o = (typeof a1 === 'object' && a1 !== null) ? a1 : {
+            customer: a1,
+            application: a2,
+            category: a3,
+            priority: a4,
+            description: a5,
+            requester: a6
+        };
         var reqNumber = 'REQ-' + Math.floor(100000 + Math.random() * 900000);
         var req = {
             request_id: 'req_' + Date.now().toString(36),
             number: reqNumber,
+            request_number: reqNumber,
             customer: o.customer || 'cust_acme',
             requester: o.requester || 'customer_user',
             application: o.application || 'crm',
@@ -49,6 +57,8 @@ AppForgeCustomerSupportService.prototype = {
         };
 
         AppForgeCustomerSupportService._store.requests.push(req);
+        req.success = true;
+        req.request = req;
         return req;
     },
 
@@ -57,6 +67,11 @@ AppForgeCustomerSupportService.prototype = {
         return AppForgeCustomerSupportService._store.requests.filter(function(r) {
             return r.customer === customerId;
         });
+    },
+
+    getKnowledgeArticles: function(role) {
+        'use strict';
+        return this.listKnowledgeArticles(role);
     },
 
     /**

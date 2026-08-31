@@ -49,6 +49,7 @@ AppForgeSecurityOperationsService.prototype = {
             resolution: null
         };
 
+        eventRec.success = true;
         AppForgeSecurityOperationsService._store.security_events.push(eventRec);
         this.auditService.logEvent('SECURITY_EVENT_DETECTED', 'SECURITY', user || 'unknown', eventRec.correlation_id, 'CRITICAL', 'Security Event: ' + evNumber + ' [' + eventRec.event_type + ']');
         return eventRec;

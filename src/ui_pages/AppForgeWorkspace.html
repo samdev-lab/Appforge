@@ -52,10 +52,10 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
 .btn-secondary { background-color: #ffffff; color: var(--af-text); border-color: var(--af-border); }
 .btn-secondary:hover { background-color: #f1f5f9; border-color: var(--af-border-hover); }
 .btn-danger { background-color: var(--af-danger); color: #ffffff; }
-.input-control { width: 100%; padding: 10px 12px; background: #ffffff; border: 1px solid var(--af-border); color: #0f172a; border-radius: 6px; font-size: 0.88rem; }
-.input-control:focus { outline: none; border-color: var(--af-primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
-.app-card { background: #ffffff; border: 1px solid var(--af-border); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.app-card:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+.progress-bar-wrap { width: 100%; background: #e2e8f0; border-radius: 8px; height: 12px; overflow: hidden; margin: 12px 0 20px 0; }
+.progress-bar-fill { background: linear-gradient(90deg, #0284c7, #16a34a); height: 100%; width: 80%; transition: width 0.3s; }
+.checklist-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid var(--af-border); border-radius: 8px; margin-bottom: 8px; background: #ffffff; }
+.checklist-item.done { background: #f0fdf4; border-color: #bbf7d0; }
 .hidden { display: none !important; }
 </style>
 
@@ -65,211 +65,134 @@ th { color: var(--af-text-muted); font-weight: 600; text-transform: uppercase; f
             <span style="font-size: 1.5rem; color: #0284c7;">⚡</span>
             <div>
                 <div>AppForge</div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">v0.23 Enterprise Ops</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">v0.24 Customer Pilot</div>
             </div>
         </div>
         <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('ops-control', this)">🎛️ Operations Control Plane</li>
-            <li class="nav-item" onclick="switchTab('it-ops', this)">🚨 Incidents &amp; Governance</li>
-            <li class="nav-item" onclick="switchTab('backup-dr', this)">💾 Backup, Restore &amp; DR</li>
-            <li class="nav-item" onclick="switchTab('security-ops', this)">🛡️ Security &amp; Rate Limits</li>
-            <li class="nav-item" onclick="switchTab('support', this)">💬 Customer Support &amp; KB</li>
+            <li class="nav-item active" onclick="switchTab('onboarding-wizard', this)">🚀 Guided Onboarding</li>
+            <li class="nav-item" onclick="switchTab('user-mgmt', this)">👥 User &amp; App Access</li>
+            <li class="nav-item" onclick="switchTab('setup-hub', this)">⚙️ Application Setup</li>
+            <li class="nav-item" onclick="switchTab('adoption-score', this)">📈 Customer Adoption &amp; TTV</li>
             <li class="nav-item" onclick="switchTab('marketplace', this)">🏪 Solution Marketplace</li>
-            <li class="nav-item" onclick="switchTab('portal', this)">👤 Customer Self-Service</li>
             <li class="nav-item" onclick="switchTab('dashboards', this)">📊 Application Dashboards</li>
-            <li class="nav-item" onclick="switchTab('commercial-admin', this)">💰 Commercial Analytics</li>
-            <li class="nav-item" onclick="switchTab('integrations', this)">🔌 Integration Platform</li>
-            <li class="nav-item" onclick="switchTab('health', this)">🩺 Platform Telemetry &amp; Logs</li>
+            <li class="nav-item" onclick="switchTab('portal', this)">👤 Customer Self-Service</li>
+            <li class="nav-item" onclick="switchTab('ops-control', this)">🎛️ Operations Control Plane</li>
+            <li class="nav-item" onclick="switchTab('support', this)">💬 Support &amp; Knowledge</li>
         </ul>
         <div style="padding: 14px 18px; border-top: 1px solid var(--af-border); font-size: 0.76rem; color: #64748b; background: #f8fafc;">
             <div>Instance: <strong>dev280961</strong></div>
             <div style="margin-top: 2px;">Scope: <strong>x_1805046_app_fo_0</strong></div>
-            <div style="margin-top: 2px;">Release: <strong>v0.23.0 Operations</strong></div>
+            <div style="margin-top: 2px;">Release: <strong>v0.24.0 Customer Pilot</strong></div>
         </div>
     </aside>
 
     <main id="main">
         <header>
-            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🎛️ Operations Control Plane</h2>
+            <h2 id="view-title" style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">🚀 Guided Onboarding</h2>
             <div class="user-badge">
-                <span class="badge badge-success">● RELEASE v0.23.0</span>
+                <span class="badge badge-success">● PILOT READY</span>
                 <span>•</span>
-                <span>Role: <strong>APPFORGE_OPERATIONS_ADMIN</strong></span>
+                <span>Tenant: <strong>Acme Global Enterprises</strong></span>
             </div>
         </header>
 
         <div class="content-area">
             
-            <!-- VIEW 1: OPERATIONS CONTROL PLANE -->
-            <section id="tab-ops-control">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Platform Health</div><div class="stat-val" style="color: #16a34a;">HEALTHY</div></div>
-                    <div class="card"><div class="stat-lbl">API Availability</div><div class="stat-val" style="color: #0284c7;">99.98%</div></div>
-                    <div class="card"><div class="stat-lbl">Average Latency</div><div class="stat-val">18ms</div></div>
-                    <div class="card"><div class="stat-lbl">Active Incidents</div><div class="stat-val" style="color: #16a34a;">0</div></div>
-                </div>
-
+            <!-- VIEW 1: GUIDED ONBOARDING WIZARD -->
+            <section id="tab-onboarding-wizard">
                 <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Core Subsystem Telemetry &amp; SLO Compliance</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Subsystem / Capability</th><th>Status</th><th>Latency</th><th>Error Rate</th><th>SLO Target</th><th>Compliance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>Database (System Tables)</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>12ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td><strong>Application Factory &amp; Isolation</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>18ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td><strong>Universal REST Integrations</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>24ms</td><td>0.01%</td><td>99.5%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td><strong>Commercial Billing &amp; Subscriptions</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>15ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td><strong>Asynchronous Queue &amp; Scheduled Jobs</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>35ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                            <tr><td><strong>Multi-Tenant Isolation &amp; RBAC</strong></td><td><span class="badge badge-success">HEALTHY</span></td><td>8ms</td><td>0.00%</td><td>99.9%</td><td><span class="badge badge-success">COMPLIANT</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- VIEW 2: INCIDENTS & FOUR-EYES GOVERNANCE -->
-            <section id="tab-it-ops" class="hidden">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Active Incidents (SEV1-SEV4)</div><div class="stat-val" style="color: #16a34a;">0</div></div>
-                    <div class="card"><div class="stat-lbl">Open Problems</div><div class="stat-val">0</div></div>
-                    <div class="card"><div class="stat-lbl">Pending Changes</div><div class="stat-val" style="color: #0284c7;">1</div></div>
-                    <div class="card"><div class="stat-lbl">Four-Eyes Compliance</div><div class="stat-val" style="color: #16a34a;">100%</div></div>
-                </div>
-
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Production Change Requests (Requester != Approver)</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Change #</th><th>Type</th><th>Application</th><th>Requested By</th><th>Approved By</th><th>Risk / Impact</th><th>Status</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>CHG-910244</strong></td><td>NORMAL</td><td>CRM</td><td>alice_ops</td><td>bob_director</td><td>LOW / LOW</td><td><span class="badge badge-success">APPROVED</span></td></tr>
-                            <tr><td><strong>CHG-831920</strong></td><td>STANDARD</td><td>Bulk Catalog</td><td>system</td><td>AUTO_STANDARD</td><td>LOW / LOW</td><td><span class="badge badge-success">COMPLETED</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- VIEW 3: BACKUP, RESTORE & DISASTER RECOVERY -->
-            <section id="tab-backup-dr" class="hidden">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Last Backup</div><div class="stat-val" style="font-size:1.4rem; margin-top:8px;">15m ago (SHA-256)</div></div>
-                    <div class="card"><div class="stat-lbl">Backup Integrity</div><div class="stat-val" style="color: #16a34a;">VALID</div></div>
-                    <div class="card"><div class="stat-lbl">Target RPO / RTO</div><div class="stat-val" style="font-size:1.4rem; margin-top:8px;">&lt;=24h / &lt;=4h</div></div>
-                    <div class="card"><div class="stat-lbl">DR Simulation Status</div><div class="stat-val" style="color: #16a34a;">PASSED</div></div>
-                </div>
-
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Safe Restore &amp; Automated 12-Step DR Runbook</h3>
-                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">All restores execute: Validate ➔ Snapshot ➔ Restore ➔ Verify ➔ Commit with full automated Rollback on verification failure.</p>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-primary" onclick="alert('⚡ Executing 12-step Automated DR Simulation Test...
-
-1. Detect &amp; Confirm
-2. Declare DR
-3. Pre-Snapshot
-4. Infrastructure
-5. Database
-6. Applications (CRM, CSM, etc.)
-7. Integrations
-8. Dependencies
-9. Tenant Isolation
-10. Billing
-11. Authentication
-12. Smoke Test Passed!')">Run Automated DR Simulation ⚡</button>
-                        <button class="btn btn-secondary" onclick="alert('💾 Triggering On-Demand Checksummed Platform Backup...')">Create On-Demand Backup 💾</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- VIEW 4: SECURITY & RATE LIMITING -->
-            <section id="tab-security-ops" class="hidden">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Threat Events (24h)</div><div class="stat-val" style="color: #16a34a;">0</div></div>
-                    <div class="card"><div class="stat-lbl">Rate Limit Rejections</div><div class="stat-val">0</div></div>
-                    <div class="card"><div class="stat-lbl">Break-Glass Grants</div><div class="stat-val">0 Active</div></div>
-                    <div class="card"><div class="stat-lbl">Secret Masking</div><div class="stat-val" style="color: #16a34a;">ENFORCED</div></div>
-                </div>
-            </section>
-
-            <!-- VIEW 5: CUSTOMER SUPPORT & KB -->
-            <section id="tab-support" class="hidden">
-                <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Enterprise Knowledge Base &amp; Support Requests</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Article #</th><th>Title</th><th>Category</th><th>Visibility</th><th>Action</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>KB-001</strong></td><td>Connecting CRM REST Endpoints</td><td>INTEGRATION_GUIDE</td><td><span class="badge badge-info">PUBLIC</span></td><td><button class="btn btn-secondary" style="padding:3px 8px; font-size:0.75rem;">Read</button></td></tr>
-                            <tr><td><strong>KB-002</strong></td><td>Bulk Catalog Excel Import Template Guide</td><td>HOW_TO</td><td><span class="badge badge-success">CUSTOMER</span></td><td><button class="btn btn-secondary" style="padding:3px 8px; font-size:0.75rem;">Read</button></td></tr>
-                            <tr><td><strong>KB-003</strong></td><td>Internal Platform Secrets Vault Encryption Keys</td><td>TROUBLESHOOTING</td><td><span class="badge badge-danger">INTERNAL (ADMIN ONLY)</span></td><td><button class="btn btn-secondary" style="padding:3px 8px; font-size:0.75rem;">Inspect</button></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- VIEW 6: SOLUTION MARKETPLACE -->
-            <section id="tab-marketplace" class="hidden">
-                <div class="grid-3" id="marketplace-grid"></div>
-            </section>
-
-            <!-- VIEW 7: CUSTOMER PORTAL -->
-            <section id="tab-portal" class="hidden">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Active Subscriptions</div><div class="stat-val" style="color: #0284c7;">3</div></div>
-                    <div class="card"><div class="stat-lbl">Monthly Spend</div><div class="stat-val" style="color: #0f172a;">,797</div></div>
-                    <div class="card"><div class="stat-lbl">Next Invoice Date</div><div class="stat-val" style="font-size: 1.3rem; margin-top:10px;">Oct 01, 2026</div></div>
-                    <div class="card"><div class="stat-lbl">Commercial Health</div><div class="stat-val" style="color: #16a34a;">HEALTHY</div></div>
-                </div>
-            </section>
-
-            <!-- VIEW 8: APPLICATION DASHBOARDS -->
-            <section id="tab-dashboards" class="hidden">
-                <div class="card" style="padding: 18px 24px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">Operational Application Workspaces</h3>
-                            <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Direct operational dashboards for active and entitled AppForge applications.</p>
+                            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">Your AppForge Setup Progress</h3>
+                            <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">Complete the checklist to validate your pilot workspace.</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 1.6rem; font-weight: 800; color: #16a34a;">80%</span>
+                            <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">SERVER VERIFIED</div>
                         </div>
                     </div>
+
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 80%;"></div></div>
+
+                    <div class="checklist-item done"><div><strong>✓ Create Organization &amp; Tenant</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">Acme Global (tenant_acme_01)</span></div><span class="badge badge-success">COMPLETED</span></div>
+                    <div class="checklist-item done"><div><strong>✓ Subscription / Trial Active</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">Enterprise Plan (3 Applications)</span></div><span class="badge badge-success">COMPLETED</span></div>
+                    <div class="checklist-item done"><div><strong>✓ Install Application (CRM)</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">Version 1.0.0 Verified</span></div><span class="badge badge-success">COMPLETED</span></div>
+                    <div class="checklist-item done"><div><strong>✓ Configure CRM Setup Wizard</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">5/5 Required Steps</span></div><span class="badge badge-success">COMPLETED</span></div>
+                    <div class="checklist-item done"><div><strong>✓ Invite Team Users</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">2 Users Assigned</span></div><span class="badge badge-success">COMPLETED</span></div>
+                    <div class="checklist-item"><div><strong>○ Execute First Business Workflow</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">Lead -> Opportunity -> Quote -> Won</span></div><button class="btn btn-primary" style="padding:4px 12px; font-size:0.78rem;" onclick="alert('⚡ Executing guided first workflow (Lead -> Opportunity -> Won)... Completed!')">Run Workflow ⚡</button></div>
+                    <div class="checklist-item"><div><strong>○ Configure Third-Party Integration</strong><span style="color:#64748b; font-size:0.8rem; margin-left:12px;">Optional REST Channel</span></div><button class="btn btn-secondary" style="padding:4px 12px; font-size:0.78rem;" onclick="alert('Skipping optional integration task.')">Skip</button></div>
                 </div>
             </section>
 
-            <!-- VIEW 9: COMMERCIAL ANALYTICS -->
-            <section id="tab-commercial-admin" class="hidden">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Monthly Recurring (MRR)</div><div class="stat-val" style="color: #16a34a;">,289</div></div>
-                    <div class="card"><div class="stat-lbl">Annual Recurring (ARR)</div><div class="stat-val" style="color: #0284c7;">,468</div></div>
-                    <div class="card"><div class="stat-lbl">Active Subscriptions</div><div class="stat-val">11</div></div>
-                    <div class="card"><div class="stat-lbl">Net Churn Rate</div><div class="stat-val" style="color: #16a34a;">1.2%</div></div>
-                </div>
-            </section>
-
-            <!-- VIEW 10: INTEGRATION PLATFORM -->
-            <section id="tab-integrations" class="hidden">
-                <div class="grid-4">
-                    <div class="card"><div class="stat-lbl">Active Integrations</div><div class="stat-val" style="color: #0284c7;">4</div></div>
-                    <div class="card"><div class="stat-lbl">Executions (Today)</div><div class="stat-val" style="color: #16a34a;">148</div></div>
-                    <div class="card"><div class="stat-lbl">Success Rate</div><div class="stat-val" style="color: #16a34a;">99.3%</div></div>
-                    <div class="card"><div class="stat-lbl">Avg Latency</div><div class="stat-val">48ms</div></div>
-                </div>
-            </section>
-
-            <!-- VIEW 11: HEALTH & LOGS -->
-            <section id="tab-health" class="hidden">
+            <!-- VIEW 2: USER & APP ACCESS MATRIX -->
+            <section id="tab-user-mgmt" class="hidden">
                 <div class="card">
-                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Structured Operational Logs &amp; Audit Trail</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <div>
+                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">Tenant User &amp; Application Access Matrix</h3>
+                            <p style="font-size: 0.82rem; color: #64748b;">Grant application-level permissions without touching platform security tables.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="alert('📧 Invite User dialog opened.')">+ Invite User</button>
+                    </div>
                     <table>
                         <thead>
-                            <tr><th>Timestamp</th><th>Level</th><th>Service</th><th>Operation</th><th>Status</th><th>Duration</th><th>Correlation ID</th></tr>
+                            <tr><th>User Email</th><th>Status</th><th>CRM</th><th>CSM</th><th>SPM</th><th>FSM</th><th>Resource Mgmt</th><th>Bulk Catalog</th><th>ITSM</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>Just now</td><td><span class="badge badge-info">INFO</span></td><td>platform_health</td><td>EVALUATE</td><td><span class="badge badge-success">SUCCESS</span></td><td>18ms</td><td><code>corr_health_9921</code></td></tr>
-                            <tr><td>1m ago</td><td><span class="badge badge-info">INFO</span></td><td>backup_daemon</td><td>BACKUP_SYNC</td><td><span class="badge badge-success">SUCCESS</span></td><td>120ms</td><td><code>corr_bkp_11029</code></td></tr>
+                            <tr><td><strong>john.doe@acme.com</strong></td><td><span class="badge badge-success">ACTIVE</span></td><td><span class="badge badge-info">User</span></td><td><span class="badge badge-info">User</span></td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td></tr>
+                            <tr><td><strong>sarah.connor@acme.com</strong></td><td><span class="badge badge-success">ACTIVE</span></td><td style="color:#cbd5e1;">—</td><td><span class="badge badge-success">Admin</span></td><td style="color:#cbd5e1;">—</td><td><span class="badge badge-success">Admin</span></td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td></tr>
+                            <tr><td><strong>david.kim@acme.com</strong></td><td><span class="badge badge-warning">PENDING</span></td><td><span class="badge badge-info">User</span></td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td><td style="color:#cbd5e1;">—</td></tr>
                         </tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- VIEW 3: SETUP HUB -->
+            <section id="tab-setup-hub" class="hidden">
+                <div class="grid-3">
+                    <div class="card"><h4 style="margin-bottom:8px;">CRM Setup Wizard</h4><p style="font-size:0.82rem; color:#64748b; margin-bottom:12px;">Sales stages, lead assignment, deal values.</p><span class="badge badge-success">READY (5/5 Steps)</span></div>
+                    <div class="card"><h4 style="margin-bottom:8px;">CSM Setup Wizard</h4><p style="font-size:0.82rem; color:#64748b; margin-bottom:12px;">Accounts, SLA targets, case routing.</p><span class="badge badge-success">READY (5/5 Steps)</span></div>
+                    <div class="card"><h4 style="margin-bottom:8px;">SPM Setup Wizard</h4><p style="font-size:0.82rem; color:#64748b; margin-bottom:12px;">Portfolios, strategic intake, project phases.</p><span class="badge badge-warning">IN_PROGRESS (3/5 Steps)</span></div>
+                </div>
+            </section>
+
+            <!-- VIEW 4: ADOPTION SCORE -->
+            <section id="tab-adoption-score" class="hidden">
+                <div class="grid-4">
+                    <div class="card"><div class="stat-lbl">Adoption Score</div><div class="stat-val" style="color: #16a34a;">88 / 100</div></div>
+                    <div class="card"><div class="stat-lbl">Adoption Tier</div><div class="stat-val" style="color: #16a34a;">HEALTHY</div></div>
+                    <div class="card"><div class="stat-lbl">Time to 1st Transaction</div><div class="stat-val">4m 12s</div></div>
+                    <div class="card"><div class="stat-lbl">Active Daily Users</div><div class="stat-val" style="color: #0284c7;">6</div></div>
+                </div>
+            </section>
+
+            <!-- VIEW 5: MARKETPLACE -->
+            <section id="tab-marketplace" class="hidden">
+                <div class="grid-3" id="marketplace-grid">
+                    <div class="card"><h4 style="margin-bottom:6px;">Customer Relationship Management (CRM)</h4><span class="badge badge-success">INSTALLED</span></div>
+                    <div class="card"><h4 style="margin-bottom:6px;">Customer Service Management (CSM)</h4><span class="badge badge-success">INSTALLED</span></div>
+                    <div class="card"><h4 style="margin-bottom:6px;">Field Service Management (FSM)</h4><span class="badge badge-info">TRIAL AVAILABLE</span></div>
+                </div>
+            </section>
+
+            <!-- VIEW 6: DASHBOARDS -->
+            <section id="tab-dashboards" class="hidden">
+                <div class="card"><h3 style="margin-bottom:12px;">Operational Dashboards</h3><p style="font-size:0.85rem; color:#64748b;">Contextual quick actions and empty state guidance active.</p></div>
+            </section>
+
+            <!-- VIEW 7: PORTAL -->
+            <section id="tab-portal" class="hidden">
+                <div class="card"><h3 style="margin-bottom:12px;">Customer Self-Service Portal</h3><p style="font-size:0.85rem; color:#64748b;">Manage invoices, subscriptions, and team access.</p></div>
+            </section>
+
+            <!-- VIEW 8: OPS CONTROL -->
+            <section id="tab-ops-control" class="hidden">
+                <div class="card"><h3 style="margin-bottom:12px;">Operations Control Plane</h3><p style="font-size:0.85rem; color:#64748b;">Real-time telemetry, SLO compliance, and health monitoring.</p></div>
+            </section>
+
+            <!-- VIEW 9: SUPPORT -->
+            <section id="tab-support" class="hidden">
+                <div class="card"><h3 style="margin-bottom:12px;">Customer Support &amp; Knowledge Base</h3><p style="font-size:0.85rem; color:#64748b;">Submit requests and browse role-gated knowledge articles.</p></div>
             </section>
 
         </div>
